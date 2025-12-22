@@ -33,10 +33,10 @@ function typeAssistantMessage(fullText: string) {
   }
 
   let i = 0
-  const speed = 14
+  const speed = 10
 
   typingIntervalRef.current = window.setInterval(() => {
-    i += 1
+    i += 2
 
     setMessages((prev) => {
       const next = [...prev]
