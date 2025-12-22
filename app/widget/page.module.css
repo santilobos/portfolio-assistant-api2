@@ -100,14 +100,32 @@
   color:#111111;
 }
 
-/* Quitar fondo oscuro de autofill / focus (Chrome, Safari) */
+/* 1) Reset general del input (Safari/Chrome) */
+.input{
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* 2) Quitar autofill/fondo interno oscuro (Chrome/Safari) */
 .input:-webkit-autofill,
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus,
-.input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px rgba(255,255,255,0.9) inset !important;
+.input:-webkit-autofill:active{
+  -webkit-box-shadow: 0 0 0 9999px rgba(255,255,255,0.9) inset !important;
+  box-shadow: 0 0 0 9999px rgba(255,255,255,0.9) inset !important;
   -webkit-text-fill-color: #111111 !important;
-  transition: background-color 9999s ease-in-out 0s;
+  caret-color: #111111;
+  transition: background-color 9999s ease-out 0s;
+}
+
+/* 3) Quitar highlight al hacer tap (iOS) */
+.input{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 4) Si el navegador mete focus outline raro, lo controlamos */
+.input:focus{
+  outline: none;
 }
 
 
