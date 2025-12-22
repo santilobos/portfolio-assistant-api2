@@ -7,6 +7,8 @@
   flex-direction:column;
   background:#F5F6F7;
   color:#111111;
+  color-scheme: light;
+  font-family: inherit;
 }
 
 /* Mensajes */
@@ -98,6 +100,8 @@
   font-size: 18px;
   outline:none;
   color:#111111;
+  font-family: inherit;
+  color-scheme: light;
 }
 
 /* 1) Reset general del input (Safari/Chrome) */
@@ -130,7 +134,9 @@
 
 
 .input::placeholder{
-  color: rgba(17,17,17,0.45);
+  font-family: inherit;
+  font-weight: 400;
+  color: rgba(17,17,17,0.35);
 }
 
 .sendBtn{
