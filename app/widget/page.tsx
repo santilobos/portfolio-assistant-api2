@@ -59,20 +59,23 @@ export default function Widget() {
   return (
     <div className={styles.app}>
       {/* Messages */}
-      <div ref={listRef} style={{ flex: 1, overflowY: "auto", padding: 18 }}>
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            style={{
-              marginBottom: 10,
-              opacity: m.role === "user" ? 0.75 : 1,
-              whiteSpace: "pre-wrap",
-              fontSize: 14,
-            }}
-          >
-            {m.content}
-          </div>
-        ))}
+      <div ref={listRef} className={styles.messages}>
+        {messages.map((m, i) => {
+  if (m.role === "user") {
+    return (
+      <div key={i} className={styles.userRow}>
+        <div className={styles.userBubble}>{m.content}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div key={i} className={styles.assistantRow}>
+      <div className={styles.assistantText}>{m.content}</div>
+    </div>
+  )
+})}
+
         {loading && <div style={{ opacity: 0.6 }}>Typing…</div>}
 
         {messages.length <= 2 && (
