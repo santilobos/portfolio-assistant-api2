@@ -28,7 +28,7 @@
 
 .assistantText{
   font-size: 1.7rem;
-  line-height: 1.2;
+  line-height: 1.6;
   font-weight: 500;
   color:#000000;
   max-width: 520px;
@@ -38,6 +38,7 @@
 .userRow{
   display:flex;
   justify-content:flex-end;
+   margin-bottom: 48px; 
 }
 
 .userBubble{

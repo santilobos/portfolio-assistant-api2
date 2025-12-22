@@ -141,9 +141,10 @@ React.useEffect(() => {
 
   return (
   <div key={i} className={styles.assistantRow}>
-    <div className={isFirstAssistant ? styles.assistantText : styles.assistantTextSmall}>
-      {m.content}
-    </div>
+    <div className={styles.assistantText}>
+  {m.content}
+</div>
+
 
     {/* Follow-up questions SOLO bajo la última respuesta */}
     {isLastAssistant && !loading && (
