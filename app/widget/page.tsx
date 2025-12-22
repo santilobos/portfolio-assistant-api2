@@ -105,12 +105,21 @@ React.useEffect(() => {
     "What was your role and impact?",
     "How do you approach design systems?",
   ]
-
+ 
+  const followUps = [
+  "What makes your design approach unique?",
+  "How do you approach product strategy?",
+  "What technologies do you use?"
+]
   return (
     <div className={`${styles.app} ${aeonik.className}`}>
       {/* Messages */}
       <div ref={listRef} className={styles.messages}>
   {messages.map((m, i) => {
+    const isFirstAssistant = i === 0
+    const isLastAssistant = m.role === "assistant" && i === messages.length - 1
+
+
   if (m.role === "user") {
     return (
       <div key={i} className={styles.userRow}>
@@ -118,8 +127,6 @@ React.useEffect(() => {
       </div>
     )
   }
-
-  const isFirstAssistant = i === 0
 
   // Si el mensaje assistant está vacío y estás cargando -> thinking…
   if (m.content === "" && loading) {
@@ -132,14 +139,29 @@ React.useEffect(() => {
     )
   }
 
-  // Assistant normal (primero grande, resto pequeño)
   return (
-    <div key={i} className={styles.assistantRow}>
-      <div className={isFirstAssistant ? styles.assistantText : styles.assistantTextSmall}>
-        {m.content}
-      </div>
+  <div key={i} className={styles.assistantRow}>
+    <div className={isFirstAssistant ? styles.assistantText : styles.assistantTextSmall}>
+      {m.content}
     </div>
-  )
+
+    {/* Follow-up questions SOLO bajo la última respuesta */}
+    {isLastAssistant && !loading && (
+      <div className={styles.followUps}>
+        {followUps.map((q) => (
+          <button
+            key={q}
+            onClick={() => send(q)}
+            className={styles.followUpBtn}
+          >
+            ↳ {q}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+)
+
 })}
 
 
