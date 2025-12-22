@@ -171,3 +171,38 @@
   gap: 14px;
   padding-bottom: 12px;  /* aire con el input */
 }
+
+
+/* --- Thinking shimmer --- */
+.thinkingRow{
+  padding: 8px 0 14px;
+}
+
+.thinking{
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(17,17,17,0.35);
+
+  /* shimmer magic */
+  background: linear-gradient(
+    90deg,
+    rgba(17,17,17,0.25) 0%,
+    rgba(17,17,17,0.55) 40%,
+    rgba(17,17,17,0.25) 80%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: shimmer 1.6s infinite linear;
+}
+
+@keyframes shimmer{
+  0%{
+    background-position: 200% 0;
+  }
+  100%{
+    background-position: -200% 0;
+  }
+}

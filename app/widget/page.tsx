@@ -24,37 +24,81 @@ export default function Widget() {
 
   const listRef = React.useRef<HTMLDivElement | null>(null)
 
+const typingIntervalRef = React.useRef<number | null>(null)
+
+function typeAssistantMessage(fullText: string) {
+  if (typingIntervalRef.current) {
+    window.clearInterval(typingIntervalRef.current)
+    typingIntervalRef.current = null
+  }
+
+  let i = 0
+  const speed = 14
+
+  typingIntervalRef.current = window.setInterval(() => {
+    i += 1
+
+    setMessages((prev) => {
+      const next = [...prev]
+      const last = next[next.length - 1]
+      if (last?.role === "assistant") {
+        next[next.length - 1] = { ...last, content: fullText.slice(0, i) }
+      }
+      return next
+    })
+
+    if (i >= fullText.length) {
+      if (typingIntervalRef.current) {
+        window.clearInterval(typingIntervalRef.current)
+        typingIntervalRef.current = null
+      }
+      setLoading(false)
+    }
+  }, speed)
+}
+
+React.useEffect(() => {
+  return () => {
+    if (typingIntervalRef.current) window.clearInterval(typingIntervalRef.current)
+  }
+}, [])
+
+
   React.useEffect(() => {
     if (!listRef.current) return
     listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages, loading])
 
   async function send(text?: string) {
-    const content = (text ?? input).trim()
-    if (!content || loading) return
+  const q = (text ?? input).trim()
+  if (!q || loading) return
 
-    const next: Msg[] = [...messages, { role: "user", content }]
-    setMessages(next)
-    setInput("")
-    setLoading(true)
+  setInput("")
+  setLoading(true)
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next }),
-      })
-      const data = await res.json()
-      setMessages([...next, { role: "assistant", content: data.reply ?? "…" }])
-    } catch {
-      setMessages([
-        ...next,
-        { role: "assistant", content: "Error connecting. Try again." },
-      ])
-    } finally {
-      setLoading(false)
-    }
+  // 1️⃣ mensaje del usuario
+  setMessages((prev) => [...prev, { role: "user", content: q }])
+
+  // 2️⃣ placeholder del assistant (VACÍO)
+  setMessages((prev) => [...prev, { role: "assistant", content: "" }])
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: q }),
+    })
+
+    const data = await res.json()
+    const answer = data.answer ?? data.text ?? data.reply ?? ""
+
+    // 3️⃣ escribir letra a letra
+    typeAssistantMessage(answer)
+  } catch (e) {
+    typeAssistantMessage("Sorry, something went wrong.")
   }
+}
+
 
   const quick = [
     "What projects have you worked on?",
@@ -67,23 +111,37 @@ export default function Widget() {
       {/* Messages */}
       <div ref={listRef} className={styles.messages}>
   {messages.map((m, i) => {
-    if (m.role === "user") {
-      return (
-        <div key={i} className={styles.userRow}>
-          <div className={styles.userBubble}>{m.content}</div>
-        </div>
-      )
-    }
+  if (m.role === "user") {
+    return (
+      <div key={i} className={styles.userRow}>
+        <div className={styles.userBubble}>{m.content}</div>
+      </div>
+    )
+  }
 
-    const isFirstAssistant = m.role === "assistant" && i === 0
+  const isFirstAssistant = i === 0
+
+  // Si el mensaje assistant está vacío y estás cargando -> thinking…
+  if (m.content === "" && loading) {
     return (
       <div key={i} className={styles.assistantRow}>
-        <div className={isFirstAssistant ? styles.assistantText : styles.assistantTextSmall}>
-          {m.content}
+        <div className={styles.thinkingRow}>
+          <span className={styles.thinking}>thinking…</span>
         </div>
       </div>
     )
-  })}
+  }
+
+  // Assistant normal (primero grande, resto pequeño)
+  return (
+    <div key={i} className={styles.assistantRow}>
+      <div className={isFirstAssistant ? styles.assistantText : styles.assistantTextSmall}>
+        {m.content}
+      </div>
+    </div>
+  )
+})}
+
 
   {/* 👇 Intro pegado abajo cuando aún no hay conversación */}
   {messages.length <= 1 && (
