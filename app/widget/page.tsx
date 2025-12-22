@@ -18,9 +18,7 @@ const aeonik = localFont({
 type Msg = { role: "user" | "assistant"; content: string }
 
 export default function Widget() {
-  const [messages, setMessages] = React.useState<Msg[]>([
-    { role: "assistant", content: "Hey, ask me anything!" },
-  ])
+  const [messages, setMessages] = React.useState<Msg[]>([])
   const [input, setInput] = React.useState("")
   const [loading, setLoading] = React.useState(false)
 
@@ -68,46 +66,43 @@ export default function Widget() {
     <div className={`${styles.app} ${aeonik.className}`}>
       {/* Messages */}
       <div ref={listRef} className={styles.messages}>
-        {messages.map((m, i) => {
-  if (m.role === "user") {
+  {messages.map((m, i) => {
+    if (m.role === "user") {
+      return (
+        <div key={i} className={styles.userRow}>
+          <div className={styles.userBubble}>{m.content}</div>
+        </div>
+      )
+    }
+
+    const isFirstAssistant = m.role === "assistant" && i === 0
     return (
-      <div key={i} className={styles.userRow}>
-        <div className={styles.userBubble}>{m.content}</div>
+      <div key={i} className={styles.assistantRow}>
+        <div className={isFirstAssistant ? styles.assistantText : styles.assistantTextSmall}>
+          {m.content}
+        </div>
       </div>
     )
-  }
+  })}
 
-  return (
-    <div key={i} className={styles.assistantRow}>
-      <div className={styles.assistantText}>{m.content}</div>
-    </div>
-  )
-})}
-
-        {loading && <div style={{ opacity: 0.6 }}>Typing…</div>}
-
-        {messages.length <= 2 && (
-          <div style={{ display: "grid", gap: 12, marginTop: 18 }}>
-            {quick.map((q) => (
-              <button
-                key={q}
-                onClick={() => send(q)}
-                style={{
-                  textAlign: "left",
-                  padding: "14px",
-                  borderRadius: 6,
-                  border: "1px solid rgba(0,0,0,0.15)",
-                  background: "#fff",
-                  fontSize: 14,
-                  cursor: "pointer",
-                }}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        )}
+  {/* 👇 Intro pegado abajo cuando aún no hay conversación */}
+  {messages.length <= 1 && (
+    <div className={styles.intro}>
+      <div className={styles.assistantRow}>
+        <div className={styles.assistantText}>Hey, what would you like to know?</div>
       </div>
+
+      <div className={styles.quickGrid}>
+        {quick.map((q) => (
+          <button key={q} onClick={() => send(q)} className={styles.quickBtn}>
+            {q}
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
 
       {/* Input */}
       <div style={{ padding: 14, borderTop: "1px solid rgba(0,0,0,0.12)" }}>

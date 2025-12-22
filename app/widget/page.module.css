@@ -100,6 +100,17 @@
   color:#111111;
 }
 
+/* Quitar fondo oscuro de autofill / focus (Chrome, Safari) */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(255,255,255,0.9) inset !important;
+  -webkit-text-fill-color: #111111 !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+
 .input::placeholder{
   color: rgba(17,17,17,0.45);
 }
@@ -126,4 +137,13 @@
 .sendBtnDisabled{
   opacity: .45;
   cursor: not-allowed;
+}
+
+/* Empuja el bloque de intro al fondo del área de mensajes */
+.intro{
+  margin-top: auto;      /* 👈 magia: empuja hacia abajo */
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 12px;  /* aire con el input */
 }
