@@ -4,6 +4,9 @@ export const dynamic = "force-dynamic"
 
 import * as React from "react"
 
+import styles from "./page.module.css"
+
+
 type Msg = { role: "user" | "assistant"; content: string }
 
 export default function Widget() {
@@ -54,7 +57,7 @@ export default function Widget() {
   ]
 
   return (
-    <div style={{ height: "100vh", background: "#F5F6F7", display: "flex", flexDirection: "column" }}>
+    <div className={styles.app}>
       {/* Messages */}
       <div ref={listRef} style={{ flex: 1, overflowY: "auto", padding: 18 }}>
         {messages.map((m, i) => (
