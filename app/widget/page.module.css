@@ -26,6 +26,15 @@
   padding: 8px 0 0;
 }
 
+.chatTitle {
+  font-size: 1.7rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+
 .assistantText{
   font-size: 1rem;
   line-height: 1.6;
@@ -206,4 +215,54 @@
   100%{
     background-position: -200% 0;
   }
+}
+
+
+.followUps {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* El botón ahora parece un link */
+.followUpBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  background: transparent;
+  border: none;
+  padding: 0;
+
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(17, 17, 17, 0.55);
+
+  cursor: pointer;
+  text-align: left;
+  width: fit-content;
+}
+
+.followUpBtn:hover {
+  color: rgba(17, 17, 17, 0.8);
+}
+
+.followUpBtn:active {
+  transform: translateY(1px);
+}
+
+.followUpBtn:focus-visible {
+  outline: 2px solid rgba(17, 17, 17, 0.18);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+/* Icono ↳ */
+.followUpIcon {
+  color: rgba(17, 17, 17, 0.35);
+  flex-shrink: 0;
 }

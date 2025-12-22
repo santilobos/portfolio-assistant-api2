@@ -151,12 +151,14 @@ React.useEffect(() => {
       <div className={styles.followUps}>
         {followUps.map((q) => (
           <button
-            key={q}
-            onClick={() => send(q)}
-            className={styles.followUpBtn}
-          >
-            ↳ {q}
-          </button>
+  key={q}
+  onClick={() => send(q)}
+  className={styles.followUpBtn}
+>
+  <span className={styles.followUpIcon}>↳</span>
+  <span>{q}</span>
+</button>
+
         ))}
       </div>
     )}
@@ -168,10 +170,13 @@ React.useEffect(() => {
 
   {/* 👇 Intro pegado abajo cuando aún no hay conversación */}
   {messages.length <= 1 && (
-    <div className={styles.intro}>
-      <div className={styles.assistantRow}>
-        <div className={styles.assistantText}>Hey, what would you like to know?</div>
+  <div className={styles.intro}>
+    <div className={styles.assistantRow}>
+      <div className={styles.chatTitle}>
+        Hey, what would you like to know?
       </div>
+    </div>
+
 
       <div className={styles.quickGrid}>
         {quick.map((q) => (
