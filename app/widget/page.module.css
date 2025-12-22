@@ -13,10 +13,10 @@
 .messages{
   flex:1;
   overflow-y:auto;
-  padding: 18px;
+  padding: 16px;
   display:flex;
   flex-direction:column;
-  gap: 14px;
+  gap: 16px;
 }
 
 /* Assistant (texto grande tipo hero) */
@@ -25,11 +25,10 @@
 }
 
 .assistantText{
-  font-size: 40px;
-  line-height: 1.05;
+  font-size: 1.7rem;
+  line-height: 1.2;
   font-weight: 500;
-  letter-spacing: -0.02em;
-  color:#111111;
+  color:#000000;
   max-width: 520px;
 }
 

@@ -19,7 +19,7 @@ type Msg = { role: "user" | "assistant"; content: string }
 
 export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([
-    { role: "assistant", content: "Hey, what would you like to know?" },
+    { role: "assistant", content: "Hey, ask me anything!" },
   ])
   const [input, setInput] = React.useState("")
   const [loading, setLoading] = React.useState(false)
