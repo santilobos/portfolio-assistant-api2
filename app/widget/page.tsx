@@ -6,6 +6,14 @@ import * as React from "react"
 
 import styles from "./page.module.css"
 
+import localFont from "next/font/local"
+
+const aeonik = localFont({
+  src: "../fonts/AeonikPro-Regular.woff",
+  weight: "400",
+  style: "normal",
+})
+
 
 type Msg = { role: "user" | "assistant"; content: string }
 
@@ -57,7 +65,7 @@ export default function Widget() {
   ]
 
   return (
-    <div className={styles.app}>
+    <div className={`${styles.app} ${aeonik.className}`}>
       {/* Messages */}
       <div ref={listRef} className={styles.messages}>
         {messages.map((m, i) => {

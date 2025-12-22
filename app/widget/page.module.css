@@ -7,8 +7,6 @@
   background:
     radial-gradient(1200px 600px at 20% 0%, rgba(0, 0, 0, 0.06), transparent 55%),
     #f5f6f7;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto,
-    "Helvetica Neue", Arial;
   color: rgba(0, 0, 0, 0.86);
 }
 
