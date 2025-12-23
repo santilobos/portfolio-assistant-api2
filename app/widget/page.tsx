@@ -36,42 +36,23 @@ export default function Widget() {
 const typingIntervalRef = React.useRef<number | null>(null)
 
 React.useEffect(() => {
-  const vv = window.visualViewport
-
-  const setHeights = () => {
-    const h = Math.round(vv?.height ?? window.innerHeight)
-
-    // variable CSS para tu .app
-    document.documentElement.style.setProperty("--app-height", `${h}px`)
-
-    // MUY IMPORTANTE: forzar altura en html/body y el root (en iOS dentro de iframes ayuda mucho)
-    document.documentElement.style.height = `${h}px`
-    document.body.style.height = `${h}px`
-
-    const nextRoot =
-      document.getElementById("__next") ||
-      document.querySelector("main") ||
-      document.body
-
-    if (nextRoot instanceof HTMLElement) {
-      nextRoot.style.height = `${h}px`
-    }
+  const setVH = () => {
+    const vv = window.visualViewport
+    const h = vv?.height ?? window.innerHeight
+    document.documentElement.style.setProperty("--vvh", `${h}px`)
   }
 
-  setHeights()
-
-  vv?.addEventListener("resize", setHeights)
-  vv?.addEventListener("scroll", setHeights) // iOS mueve visualViewport con teclado
-  window.addEventListener("resize", setHeights)
+  setVH()
+  window.visualViewport?.addEventListener("resize", setVH)
+  window.visualViewport?.addEventListener("scroll", setVH)
+  window.addEventListener("resize", setVH)
 
   return () => {
-    vv?.removeEventListener("resize", setHeights)
-    vv?.removeEventListener("scroll", setHeights)
-    window.removeEventListener("resize", setHeights)
+    window.visualViewport?.removeEventListener("resize", setVH)
+    window.visualViewport?.removeEventListener("scroll", setVH)
+    window.removeEventListener("resize", setVH)
   }
 }, [])
-
-
 
 
 function typeAssistantMessage(fullText: string) {
@@ -386,11 +367,7 @@ setMessages((prev) => [
 ]
 
   return (
-    <div
-  className={`${styles.app} ${aeonik.className}`}
-  style={{ height: "var(--vvh)", maxHeight: "var(--vvh)" }}
->
-
+    <div className={`${styles.app} ${aeonik.className}`}>
        <ChatHeader
       onReset={() => {
         setMessages([])
@@ -485,15 +462,7 @@ setMessages((prev) => [
 
 
       {/* Input */}
-      <div
-  style={{
-    padding: 14,
-    paddingBottom: "calc(14px + env(safe-area-inset-bottom))",
-    borderTop: "1px solid rgba(0,0,0,0.12)",
-    background: "#fff",
-  }}
->
-
+      <div style={{ padding: 14, borderTop: "1px solid rgba(0,0,0,0.12)" }}>
         <div
           style={{
             display: "flex",
@@ -509,14 +478,8 @@ setMessages((prev) => [
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            onFocus={() => {
-  setTimeout(() => {
-    listRef.current?.scrollTo(0, listRef.current.scrollHeight)
-  }, 80)
-}}
-
             placeholder="Ask about me…"
-            style={{ flex: 1, border: "none", outline: "none", fontSize: "1rem" }}
+            style={{ flex: 1, border: "none", outline: "none", fontSize: 14 }}
           />
 
 <button
