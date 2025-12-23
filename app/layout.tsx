@@ -1,3 +1,5 @@
+import localFont from "next/font/local"
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -6,6 +8,21 @@ const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
+
+const aeonik = localFont({
+  src: [
+    {
+      path: "./fonts/AeonikPro-Regular.woff",
+      weight: "400",
+      style: "normal",
+    },
+    // si tienes más pesos:
+    // { path: "./fonts/AeonikPro-Medium.woff", weight: "500", style: "normal" },
+    // { path: "./fonts/AeonikPro-Bold.woff", weight: "700", style: "normal" },
+  ],
+  variable: "--font-aeonik",
+  display: "swap",
+})
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -24,9 +41,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
-      </body>
+      <body className={`${aeonik.variable} ${geistSans.variable} ${geistMono.variable}`}>
+  {children}
+</body>
+
     </html>
   );
 }
