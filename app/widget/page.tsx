@@ -36,13 +36,18 @@ export default function Widget() {
 const typingIntervalRef = React.useRef<number | null>(null)
 
 React.useEffect(() => {
+  // ✅ Solo aplicar en mobile / tablet
+  const isMobile = window.matchMedia("(max-width: 820px)").matches
+  if (!isMobile) return
+
   const setVH = () => {
     const vv = window.visualViewport
-    const h = vv?.height ?? window.innerHeight
+    const h = Math.round(vv?.height ?? window.innerHeight)
     document.documentElement.style.setProperty("--vvh", `${h}px`)
   }
 
   setVH()
+
   window.visualViewport?.addEventListener("resize", setVH)
   window.visualViewport?.addEventListener("scroll", setVH)
   window.addEventListener("resize", setVH)
@@ -53,6 +58,7 @@ React.useEffect(() => {
     window.removeEventListener("resize", setVH)
   }
 }, [])
+
 
 
 function typeAssistantMessage(fullText: string) {
