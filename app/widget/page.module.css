@@ -1,308 +1,215 @@
 /* app/widget/page.module.css */
 
-/* Base */
-.app{
+/* --- Base del Widget --- */
+.app {
   height: 100vh;
-  display:flex;
-  flex-direction:column;
-  background:#F5F6F7;
-  color:#111111;
+  display: flex;
+  flex-direction: column;
+  background: #F5F6F7;
+  color: #111111;
   color-scheme: light;
   font-family: inherit;
+  overflow: hidden;
 }
 
-/* Mensajes */
-.messages{
-  flex:1;
-  overflow-y:auto;
-  padding: 16px;
-  display:flex;
-  flex-direction:column;
-  gap: 16px;
+/* --- Área de Mensajes --- */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  scroll-behavior: smooth;
 }
 
-/* Assistant (texto grande tipo hero) */
-.assistantRow{
+/* --- Filas y Burbujas --- */
+.assistantRow {
   padding: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.chatTitle {
-  font-size: 1.7rem;
-  font-weight: 500;
+.userRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px; 
+}
+
+.userBubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: rgba(17, 17, 17, 0.06);
+  color: #111111;
+  font-size: 0.95rem;
   line-height: 1.4;
-  margin-bottom: 20px;
-  color: #111;
 }
 
-
-.assistantText{
+.assistantText {
   font-size: 1rem;
   line-height: 1.6;
   font-weight: 500;
-  color:#000000;
+  color: #000000;
   max-width: 520px;
+  white-space: pre-wrap;
 }
 
-/* User bubble (si la quieres suave, no “chatty”) */
-.userRow{
-  display:flex;
-  justify-content:flex-end;
-   margin-bottom: 48px; 
+/* --- Intro (Estado Inicial) --- */
+.intro {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 12px;
 }
 
-.userBubble{
-  max-width: 78%;
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: rgba(17,17,17,0.06);
-  color:#111111;
-  font-size: 14px;
-  line-height: 1.4;
+.chatTitle {
+  font-size: 1.8rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  color: #111;
+  letter-spacing: -0.02em;
 }
 
-/* Quick buttons */
+/* --- Botones de la Grid (Quick Buttons) --- */
 .quickGrid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
-
 .quickBtn {
   text-align: left;
-  padding: 14px 16px;
-  border-radius: 6px;
+  padding: 16px;
+  border-radius: 12px;
   border: 1px solid #d6dce3;
-  background: transparent;
-  color: #6b7280;
+  background: #ffffff;
+  color: #4b5563;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: 
-    color 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 
 .quickBtn:hover {
   color: rgb(255, 92, 0);
   border-color: rgb(255, 92, 0);
-  background: rgba(255, 92, 0, 0.04);
+  background: rgba(255, 92, 0, 0.02);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 92, 0, 0.08);
 }
 
-
-/* Composer (input abajo) */
-.composerWrap{
-  padding: 14px 18px 18px;
-  border-top: 1px solid #D6DCE3;
-  background:#F5F6F7;
-}
-
-.composer{
-  display:flex;
-  gap: 10px;
-  align-items:center;
-}
-
-.input{
-  flex:1;
-  height: 64px;
-  border-radius: 8px;
-  border: 1px solid #D6DCE3;
-  background: rgba(255,255,255,0.9);
-  padding: 0 16px;
-  font-size: 1rem;
-  outline:none;
-  color:#111111;
-  font-family: inherit;
-  color-scheme: light;
-}
-
-/* 1) Reset general del input (Safari/Chrome) */
-.input{
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-/* 2) Quitar autofill/fondo interno oscuro (Chrome/Safari) */
-.input:-webkit-autofill,
-.input:-webkit-autofill:hover,
-.input:-webkit-autofill:focus,
-.input:-webkit-autofill:active{
-  -webkit-box-shadow: 0 0 0 9999px rgba(255,255,255,0.9) inset !important;
-  box-shadow: 0 0 0 9999px rgba(255,255,255,0.9) inset !important;
-  -webkit-text-fill-color: #111111 !important;
-  caret-color: #111111;
-  transition: background-color 9999s ease-out 0s;
-}
-
-/* 3) Quitar highlight al hacer tap (iOS) */
-.input{
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* 4) Si el navegador mete focus outline raro, lo controlamos */
-.input:focus{
-  outline: none;
-}
-
-
-.input::placeholder{
-  font-family: inherit;
-  font-weight: 400;
-  color: rgba(17,17,17,0.35);
-}
-
-.sendBtn{
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  border: 1px solid #D6DCE3;
-  background: rgba(255,255,255,0.9);
-  cursor:pointer;
-  font-size: 20px;
-  line-height: 1;
-  color:#111111;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.sendBtnEnabled:hover{
-  background: #ffffff;
-}
-
-.sendBtnDisabled{
-  opacity: .45;
-  cursor: not-allowed;
-}
-
-/* Empuja el bloque de intro al fondo del área de mensajes */
-.intro{
-  margin-top: auto;      /* 👈 magia: empuja hacia abajo */
+/* --- Sugerencias (Follow Ups) --- */
+.followUpsContainer {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding-bottom: 12px;  /* aire con el input */
 }
 
-
-/* --- Thinking shimmer --- */
-.thinkingRow{
-  padding: 8px 0 14px;
+.divider {
+  height: 1px;
+  background-color: #e6e6e6;
+  margin: 24px 0 16px;
+  width: 100%;
 }
-
-.thinking{
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  color: rgba(17,17,17,0.35);
-
-  /* shimmer magic */
-  background: linear-gradient(
-    90deg,
-    rgba(17,17,17,0.25) 0%,
-    rgba(17,17,17,0.55) 40%,
-    rgba(17,17,17,0.25) 80%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  animation: shimmer 1.6s infinite linear;
-}
-
-@keyframes shimmer{
-  0%{
-    background-position: 200% 0;
-  }
-  100%{
-    background-position: -200% 0;
-  }
-}
-
-
-@keyframes fadeInTyping {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.assistantTyping {
-  animation: fadeInTyping 0.45s cubic-bezier(.22,.61,.36,1);
-
-}
-
 
 .followUps {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  margin-top: 24px;
+  gap: 16px;
 }
 
 .followUpBtn {
   border: none;
   background: none;
-  padding: 0;
+  padding: 4px 0;
   text-align: left;
-
   font-size: 1rem;
-  color: #6b7280; /* gris suave */
+  color: #6b7280;
   cursor: pointer;
-
-  transition: color 0.15s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .followUpBtn:hover {
-  color: rgb(255, 92, 0); /* naranja */
+  color: rgb(255, 92, 0);
+  transform: translateX(6px);
 }
 
-
-.followUpBtn:focus-visible{
-  outline: none;
-  color: rgb(255,92,0);
-}
-
-
-/* Icono ↳ */
-.followUpIcon {
-  color: rgba(17, 17, 17, 0.35);
-  flex-shrink: 0;
-}
-
-
-.sendBtn{
+/* --- Input y Composer --- */
+.sendBtn {
   width: 36px;
   height: 36px;
   border: 0;
   background: transparent;
   cursor: pointer;
-  color: rgba(17,17,17,0.35); /* gris por defecto */
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  color: rgba(17, 17, 17, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform 0.1s ease;
 }
 
-.sendBtnActive{
-  color: rgb(255,92,0); /* naranja */
+.sendBtnActive {
+  color: rgb(255, 92, 0);
 }
 
-.sendBtn:disabled{
+.sendBtnActive:hover {
+  transform: scale(1.1);
+}
+
+.sendBtn:disabled {
   cursor: not-allowed;
-  opacity: .5;
+  opacity: 0.5;
 }
 
-.sendIcon{
-  display:block;
+/* --- Animaciones y Efectos Visuales --- */
+.thinking {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.35);
+  background: linear-gradient(
+    90deg,
+    rgba(17,17,17,0.2) 0%,
+    rgba(17,17,17,0.6) 40%,
+    rgba(17,17,17,0.2) 80%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 1.6s infinite linear;
 }
 
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
-.divider {
-  height: 1px;
-  background-color: #e6e6e6; /* gris suave */
-  margin: 20px 0 16px;
+/* Suaviza la aparición del texto mientras se escribe */
+.assistantTyping {
+  animation: fadeInTyping 0.4s ease-out;
+}
+
+@keyframes fadeInTyping {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* --- Reset de Inputs --- */
+input {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 9999px white inset !important;
+  box-shadow: 0 0 0 9999px white inset !important;
 }
