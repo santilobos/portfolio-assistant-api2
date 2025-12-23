@@ -152,12 +152,13 @@ React.useEffect(() => {
     {isLastAssistant && !loading && (
   <>
     <div className={styles.divider} />
+
     <div className={styles.followUps}>
-      {followUps.map((q) => (
+      {followUps.map(q => (
         <button
           key={q}
           onClick={() => send(q)}
-          className={styles.quickBtn}
+          className={styles.followUpBtn}
         >
           ↳ {q}
         </button>
@@ -165,6 +166,7 @@ React.useEffect(() => {
     </div>
   </>
 )}
+
 
   </div>
 )

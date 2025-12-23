@@ -237,32 +237,30 @@
 }
 
 
-.followUps{
-  margin-top: 18px;
+.followUps {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  margin-top: 24px;
 }
 
-.followUpBtn{
-  border: 0;
-  background: transparent;
+.followUpBtn {
+  border: none;
+  background: none;
   padding: 0;
   text-align: left;
+
+  font-size: 1rem;
+  color: #6b7280; /* gris suave */
   cursor: pointer;
 
-  color: rgba(17,17,17,0.45);
-  font-size: 16px;
-  line-height: 1.35;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  transition: color 0.15s ease;
 }
 
-.followUpBtn:hover{
-  color: rgb(255,92,0);
+.followUpBtn:hover {
+  color: rgb(255, 92, 0); /* naranja */
 }
+
 
 .followUpBtn:focus-visible{
   outline: none;
