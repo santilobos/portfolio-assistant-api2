@@ -141,9 +141,10 @@ React.useEffect(() => {
 
   return (
   <div key={i} className={styles.assistantRow}>
-    <div className={styles.assistantText}>
+    <div className={`${styles.assistantText} ${styles.assistantTyping}`}>
   {m.content}
 </div>
+
 
 
     {/* Follow-up questions SOLO bajo la última respuesta */}

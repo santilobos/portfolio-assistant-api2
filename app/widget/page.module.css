@@ -218,6 +218,21 @@
 }
 
 
+@keyframes fadeInTyping {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.assistantTyping {
+  animation: fadeInTyping 0.45s cubic-bezier(.22,.61,.36,1);
+
+}
+
+
 .followUps {
   margin-top: 20px;
   padding-top: 14px;
@@ -248,7 +263,7 @@
 }
 
 .followUpBtn:hover {
-  color: rgba(17, 17, 17, 0.8);
+  color: rgb(255, 94, 0);
 }
 
 .followUpBtn:active {
