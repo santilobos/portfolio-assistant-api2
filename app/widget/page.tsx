@@ -25,7 +25,7 @@ export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([])
   const [input, setInput] = React.useState("")
   const [loading, setLoading] = React.useState(false)
-  const [isOpen, setIsOpen] = React.useState(false) // ⬅️ pon false luego
+  const [isOpen, setIsOpen] = React.useState(true) // ⬅️ pon false luego
   const hasText = input.trim().length > 0
 
   const listRef = React.useRef<HTMLDivElement | null>(null)
