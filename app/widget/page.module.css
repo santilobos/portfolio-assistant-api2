@@ -11,6 +11,20 @@
   color-scheme: light;
   font-family: inherit;
   overflow: hidden;
+   /* fallback base */
+  height: 100vh;
+
+  /* mejor para mobile moderno (Android/iOS) */
+  height: 100dvh;
+
+  /* si tu JS calcula --vvh, esto gana cuando exista */
+  height: var(--vvh, 100dvh);
+
+  max-height: var(--vvh, 100dvh);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 
