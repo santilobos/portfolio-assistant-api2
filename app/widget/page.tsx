@@ -255,28 +255,36 @@ function ChatHeader({
           />
 
           <div
-            ref={cardRef}
-            style={{
-              position: "fixed",
-              top: pos.top,
-              left: pos.left,
-              transform: "translateX(-50%)",
-              width: pos.width,
-              zIndex: 9999,
-              background: "#F3F6FA",
-              border: "1px solid rgba(0,0,0,0.10)",
-              borderRadius: 14,
-              padding: 14,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-              color: "rgba(0,0,0,0.65)",
-              lineHeight: 1.4,
-              font: "inherit",
-              writingMode: "horizontal-tb",
-            }}
-          >
-            ChatLLM is an AI chatbot. May contain hallucinations. Responses are
-            logged for research and development purposes.
-          </div>
+  ref={cardRef}
+  style={{
+    position: "fixed",
+    top: pos.top,
+    left: pos.left,
+    transform: "translateX(-50%)",
+    width: pos.width,
+    zIndex: 9999,
+
+    background: "#F3F6FA",
+    border: "1px solid rgba(0,0,0,0.08)",
+    borderRadius: 12,
+
+    padding: "14px 16px",
+    boxShadow:
+      "0px 4px 12px rgba(0,0,0,0.08), 0px 12px 24px rgba(0,0,0,0.06)",
+
+    fontFamily: azeret.style.fontFamily,
+    fontSize: "0.85rem",
+    lineHeight: 1.45,
+    letterSpacing: 0.2,
+    color: "rgba(0,0,0,0.65)",
+
+    writingMode: "horizontal-tb",
+  }}
+>
+  ChatLLM is an AI chatbot. May contain hallucinations. Responses are logged
+  for research and development purposes.
+</div>
+
         </>
       )}
     </>
