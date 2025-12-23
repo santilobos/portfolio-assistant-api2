@@ -81,7 +81,7 @@ function Icon({ src, alt }: { src: string; alt: string }) {
 const iconBtnBase: React.CSSProperties = {
   width: 32,
   height: 32,
-  borderRadius: 999,
+  borderRadius: 4,
   border: "none",
   background: "transparent",
   display: "grid",
@@ -190,7 +190,7 @@ function ChatHeader({
     top: 0,
     zIndex: 50,
     background: "#fff",
-    borderBottom: "1px solid rgba(0,0,0,0.08)",
+    borderBottom: "1px solid rgba(198,209,221,)",
     padding: "0 16px",              // 👈 sin padding vertical
     display: "flex",
     alignItems: "center",
@@ -199,7 +199,7 @@ function ChatHeader({
   }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: azeret.style.fontFamily }}>
-  <div style={{ fontWeight: 400, letterSpacing: 0.5 }}>
+  <div style={{ fontSize:"0.9rem", fontWeight: 400, letterSpacing: 0.5 }}>
     CHATLLM
   </div>
 
