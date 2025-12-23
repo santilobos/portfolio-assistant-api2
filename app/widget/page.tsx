@@ -1,20 +1,11 @@
 "use client"
 
-import * as React from "react"
-
-import styles from "./page.module.css"
-
-import { Azeret_Mono } from "next/font/google"
-
-const azeret = Azeret_Mono({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-})
-
-
-import localFont from "next/font/local"
-
 export const dynamic = "force-dynamic"
+
+import * as React from "react"
+import styles from "./page.module.css"
+import localFont from "next/font/local"
+import { Azeret_Mono } from "next/font/google"
 
 const aeonik = localFont({
   src: "../fonts/AeonikPro-Regular.woff",
@@ -22,8 +13,38 @@ const aeonik = localFont({
   style: "normal",
 })
 
+const azeret = Azeret_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+})
 
 type Msg = { role: "user" | "assistant"; content: string }
+
+function Icon({ src, alt }: { src: string; alt: string }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt}
+      width={24}
+      height={24}
+      style={{ width: 24, height: 24, display: "block" }}
+      draggable={false}
+    />
+  )
+}
+
+/** hover simple sin CSS extra */
+function withHover(bgHover: string) {
+  return {
+    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+      ;(e.currentTarget as HTMLElement).style.background = bgHover
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+      ;(e.currentTarget as HTMLElement).style.background = "transparent"
+    },
+  }
+}
 
 export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([])
@@ -32,316 +53,74 @@ export default function Widget() {
   const hasText = input.trim().length > 0
 
   const listRef = React.useRef<HTMLDivElement | null>(null)
+  const typingIntervalRef = React.useRef<number | null>(null)
 
-const typingIntervalRef = React.useRef<number | null>(null)
+  // Popover info
+  const [infoOpen, setInfoOpen] = React.useState(false)
 
-React.useEffect(() => {
-  const setVH = () => {
-    const vv = window.visualViewport
-    if (vv) {
-      // en Android a veces height es correcto pero hay offsetTop/offsetLeft
-      const h = Math.round(vv.height)
-      document.documentElement.style.setProperty("--vvh", `${h}px`)
-    } else {
-      document.documentElement.style.setProperty("--vvh", `${window.innerHeight}px`)
-    }
-  }
-
-  setVH()
-  window.visualViewport?.addEventListener("resize", setVH)
-  window.visualViewport?.addEventListener("scroll", setVH)
-  window.addEventListener("resize", setVH)
-
-  return () => {
-    window.visualViewport?.removeEventListener("resize", setVH)
-    window.visualViewport?.removeEventListener("scroll", setVH)
-    window.removeEventListener("resize", setVH)
-  }
-}, [])
-
-
-
-React.useEffect(() => {
-  const setVH = () => {
-    const vv = window.visualViewport
-    const h = vv?.height ?? window.innerHeight
-    document.documentElement.style.setProperty("--vvh", `${h}px`)
-  }
-
-  setVH()
-  window.visualViewport?.addEventListener("resize", setVH)
-  window.visualViewport?.addEventListener("scroll", setVH)
-  window.addEventListener("resize", setVH)
-
-  return () => {
-    window.visualViewport?.removeEventListener("resize", setVH)
-    window.visualViewport?.removeEventListener("scroll", setVH)
-    window.removeEventListener("resize", setVH)
-  }
-}, [])
-
-
-function typeAssistantMessage(fullText: string) {
-  if (typingIntervalRef.current) {
-    window.clearInterval(typingIntervalRef.current)
-    typingIntervalRef.current = null
-  }
-
-  let i = 0
-  const speed = 10
-
-  typingIntervalRef.current = window.setInterval(() => {
-    i += 2
-
-    setMessages((prev) => {
-      const next = [...prev]
-      const last = next[next.length - 1]
-      if (last?.role === "assistant") {
-        next[next.length - 1] = { ...last, content: fullText.slice(0, i) }
-      }
-      return next
-    })
-
-    if (i >= fullText.length) {
-      if (typingIntervalRef.current) {
-        window.clearInterval(typingIntervalRef.current)
-        typingIntervalRef.current = null
-      }
-      setLoading(false)
-    }
-  }, speed)
-}
-
-function Icon({ src, alt }: { src: string; alt: string }) {
-  return (
-    <img
-      src={src}
-      alt={alt}
-      width={18}
-      height={18}
-      style={{ display: "block" }}
-    />
-  )
-}
-
-const iconBtnBase: React.CSSProperties = {
-  width: 32,
-  height: 32,
-  borderRadius: 4,
-  border: "none",
-  background: "transparent",
-  display: "grid",
-  placeItems: "center",
-  cursor: "pointer",
-  padding: 0,
-  transition: "background-color 0.15s ease",
-}
-
-const iconInfo: React.CSSProperties = {
-  color: "rgba(0,0,0,0.45)", // gris
-}
-
-const iconAction: React.CSSProperties = {
-  color: "#000", // negro
-}
-
-
-
-function withHover(bg = "rgba(0,0,0,0.06)") {
-  return {
-    onMouseEnter: (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.currentTarget.style.backgroundColor = bg
-    },
-    onMouseLeave: (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.currentTarget.style.backgroundColor = "transparent"
-    },
-  }
-}
-
-
-
-
-function ChatHeader({
-  onReset,
-  onClose,
-}: {
-  onReset: () => void
-  onClose: () => void
-}) {
-  const [open, setOpen] = React.useState(false)
-  const btnRef = React.useRef<HTMLButtonElement | null>(null)
-  const cardRef = React.useRef<HTMLDivElement | null>(null)
-
-  // click fuera + ESC
+  // ✅ MOBILE: altura real (teclado) dentro de iframe
   React.useEffect(() => {
-    if (!open) return
-
-    const onDown = (e: PointerEvent) => {
-      const t = e.target as Node
-      if (cardRef.current?.contains(t)) return
-      if (btnRef.current?.contains(t)) return
-      setOpen(false)
+    const setAppHeight = () => {
+      const vv = window.visualViewport
+      const h = Math.round(vv?.height ?? window.innerHeight)
+      document.documentElement.style.setProperty("--app-height", `${h}px`)
     }
 
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false)
-    }
+    setAppHeight()
 
-    document.addEventListener("pointerdown", onDown, true)
-    window.addEventListener("keydown", onKey)
+    window.visualViewport?.addEventListener("resize", setAppHeight)
+    window.visualViewport?.addEventListener("scroll", setAppHeight)
+    window.addEventListener("resize", setAppHeight)
+    window.addEventListener("orientationchange", setAppHeight)
+    window.addEventListener("focusin", setAppHeight)
+    window.addEventListener("focusout", setAppHeight)
+
     return () => {
-      document.removeEventListener("pointerdown", onDown, true)
-      window.removeEventListener("keydown", onKey)
+      window.visualViewport?.removeEventListener("resize", setAppHeight)
+      window.visualViewport?.removeEventListener("scroll", setAppHeight)
+      window.removeEventListener("resize", setAppHeight)
+      window.removeEventListener("orientationchange", setAppHeight)
+      window.removeEventListener("focusin", setAppHeight)
+      window.removeEventListener("focusout", setAppHeight)
     }
-  }, [open])
+  }, [])
 
-  // posición del popover anclado al botón
-  const [pos, setPos] = React.useState({ top: 56, left: 0, width: 520 })
+  function typeAssistantMessage(fullText: string) {
+    if (typingIntervalRef.current) {
+      window.clearInterval(typingIntervalRef.current)
+      typingIntervalRef.current = null
+    }
+
+    let i = 0
+    const speed = 10
+
+    typingIntervalRef.current = window.setInterval(() => {
+      i += 2
+
+      setMessages((prev) => {
+        const next = [...prev]
+        const last = next[next.length - 1]
+        if (last?.role === "assistant") {
+          next[next.length - 1] = { ...last, content: fullText.slice(0, i) }
+        }
+        return next
+      })
+
+      if (i >= fullText.length) {
+        if (typingIntervalRef.current) {
+          window.clearInterval(typingIntervalRef.current)
+          typingIntervalRef.current = null
+        }
+        setLoading(false)
+      }
+    }, speed)
+  }
 
   React.useEffect(() => {
-    if (!open) return
-
-    const update = () => {
-      const rect = btnRef.current?.getBoundingClientRect()
-      const vw = window.innerWidth
-      const pad = 16
-      const width = Math.min(520, vw - pad * 2)
-
-      const idealLeft = rect ? rect.left + rect.width / 2 : vw / 2
-      const minLeft = pad + width / 2
-      const maxLeft = vw - pad - width / 2
-      const left = Math.max(minLeft, Math.min(maxLeft, idealLeft))
-
-      const top = rect ? rect.bottom + 10 : 56
-      setPos({ top, left, width })
-    }
-
-    update()
-    window.addEventListener("resize", update)
-    window.addEventListener("scroll", update, true)
     return () => {
-      window.removeEventListener("resize", update)
-      window.removeEventListener("scroll", update, true)
+      if (typingIntervalRef.current) window.clearInterval(typingIntervalRef.current)
     }
-  }, [open])
-
-  return (
-    <>
-      <div
-         style={{
-    height: 56,
-    minHeight: 56,
-    maxHeight: 56,
-    position: "sticky",
-    top: 0,
-    zIndex: 50,
-    background: "#fff",
-    borderBottom: "1px solid rgba(198,209,221,100)",
-    padding: "0 16px",              // 👈 sin padding vertical
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    boxSizing: "border-box",
-  }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: azeret.style.fontFamily }}>
-  <div style={{ fontSize:"0.9rem", fontWeight: 400, letterSpacing: 0.5 }}>
-    CHATLLM
-  </div>
-
-  <button
-  ref={btnRef}
-  onClick={() => setOpen(v => !v)}
-  aria-label="Info"
-  style={{ ...iconBtnBase, ...iconInfo }}
-  {...withHover("rgba(0,0,0,0.06)")}
->
-  <Icon src="/icons/info.svg" alt="Info" />
-</button>
-
-</div>
-
-<div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-  <button
-  onClick={onReset}
-  aria-label="Reset"
-  style={{ ...iconBtnBase, ...iconAction }}
-  {...withHover("rgba(0,0,0,0.08)")}
->
-  <Icon src="/icons/reset.svg" alt="Reset" />
-</button>
-
-
-  <button
-  onClick={() => {
-    window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")
-   }}
-  aria-label="Close"
-  style={{ ...iconBtnBase, ...iconAction }}
-  {...withHover("rgba(0,0,0,0.08)")}
->
-  <Icon src="/icons/close.svg" alt="Close" />
-</button>
-
-</div>
-
-      </div>
-
-      {open && (
-        <>
-          {/* backdrop invisible para detectar click fuera */}
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 9998,
-              background: "transparent",
-            }}
-          />
-
-          <div
-  ref={cardRef}
-  style={{
-    position: "fixed",
-    top: pos.top,
-    left: pos.left,
-    transform: "translateX(-50%)",
-    width: pos.width,
-    zIndex: 9999,
-
-    background: "#F3F6FA",
-    border: "1px solid rgba(0,0,0,0.08)",
-    borderRadius: 4,
-
-    padding: "14px 16px",
-    boxShadow: "0px 1px 2px rgba(0,0,0,0.06), 0px 2px 6px rgba(0,0,0,0.04)",
-    fontFamily: azeret.style.fontFamily,
-    fontSize: "0.85rem",
-    lineHeight: 1.45,
-    letterSpacing: 0.2,
-    color: "rgba(0,0,0,0.65)",
-
-    writingMode: "horizontal-tb",
-  }}
->
-  ChatLLM is an AI chatbot. May contain hallucinations. Responses are logged
-  for research and development purposes.
-</div>
-
-        </>
-      )}
-    </>
-  )
-}
-
-
-
-React.useEffect(() => {
-  return () => {
-    if (typingIntervalRef.current) window.clearInterval(typingIntervalRef.current)
-  }
-}, [])
-
+  }, [])
 
   React.useEffect(() => {
     if (!listRef.current) return
@@ -349,158 +128,255 @@ React.useEffect(() => {
   }, [messages, loading])
 
   async function send(text?: string) {
-  const q = (text ?? input).trim()
-  if (!q || loading) return
+    const q = (text ?? input).trim()
+    if (!q || loading) return
 
-  setInput("")
-  setLoading(true)
+    setInfoOpen(false)
+    setInput("")
+    setLoading(true)
 
-setMessages((prev) => [
-  ...prev,
-  { role: "user", content: q },
-  { role: "assistant", content: "" },
-])
+    // 1) user
+    setMessages((prev) => [...prev, { role: "user", content: q }])
+    // 2) assistant placeholder
+    setMessages((prev) => [...prev, { role: "assistant", content: "" }])
 
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: q }),
+      })
 
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: q }),
-    })
-
-    const data = await res.json()
-    const answer = data.answer ?? data.text ?? data.reply ?? ""
-
-    // 3️⃣ escribir letra a letra
-    typeAssistantMessage(answer)
-  } catch (e) {
-    typeAssistantMessage("Sorry, something went wrong.")
+      const data = await res.json()
+      const answer = data.answer ?? data.text ?? data.reply ?? ""
+      typeAssistantMessage(answer || "—")
+    } catch (e) {
+      typeAssistantMessage("Sorry, something went wrong.")
+    }
   }
-}
 
+  function resetChat() {
+    setInfoOpen(false)
+    setLoading(false)
+    setInput("")
+    setMessages([])
+  }
+
+  function requestClose() {
+    // 🔑 esto lo escucha Framer y cierra el panel
+    window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")
+    setInfoOpen(false)
+  }
 
   const quick = [
     "What projects have you worked on?",
     "What was your role and impact?",
     "How do you approach design systems?",
   ]
- 
+
   const followUps = [
-  "What makes your design approach unique?",
-  "How do you approach product strategy?",
-  "What technologies do you use?"
-]
+    "What makes your design approach unique?",
+    "How do you approach product strategy?",
+    "What technologies do you use?",
+  ]
 
-  return (
-    <div
-  className={`${styles.app} ${aeonik.className}`}
-  style={{ height: "var(--vvh)", maxHeight: "var(--vvh)" }}
->
+  // Styles inline del header (sin pelearte con CSS modules)
+  const headerH = 56
+  const headerDivider = "rgba(0,0,0,0.12)"
 
-       <ChatHeader
-      onReset={() => {
-        setMessages([])
-        setInput("")
-        setLoading(false)
-      }}
-      onClose={() => {
-        // le pide a Framer que cierre el panel
-        window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")
-      }}
-    />
-      {/* Messages */}
-      <div ref={listRef} className={styles.messages}>
-  {messages.map((m, i) => {
-    const isFirstAssistant = i === 0
-    const isLastAssistant = m.role === "assistant" && i === messages.length - 1
-
-
-  if (m.role === "user") {
-    return (
-      <div key={i} className={styles.userRow}>
-        <div className={styles.userBubble}>{m.content}</div>
-      </div>
-    )
+  const iconBtnBase: React.CSSProperties = {
+    width: 40,
+    height: 40,
+    display: "grid",
+    placeItems: "center",
+    border: "none",
+    outline: "none",
+    background: "transparent",
+    borderRadius: 999,
+    padding: 0,
+    cursor: "pointer",
+    WebkitTapHighlightColor: "transparent",
   }
 
-  // Si el mensaje assistant está vacío y estás cargando -> thinking…
-  if (m.content === "" && loading) {
-    return (
-      <div key={i} className={styles.assistantRow}>
-        <div className={styles.thinkingRow}>
-          <span className={styles.thinking}>thinking…</span>
-        </div>
-      </div>
-    )
-  }
+  const iconMuted: React.CSSProperties = { opacity: 0.55 }
+  const iconAction: React.CSSProperties = { opacity: 1 }
 
   return (
-  <div key={i} className={styles.assistantRow}>
-    <div className={`${styles.assistantText} ${styles.assistantTyping}`}>
-  {m.content}
-</div>
-
-
-
-    {/* Follow-up questions SOLO bajo la última respuesta */}
-    {isLastAssistant && !loading && (
-  <>
-    <div className={styles.divider} />
-
-    <div className={styles.followUps}>
-      {followUps.map(q => (
-        <button
-          key={q}
-          onClick={() => send(q)}
-          className={styles.followUpBtn}
-        >
-          ↳ {q}
-        </button>
-      ))}
-    </div>
-  </>
-)}
-
-
-  </div>
-)
-
-})}
-
-
-  {/* 👇 Intro pegado abajo cuando aún no hay conversación */}
-  {messages.length <= 1 && (
-  <div className={styles.intro}>
-    <div className={styles.assistantRow}>
-      <div className={styles.chatTitle}>
-        Hey, what would you like to know?
-      </div>
-    </div>
-
-
-      <div className={styles.quickGrid}>
-        {quick.map((q) => (
-          <button key={q} onClick={() => send(q)} className={styles.quickBtn}>
-            {q}
-          </button>
-        ))}
-      </div>
-    </div>
-  )}
-</div>
-
-
-      {/* Input */}
+    <div className={`${styles.app} ${aeonik.className}`}>
+      {/* HEADER */}
       <div
-  style={{
-    padding: 14,
-    paddingBottom: "calc(14px + env(safe-area-inset-bottom))",
-    borderTop: "1px solid rgba(0,0,0,0.12)",
-    background: "#fff",
-  }}
->
+        style={{
+          height: headerH,
+          minHeight: headerH,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 10px 0 14px",
+          background: "#fff",
+          borderBottom: `1px solid ${headerDivider}`,
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
+          fontFamily: azeret.style.fontFamily,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ fontSize: 14, fontWeight: 500, letterSpacing: 0.6 }}>
+            CHATLLM
+          </div>
 
+          <button
+            type="button"
+            aria-label="Info"
+            onClick={() => setInfoOpen((v) => !v)}
+            style={{ ...iconBtnBase, ...iconMuted }}
+            {...withHover("rgba(0,0,0,0.06)")}
+          >
+            <Icon src="/icons/info.svg" alt="Info" />
+          </button>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <button
+            type="button"
+            aria-label="Reset"
+            onClick={resetChat}
+            style={{ ...iconBtnBase, ...iconAction }}
+            {...withHover("rgba(0,0,0,0.08)")}
+          >
+            <Icon src="/icons/reset.svg" alt="Reset" />
+          </button>
+
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={requestClose}
+            style={{ ...iconBtnBase, ...iconAction }}
+            {...withHover("rgba(0,0,0,0.08)")}
+          >
+            <Icon src="/icons/close.svg" alt="Close" />
+          </button>
+        </div>
+
+        {/* POPOVER */}
+        {infoOpen && (
+          <>
+            {/* Backdrop */}
+            <button
+              type="button"
+              aria-label="Close info"
+              onClick={() => setInfoOpen(false)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "transparent",
+                border: "none",
+                zIndex: 30,
+              }}
+            />
+            {/* Card */}
+            <div
+              style={{
+                position: "absolute",
+                right: 12,
+                top: headerH + 8,
+                width: 310,
+                background: "#fff",
+                borderRadius: 12,
+                border: "1px solid rgba(0,0,0,0.10)",
+                boxShadow: "0 6px 16px rgba(0,0,0,0.10)",
+                padding: 12,
+                zIndex: 40,
+                fontFamily: azeret.style.fontFamily,
+                fontSize: 12,
+                lineHeight: 1.35,
+                color: "rgba(0,0,0,0.72)",
+              }}
+            >
+              CHATLLM is an AI chatbot. May contain hallucinations. Responses are logged
+              for research and development purposes.
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* MESSAGES */}
+      <div ref={listRef} className={styles.messages}>
+        {messages.map((m, i) => {
+          const isLastAssistant = m.role === "assistant" && i === messages.length - 1
+
+          if (m.role === "user") {
+            return (
+              <div key={i} className={styles.userRow}>
+                <div className={styles.userBubble}>{m.content}</div>
+              </div>
+            )
+          }
+
+          if (m.content === "" && loading) {
+            return (
+              <div key={i} className={styles.assistantRow}>
+                <div className={styles.thinkingRow}>
+                  <span className={styles.thinking}>thinking…</span>
+                </div>
+              </div>
+            )
+          }
+
+          return (
+            <div key={i} className={styles.assistantRow}>
+              <div className={`${styles.assistantText} ${styles.assistantTyping}`}>
+                {m.content}
+              </div>
+
+              {isLastAssistant && !loading && (
+                <>
+                  <div className={styles.divider} />
+
+                  <div className={styles.followUps}>
+                    {followUps.map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => send(q)}
+                        className={styles.followUpBtn}
+                      >
+                        ↳ {q}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )
+        })}
+
+        {/* Intro cuando no hay conversación */}
+        {messages.length <= 1 && (
+          <div className={styles.intro}>
+            <div className={styles.assistantRow}>
+              <div className={styles.chatTitle}>Hey, what would you like to know?</div>
+            </div>
+
+            <div className={styles.quickGrid}>
+              {quick.map((q) => (
+                <button key={q} onClick={() => send(q)} className={styles.quickBtn}>
+                  {q}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* INPUT */}
+      <div
+        style={{
+          padding: 14,
+          paddingBottom: `calc(14px + env(safe-area-inset-bottom))`,
+          borderTop: "1px solid rgba(0,0,0,0.12)",
+          background: "#fff",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -516,35 +392,41 @@ setMessages((prev) => [
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            onFocus={() => setTimeout(() => listRef.current?.scrollTo(0, listRef.current.scrollHeight), 50)}
+            onFocus={() =>
+              setTimeout(() => listRef.current?.scrollTo(0, listRef.current.scrollHeight), 50)
+            }
             placeholder="Ask about me…"
-            style={{ flex: 1, border: "none", outline: "none", fontSize: "1rem" }}
+            style={{
+              flex: 1,
+              border: "none",
+              outline: "none",
+              fontSize: 16, // 👈 importante en iOS para evitar zoom
+              fontFamily: aeonik.style.fontFamily,
+              background: "transparent",
+            }}
           />
 
-<button
-  onClick={() => send()}
-  disabled={loading || !hasText}
-  className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
-  aria-label="Send"
->
-  <svg
-    className={styles.sendIcon}
-    width="24"
-    height="24"
-    viewBox="0 0 960 960"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-  >
-    <path
-      d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"
-      fill="currentColor"
-    />
-  </svg>
-</button>
-
-
-
-
+          <button
+            onClick={() => send()}
+            disabled={loading || !hasText}
+            className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
+            aria-label="Send"
+            type="button"
+          >
+            <svg
+              className={styles.sendIcon}
+              width="24"
+              height="24"
+              viewBox="0 0 960 960"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

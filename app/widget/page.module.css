@@ -1,37 +1,19 @@
 /* app/widget/page.module.css */
 
-/* Base */
 .app{
-  height: var(--vvh, 100vh);
-  max-height: var(--vvh, 100vh);
-  display: flex;
-  flex-direction: column;
-  background: #F5F6F7;
-  color: #111111;
-  color-scheme: light;
-  font-family: inherit;
-  overflow: hidden;
-   /* fallback base */
-  height: 100vh;
-
-  /* mejor para mobile moderno (Android/iOS) */
-  height: 100dvh;
-
-  /* si tu JS calcula --vvh, esto gana cuando exista */
-  height: var(--vvh, 100dvh);
-
-  max-height: var(--vvh, 100dvh);
-
+  height: var(--app-height, 100vh);
+  max-height: var(--app-height, 100vh);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: #f5f6f7;
+  color: #111;
 }
 
-
-/* Mensajes */
+/* Área scrollable */
 .messages{
   flex: 1 1 auto;
-  min-height: 0;              /* 🔥 clave en flex para que el scroll funcione */
+  min-height: 0;                 /* clave para que flex+scroll funcione */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 16px;
@@ -40,8 +22,7 @@
   gap: 16px;
 }
 
-
-/* Assistant (texto grande tipo hero) */
+/* Assistant */
 .assistantRow{
   padding: 8px 0 0;
 }
@@ -54,20 +35,28 @@
   color: #111;
 }
 
-
 .assistantText{
   font-size: 1rem;
   line-height: 1.6;
   font-weight: 500;
-  color:#000000;
+  color:#000;
   max-width: 520px;
 }
 
-/* User bubble (si la quieres suave, no “chatty”) */
+@keyframes fadeInTyping {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.assistantTyping {
+  animation: fadeInTyping 0.45s cubic-bezier(.22,.61,.36,1);
+}
+
+/* User bubble */
 .userRow{
   display:flex;
   justify-content:flex-end;
-   margin-bottom: 48px; 
+  margin-bottom: 48px;
 }
 
 .userBubble{
@@ -75,9 +64,18 @@
   padding: 10px 14px;
   border-radius: 14px;
   background: rgba(17,17,17,0.06);
-  color:#111111;
+  color:#111;
   font-size: 14px;
   line-height: 1.4;
+}
+
+/* Intro abajo */
+.intro{
+  margin-top: auto;         /* empuja al fondo */
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 12px;
 }
 
 /* Quick buttons */
@@ -88,7 +86,6 @@
   width: 100%;
 }
 
-
 .quickBtn {
   text-align: left;
   padding: 14px 16px;
@@ -98,10 +95,7 @@
   color: #6b7280;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: 
-    color 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
 .quickBtn:hover {
@@ -110,104 +104,7 @@
   background: rgba(255, 92, 0, 0.04);
 }
 
-
-/* Composer (input abajo) */
-.composerWrap{
-  padding: 14px 18px 18px;
-  border-top: 1px solid #D6DCE3;
-  background:#F5F6F7;
-}
-
-.composer{
-  display:flex;
-  gap: 10px;
-  align-items:center;
-}
-
-.input{
-  flex:1;
-  height: 64px;
-  border-radius: 8px;
-  border: 1px solid #D6DCE3;
-  background: rgba(255,255,255,0.9);
-  padding: 0 16px;
-  font-size: 1rem;
-  outline:none;
-  color:#111111;
-  font-family: inherit;
-  color-scheme: light;
-}
-
-/* 1) Reset general del input (Safari/Chrome) */
-.input{
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-/* 2) Quitar autofill/fondo interno oscuro (Chrome/Safari) */
-.input:-webkit-autofill,
-.input:-webkit-autofill:hover,
-.input:-webkit-autofill:focus,
-.input:-webkit-autofill:active{
-  -webkit-box-shadow: 0 0 0 9999px rgba(255,255,255,0.9) inset !important;
-  box-shadow: 0 0 0 9999px rgba(255,255,255,0.9) inset !important;
-  -webkit-text-fill-color: #111111 !important;
-  caret-color: #111111;
-  transition: background-color 9999s ease-out 0s;
-}
-
-/* 3) Quitar highlight al hacer tap (iOS) */
-.input{
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* 4) Si el navegador mete focus outline raro, lo controlamos */
-.input:focus{
-  outline: none;
-}
-
-
-.input::placeholder{
-  font-family: inherit;
-  font-weight: 400;
-  color: rgba(17,17,17,0.35);
-}
-
-.sendBtn{
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  border: 1px solid #D6DCE3;
-  background: rgba(255,255,255,0.9);
-  cursor:pointer;
-  font-size: 20px;
-  line-height: 1;
-  color:#111111;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.sendBtnEnabled:hover{
-  background: #ffffff;
-}
-
-.sendBtnDisabled{
-  opacity: .45;
-  cursor: not-allowed;
-}
-
-/* Empuja el bloque de intro al fondo del área de mensajes */
-.intro{
-  margin-top: auto;      /* 👈 magia: empuja hacia abajo */
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding-bottom: 12px;  /* aire con el input */
-}
-
-
-/* --- Thinking shimmer --- */
+/* Thinking shimmer */
 .thinkingRow{
   padding: 8px 0 14px;
 }
@@ -218,7 +115,6 @@
   letter-spacing: 0.02em;
   color: rgba(17,17,17,0.35);
 
-  /* shimmer magic */
   background: linear-gradient(
     90deg,
     rgba(17,17,17,0.25) 0%,
@@ -233,30 +129,11 @@
 }
 
 @keyframes shimmer{
-  0%{
-    background-position: 200% 0;
-  }
-  100%{
-    background-position: -200% 0;
-  }
+  0%{ background-position: 200% 0; }
+  100%{ background-position: -200% 0; }
 }
 
-
-@keyframes fadeInTyping {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.assistantTyping {
-  animation: fadeInTyping 0.45s cubic-bezier(.22,.61,.36,1);
-
-}
-
-
+/* Follow ups */
 .followUps {
   display: flex;
   flex-direction: column;
@@ -269,60 +146,56 @@
   background: none;
   padding: 0;
   text-align: left;
-
   font-size: 1rem;
-  color: #6b7280; /* gris suave */
+  color: #6b7280;
   cursor: pointer;
-
   transition: color 0.15s ease;
 }
 
 .followUpBtn:hover {
-  color: rgb(255, 92, 0); /* naranja */
+  color: rgb(255, 92, 0);
 }
-
 
 .followUpBtn:focus-visible{
   outline: none;
-  color: rgb(255,92,0);
+  color: rgb(255, 92, 0);
 }
 
-
-/* Icono ↳ */
-.followUpIcon {
-  color: rgba(17, 17, 17, 0.35);
-  flex-shrink: 0;
+/* Divider */
+.divider {
+  height: 1px;
+  background-color: #e6e6e6;
+  margin: 20px 0 16px;
 }
 
-
+/* Send button (el del icono) */
 .sendBtn{
   width: 36px;
   height: 36px;
   border: 0;
   background: transparent;
   cursor: pointer;
-  color: rgba(17,17,17,0.35); /* gris por defecto */
+  color: rgba(17,17,17,0.35);
   display:flex;
   align-items:center;
   justify-content:center;
+  border-radius: 999px;
+}
+
+.sendBtn:hover{
+  background: rgba(0,0,0,0.06);
 }
 
 .sendBtnActive{
-  color: rgb(255,92,0); /* naranja */
+  color: rgb(255,92,0);
 }
 
 .sendBtn:disabled{
   cursor: not-allowed;
   opacity: .5;
+  background: transparent;
 }
 
 .sendIcon{
   display:block;
-}
-
-
-.divider {
-  height: 1px;
-  background-color: #e6e6e6; /* gris suave */
-  margin: 20px 0 16px;
 }
