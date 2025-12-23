@@ -175,7 +175,7 @@ function ChatHeader({
   }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: azeret.style.fontFamily }}>
-  <div style={{ fontWeight: 700, letterSpacing: 0.5 }}>
+  <div style={{ fontWeight: 400, letterSpacing: 0.5 }}>
     CHAT LLM
   </div>
 
