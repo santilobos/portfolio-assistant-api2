@@ -266,12 +266,10 @@ function ChatHeader({
 
     background: "#F3F6FA",
     border: "1px solid rgba(0,0,0,0.08)",
-    borderRadius: 12,
+    borderRadius: 4,
 
     padding: "14px 16px",
-    boxShadow:
-      "0px 4px 12px rgba(0,0,0,0.08), 0px 12px 24px rgba(0,0,0,0.06)",
-
+    boxShadow: "0px 1px 2px rgba(0,0,0,0.06), 0px 2px 6px rgba(0,0,0,0.04)",
     fontFamily: azeret.style.fontFamily,
     fontSize: "0.85rem",
     lineHeight: 1.45,
