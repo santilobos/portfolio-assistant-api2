@@ -174,7 +174,7 @@ function ChatHeader({
     boxSizing: "border-box",
   }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: azeret.style.fontFamily }}>
   <div style={{ fontWeight: 700, letterSpacing: 0.5 }}>
     CHAT LLM
   </div>
