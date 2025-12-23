@@ -150,20 +150,22 @@ React.useEffect(() => {
 
     {/* Follow-up questions SOLO bajo la última respuesta */}
     {isLastAssistant && !loading && (
-      <div className={styles.followUps}>
-  {followUps.map((q) => (
-    <button
-      key={q}
-      onClick={() => send(q)}
-      className={styles.followUpBtn}
-      type="button"
-    >
-      ↳ {q}
-    </button>
-  ))}
-</div>
+  <>
+    <div className={styles.divider} />
+    <div className={styles.followUps}>
+      {followUps.map((q) => (
+        <button
+          key={q}
+          onClick={() => send(q)}
+          className={styles.quickBtn}
+        >
+          ↳ {q}
+        </button>
+      ))}
+    </div>
+  </>
+)}
 
-    )}
   </div>
 )
 

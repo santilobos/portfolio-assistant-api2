@@ -70,32 +70,26 @@
 
 
 .quickBtn {
-  width: 100%;
   text-align: left;
-
-  padding: 22px 18px;
-  border-radius: 8px;
-  border: 1px solid #D6DCE3;
+  padding: 14px 16px;
+  border-radius: 6px;
+  border: 1px solid #d6dce3;
   background: transparent;
-  color: #111111;
-
-  font-size: 1rem;
-  line-height: 1.2;
-  font-weight: 400;
-
+  color: #6b7280;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition:
-    background-color .12s ease,
-    border-color .12s ease,
-    color .12s ease;
+  transition: 
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
-
-.quickBtn:hover{
-  color: rgb(255,92,0);
-  background: rgba(255,255,255,0.7);
-  border-color:#C9D1DA;
+.quickBtn:hover {
+  color: rgb(255, 92, 0);
+  border-color: rgb(255, 92, 0);
+  background: rgba(255, 92, 0, 0.04);
 }
+
 
 /* Composer (input abajo) */
 .composerWrap{
@@ -117,7 +111,7 @@
   border: 1px solid #D6DCE3;
   background: rgba(255,255,255,0.9);
   padding: 0 16px;
-  font-size: 18px;
+  font-size: 1rem;
   outline:none;
   color:#111111;
   font-family: inherit;
@@ -247,7 +241,7 @@
   margin-top: 18px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 24px;
 }
 
 .followUpBtn{
@@ -306,4 +300,11 @@
 
 .sendIcon{
   display:block;
+}
+
+
+.divider {
+  height: 1px;
+  background-color: #e6e6e6; /* gris suave */
+  margin: 20px 0 16px;
 }
