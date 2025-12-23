@@ -35,6 +35,15 @@ export default function Widget() {
 
 const typingIntervalRef = React.useRef<number | null>(null)
 
+const [mounted, setMounted] = React.useState(false)
+
+React.useEffect(() => {
+  // espera al primer paint para que el transition dispare sí o sí
+  const id = requestAnimationFrame(() => setMounted(true))
+  return () => cancelAnimationFrame(id)
+}, [])
+
+
 function typeAssistantMessage(fullText: string) {
   if (typingIntervalRef.current) {
     window.clearInterval(typingIntervalRef.current)
@@ -347,7 +356,11 @@ setMessages((prev) => [
 ]
 
   return (
-    <div className={`${styles.app} ${aeonik.className}`}>
+  <div
+    className={`${styles.app} ${aeonik.className} ${styles.fadeIn} ${
+      mounted ? styles.fadeInOn : ""
+    }`}
+  >
        <ChatHeader
       onReset={() => {
         setMessages([])
