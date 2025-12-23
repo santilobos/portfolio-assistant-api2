@@ -1,141 +1,308 @@
-.page {
-  --background: #fafafa;
-  --foreground: #fff;
+/* app/widget/page.module.css */
 
-  --text-primary: #000;
-  --text-secondary: #666;
-
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
-
-  display: flex;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-geist-sans);
-  background-color: var(--background);
+/* Base */
+.app{
+  height: 100vh;
+  display:flex;
+  flex-direction:column;
+  background:#F5F6F7;
+  color:#111111;
+  color-scheme: light;
+  font-family: inherit;
 }
 
-.main {
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-  max-width: 800px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  background-color: var(--foreground);
-  padding: 120px 60px;
-}
-
-.intro {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 24px;
-}
-
-.intro h1 {
-  max-width: 320px;
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 48px;
-  letter-spacing: -2.4px;
-  text-wrap: balance;
-  color: var(--text-primary);
-}
-
-.intro p {
-  max-width: 440px;
-  font-size: 18px;
-  line-height: 32px;
-  text-wrap: balance;
-  color: var(--text-secondary);
-}
-
-.intro a {
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.ctas {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 440px;
+/* Mensajes */
+.messages{
+  flex:1;
+  overflow-y:auto;
+  padding: 16px;
+  display:flex;
+  flex-direction:column;
   gap: 16px;
-  font-size: 14px;
 }
 
-.ctas a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 128px;
-  border: 1px solid transparent;
-  transition: 0.2s;
-  cursor: pointer;
-  width: fit-content;
+/* Assistant (texto grande tipo hero) */
+.assistantRow{
+  padding: 8px 0 0;
+}
+
+.chatTitle {
+  font-size: 1.7rem;
   font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  color: #111;
 }
 
-a.primary {
-  background: var(--text-primary);
-  color: var(--background);
-  gap: 8px;
+
+.assistantText{
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 500;
+  color:#000000;
+  max-width: 520px;
 }
 
-a.secondary {
-  border-color: var(--button-secondary-border);
+/* User bubble (si la quieres suave, no “chatty”) */
+.userRow{
+  display:flex;
+  justify-content:flex-end;
+   margin-bottom: 48px; 
 }
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
-  }
+.userBubble{
+  max-width: 78%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(17,17,17,0.06);
+  color:#111111;
+  font-size: 14px;
+  line-height: 1.4;
+}
 
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
+/* Quick buttons */
+.quickGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+
+.quickBtn {
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 6px;
+  border: 1px solid #d6dce3;
+  background: transparent;
+  color: #6b7280;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: 
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.quickBtn:hover {
+  color: rgb(255, 92, 0);
+  border-color: rgb(255, 92, 0);
+  background: rgba(255, 92, 0, 0.04);
+}
+
+
+/* Composer (input abajo) */
+.composerWrap{
+  padding: 14px 18px 18px;
+  border-top: 1px solid #D6DCE3;
+  background:#F5F6F7;
+}
+
+.composer{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+}
+
+.input{
+  flex:1;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid #D6DCE3;
+  background: rgba(255,255,255,0.9);
+  padding: 0 16px;
+  font-size: 1rem;
+  outline:none;
+  color:#111111;
+  font-family: inherit;
+  color-scheme: light;
+}
+
+/* 1) Reset general del input (Safari/Chrome) */
+.input{
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* 2) Quitar autofill/fondo interno oscuro (Chrome/Safari) */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active{
+  -webkit-box-shadow: 0 0 0 9999px rgba(255,255,255,0.9) inset !important;
+  box-shadow: 0 0 0 9999px rgba(255,255,255,0.9) inset !important;
+  -webkit-text-fill-color: #111111 !important;
+  caret-color: #111111;
+  transition: background-color 9999s ease-out 0s;
+}
+
+/* 3) Quitar highlight al hacer tap (iOS) */
+.input{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 4) Si el navegador mete focus outline raro, lo controlamos */
+.input:focus{
+  outline: none;
+}
+
+
+.input::placeholder{
+  font-family: inherit;
+  font-weight: 400;
+  color: rgba(17,17,17,0.35);
+}
+
+.sendBtn{
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  border: 1px solid #D6DCE3;
+  background: rgba(255,255,255,0.9);
+  cursor:pointer;
+  font-size: 20px;
+  line-height: 1;
+  color:#111111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.sendBtnEnabled:hover{
+  background: #ffffff;
+}
+
+.sendBtnDisabled{
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* Empuja el bloque de intro al fondo del área de mensajes */
+.intro{
+  margin-top: auto;      /* 👈 magia: empuja hacia abajo */
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 12px;  /* aire con el input */
+}
+
+
+/* --- Thinking shimmer --- */
+.thinkingRow{
+  padding: 8px 0 14px;
+}
+
+.thinking{
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(17,17,17,0.35);
+
+  /* shimmer magic */
+  background: linear-gradient(
+    90deg,
+    rgba(17,17,17,0.25) 0%,
+    rgba(17,17,17,0.55) 40%,
+    rgba(17,17,17,0.25) 80%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: shimmer 1.6s infinite linear;
+}
+
+@keyframes shimmer{
+  0%{
+    background-position: 200% 0;
+  }
+  100%{
+    background-position: -200% 0;
   }
 }
 
-@media (max-width: 600px) {
-  .main {
-    padding: 48px 24px;
-  }
 
-  .intro {
-    gap: 16px;
+@keyframes fadeInTyping {
+  from {
+    opacity: 0;
   }
-
-  .intro h1 {
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -1.92px;
+  to {
+    opacity: 1;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
-  }
+.assistantTyping {
+  animation: fadeInTyping 0.45s cubic-bezier(.22,.61,.36,1);
 
-  .page {
-    --background: #000;
-    --foreground: #000;
+}
 
-    --text-primary: #ededed;
-    --text-secondary: #999;
 
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
-  }
+.followUps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.followUpBtn {
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+
+  font-size: 1rem;
+  color: #6b7280; /* gris suave */
+  cursor: pointer;
+
+  transition: color 0.15s ease;
+}
+
+.followUpBtn:hover {
+  color: rgb(255, 92, 0); /* naranja */
+}
+
+
+.followUpBtn:focus-visible{
+  outline: none;
+  color: rgb(255,92,0);
+}
+
+
+/* Icono ↳ */
+.followUpIcon {
+  color: rgba(17, 17, 17, 0.35);
+  flex-shrink: 0;
+}
+
+
+.sendBtn{
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: rgba(17,17,17,0.35); /* gris por defecto */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.sendBtnActive{
+  color: rgb(255,92,0); /* naranja */
+}
+
+.sendBtn:disabled{
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.sendIcon{
+  display:block;
+}
+
+
+.divider {
+  height: 1px;
+  background-color: #e6e6e6; /* gris suave */
+  margin: 20px 0 16px;
 }
