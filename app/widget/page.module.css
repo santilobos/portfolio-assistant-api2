@@ -202,14 +202,15 @@
 }
 
 /* --- Reset de Inputs --- */
-input {
+/* Usamos :global para decirle a Next.js que sabemos lo que hacemos */
+.app :global(input) {
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
   outline: none;
 }
 
-input:-webkit-autofill {
+.app :global(input:-webkit-autofill) {
   -webkit-box-shadow: 0 0 0 9999px white inset !important;
   box-shadow: 0 0 0 9999px white inset !important;
 }
