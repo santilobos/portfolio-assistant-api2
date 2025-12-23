@@ -1,12 +1,12 @@
 "use client"
 
-export const dynamic = "force-dynamic"
-
 import * as React from "react"
 
 import styles from "./page.module.css"
 
 import localFont from "next/font/local"
+
+export const dynamic = "force-dynamic"
 
 const aeonik = localFont({
   src: "../fonts/AeonikPro-Regular.woff",
@@ -58,6 +58,192 @@ function typeAssistantMessage(fullText: string) {
   }, speed)
 }
 
+function ChatHeader({
+  onReset,
+  onClose,
+}: {
+  onReset: () => void
+  onClose: () => void
+}) {
+  const [open, setOpen] = React.useState(false)
+  const btnRef = React.useRef<HTMLButtonElement | null>(null)
+  const cardRef = React.useRef<HTMLDivElement | null>(null)
+
+  // click fuera + ESC
+  React.useEffect(() => {
+    if (!open) return
+
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Node
+      if (cardRef.current?.contains(t)) return
+      if (btnRef.current?.contains(t)) return
+      setOpen(false)
+    }
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false)
+    }
+
+    document.addEventListener("pointerdown", onDown, true)
+    window.addEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true)
+      window.removeEventListener("keydown", onKey)
+    }
+  }, [open])
+
+  // posición del popover anclado al botón
+  const [pos, setPos] = React.useState({ top: 56, left: 0, width: 520 })
+
+  React.useEffect(() => {
+    if (!open) return
+
+    const update = () => {
+      const rect = btnRef.current?.getBoundingClientRect()
+      const vw = window.innerWidth
+      const pad = 16
+      const width = Math.min(520, vw - pad * 2)
+
+      const idealLeft = rect ? rect.left + rect.width / 2 : vw / 2
+      const minLeft = pad + width / 2
+      const maxLeft = vw - pad - width / 2
+      const left = Math.max(minLeft, Math.min(maxLeft, idealLeft))
+
+      const top = rect ? rect.bottom + 10 : 56
+      setPos({ top, left, width })
+    }
+
+    update()
+    window.addEventListener("resize", update)
+    window.addEventListener("scroll", update, true)
+    return () => {
+      window.removeEventListener("resize", update)
+      window.removeEventListener("scroll", update, true)
+    }
+  }, [open])
+
+  return (
+    <>
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
+          background: "#fff",
+          borderBottom: "1px solid rgba(0,0,0,0.08)",
+          padding: "14px 16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ fontWeight: 700, letterSpacing: 0.5 }}>CHAT LLM</div>
+
+          <button
+            ref={btnRef}
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Info"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 999,
+              border: "1px solid rgba(0,0,0,0.12)",
+              background: "#fff",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+              font: "inherit",
+              color: "rgba(0,0,0,0.65)",
+            }}
+          >
+            i
+          </button>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button
+            onClick={onReset}
+            aria-label="Reset"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 999,
+              border: "1px solid rgba(0,0,0,0.12)",
+              background: "#fff",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+              font: "inherit",
+              color: "rgba(0,0,0,0.65)",
+            }}
+          >
+            ↻
+          </button>
+
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 999,
+              border: "1px solid rgba(0,0,0,0.12)",
+              background: "#fff",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+              font: "inherit",
+              color: "rgba(0,0,0,0.65)",
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <>
+          {/* backdrop invisible para detectar click fuera */}
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 9998,
+              background: "transparent",
+            }}
+          />
+
+          <div
+            ref={cardRef}
+            style={{
+              position: "fixed",
+              top: pos.top,
+              left: pos.left,
+              transform: "translateX(-50%)",
+              width: pos.width,
+              zIndex: 9999,
+              background: "#F3F6FA",
+              border: "1px solid rgba(0,0,0,0.10)",
+              borderRadius: 14,
+              padding: 14,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+              color: "rgba(0,0,0,0.65)",
+              lineHeight: 1.4,
+              font: "inherit",
+              writingMode: "horizontal-tb",
+            }}
+          >
+            ChatLLM is an AI chatbot. May contain hallucinations. Responses are
+            logged for research and development purposes.
+          </div>
+        </>
+      )}
+    </>
+  )
+}
+
+
 React.useEffect(() => {
   return () => {
     if (typingIntervalRef.current) window.clearInterval(typingIntervalRef.current)
@@ -77,11 +263,12 @@ React.useEffect(() => {
   setInput("")
   setLoading(true)
 
-  // 1️⃣ mensaje del usuario
-  setMessages((prev) => [...prev, { role: "user", content: q }])
+setMessages((prev) => [
+  ...prev,
+  { role: "user", content: q },
+  { role: "assistant", content: "" },
+])
 
-  // 2️⃣ placeholder del assistant (VACÍO)
-  setMessages((prev) => [...prev, { role: "assistant", content: "" }])
 
   try {
     const res = await fetch("/api/chat", {
@@ -112,8 +299,20 @@ React.useEffect(() => {
   "How do you approach product strategy?",
   "What technologies do you use?"
 ]
+
   return (
     <div className={`${styles.app} ${aeonik.className}`}>
+       <ChatHeader
+      onReset={() => {
+        setMessages([])
+        setInput("")
+        setLoading(false)
+      }}
+      onClose={() => {
+        // le pide a Framer que cierre el panel
+        window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")
+      }}
+    />
       {/* Messages */}
       <div ref={listRef} className={styles.messages}>
   {messages.map((m, i) => {
