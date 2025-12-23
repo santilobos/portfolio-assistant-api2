@@ -229,8 +229,7 @@ function ChatHeader({
   <button
   onClick={() => {
     window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")
-    onClose()
-  }}
+   }}
   aria-label="Close"
   style={{ ...iconBtnBase, ...iconAction }}
   {...withHover("rgba(0,0,0,0.08)")}
