@@ -4,6 +4,14 @@ import * as React from "react"
 
 import styles from "./page.module.css"
 
+import { Azeret_Mono } from "next/font/google"
+
+const azeret = Azeret_Mono({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+})
+
+
 import localFont from "next/font/local"
 
 export const dynamic = "force-dynamic"
@@ -57,6 +65,31 @@ function typeAssistantMessage(fullText: string) {
     }
   }, speed)
 }
+
+function Icon({ src, alt }: { src: string; alt: string }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      width={18}
+      height={18}
+      style={{ display: "block" }}
+    />
+  )
+}
+
+const iconBtn: React.CSSProperties = {
+  width: 32,
+  height: 32,
+  borderRadius: 999,
+  border: "1px solid rgba(0,0,0,0.12)",
+  background: "#fff",
+  display: "grid",
+  placeItems: "center",
+  cursor: "pointer",
+  padding: 0,
+}
+
 
 function ChatHeader({
   onReset,
@@ -125,81 +158,58 @@ function ChatHeader({
   return (
     <>
       <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 50,
-          background: "#fff",
-          borderBottom: "1px solid rgba(0,0,0,0.08)",
-          padding: "14px 16px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
+         style={{
+    height: 56,
+    minHeight: 56,
+    maxHeight: 56,
+    position: "sticky",
+    top: 0,
+    zIndex: 50,
+    background: "#fff",
+    borderBottom: "1px solid rgba(0,0,0,0.08)",
+    padding: "0 16px",              // 👈 sin padding vertical
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    boxSizing: "border-box",
+  }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ fontWeight: 700, letterSpacing: 0.5 }}>CHAT LLM</div>
+  <div style={{ fontWeight: 700, letterSpacing: 0.5 }}>
+    CHAT LLM
+  </div>
 
-          <button
-            ref={btnRef}
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Info"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 999,
-              border: "1px solid rgba(0,0,0,0.12)",
-              background: "#fff",
-              display: "grid",
-              placeItems: "center",
-              cursor: "pointer",
-              font: "inherit",
-              color: "rgba(0,0,0,0.65)",
-            }}
-          >
-            i
-          </button>
-        </div>
+  <button
+    ref={btnRef}
+    onClick={() => setOpen(v => !v)}
+    aria-label="Info"
+    style={iconBtn}
+  >
+    <Icon src="/icons/info.svg" alt="Info" />
+  </button>
+</div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button
-            onClick={onReset}
-            aria-label="Reset"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 999,
-              border: "1px solid rgba(0,0,0,0.12)",
-              background: "#fff",
-              display: "grid",
-              placeItems: "center",
-              cursor: "pointer",
-              font: "inherit",
-              color: "rgba(0,0,0,0.65)",
-            }}
-          >
-            ↻
-          </button>
+<div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+  <button
+    onClick={onReset}
+    aria-label="Reset"
+    style={iconBtn}
+  >
+    <Icon src="/icons/reset.svg" alt="Reset" />
+  </button>
 
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 999,
-              border: "1px solid rgba(0,0,0,0.12)",
-              background: "#fff",
-              display: "grid",
-              placeItems: "center",
-              cursor: "pointer",
-              font: "inherit",
-              color: "rgba(0,0,0,0.65)",
-            }}
-          >
-            ✕
-          </button>
-        </div>
+  <button
+    onClick={() => {
+      window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")
+      onClose()
+    }}
+    aria-label="Close"
+    style={iconBtn}
+  >
+    <Icon src="/icons/close.svg" alt="Close" />
+  </button>
+</div>
+
       </div>
 
       {open && (
@@ -242,6 +252,7 @@ function ChatHeader({
     </>
   )
 }
+
 
 
 React.useEffect(() => {
