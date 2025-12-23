@@ -2,29 +2,31 @@
 
 /* Base */
 .app{
-  height: var(--vvh, 100vh);
-  max-height: var(--vvh, 100vh);
+  /* fallback base */
+  height: 100vh;
+
+  /* mejor para mobile moderno (Android/iOS) */
+  height: 100dvh;
+
+  /* si tu JS calcula --vvh, esto gana cuando exista */
+  height: var(--vvh, 100dvh);
+
+  max-height: var(--vvh, 100dvh);
+
   display: flex;
   flex-direction: column;
-  background: #F5F6F7;
-  color: #111111;
-  color-scheme: light;
-  font-family: inherit;
   overflow: hidden;
 }
 
 
-/* Mensajes */
+
 .messages{
   flex: 1 1 auto;
-  min-height: 0;              /* 🔥 clave en flex para que el scroll funcione */
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
+
 
 
 /* Assistant (texto grande tipo hero) */

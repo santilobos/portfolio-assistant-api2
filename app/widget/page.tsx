@@ -38,8 +38,13 @@ const typingIntervalRef = React.useRef<number | null>(null)
 React.useEffect(() => {
   const setVH = () => {
     const vv = window.visualViewport
-    const h = vv?.height ?? window.innerHeight
-    document.documentElement.style.setProperty("--vvh", `${h}px`)
+    if (vv) {
+      // en Android a veces height es correcto pero hay offsetTop/offsetLeft
+      const h = Math.round(vv.height)
+      document.documentElement.style.setProperty("--vvh", `${h}px`)
+    } else {
+      document.documentElement.style.setProperty("--vvh", `${window.innerHeight}px`)
+    }
   }
 
   setVH()
@@ -53,6 +58,7 @@ React.useEffect(() => {
     window.removeEventListener("resize", setVH)
   }
 }, [])
+
 
 
 React.useEffect(() => {
@@ -510,8 +516,9 @@ setMessages((prev) => [
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
+            onFocus={() => setTimeout(() => listRef.current?.scrollTo(0, listRef.current.scrollHeight), 50)}
             placeholder="Ask about me…"
-            style={{ flex: 1, border: "none", outline: "none", fontSize: 14 }}
+            style={{ flex: 1, border: "none", outline: "none", fontSize: "1rem" }}
           />
 
 <button
