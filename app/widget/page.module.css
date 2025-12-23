@@ -191,7 +191,6 @@
   100% { background-position: -200% 0; }
 }
 
-/* Suaviza la aparición del texto mientras se escribe */
 .assistantTyping {
   animation: fadeInTyping 0.4s ease-out;
 }
@@ -201,16 +200,26 @@
   to { opacity: 1; }
 }
 
-/* --- Reset de Inputs --- */
-/* Usamos :global para decirle a Next.js que sabemos lo que hacemos */
+/* --- RESET DE SELECTORES GLOBALES (Solución para Vercel) --- */
+
 .app :global(input) {
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
   outline: none;
+  border: none;
+  font-family: inherit;
+}
+
+.app :global(input::placeholder) {
+  color: rgba(17, 17, 17, 0.35);
 }
 
 .app :global(input:-webkit-autofill) {
   -webkit-box-shadow: 0 0 0 9999px white inset !important;
   box-shadow: 0 0 0 9999px white inset !important;
+}
+
+.app :global(svg) {
+  display: block;
 }
