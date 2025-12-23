@@ -281,3 +281,35 @@
   color: rgba(17, 17, 17, 0.35);
   flex-shrink: 0;
 }
+
+
+.sendBtn{
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+
+  color: #b5b5b5;          /* gris por defecto */
+  transition: color .2s ease;
+}
+
+.sendBtn.active{
+  color: rgb(255,92,0);    /* naranja cuando hay texto */
+}
+
+.sendBtn:disabled{
+  cursor:not-allowed;
+  opacity:.4;
+}
+
+/* IMPORTANTE: el <img> no hereda color.
+   Si tu SVG depende de currentColor, tienes que renderizarlo inline
+   o usar mask. */
+.sendIcon{
+  width: 18px;
+  height: 18px;
+}

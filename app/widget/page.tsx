@@ -21,6 +21,7 @@ export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([])
   const [input, setInput] = React.useState("")
   const [loading, setLoading] = React.useState(false)
+  const hasText = input.trim().length > 0
 
   const listRef = React.useRef<HTMLDivElement | null>(null)
 
@@ -211,21 +212,17 @@ React.useEffect(() => {
             placeholder="Ask about me…"
             style={{ flex: 1, border: "none", outline: "none", fontSize: 14 }}
           />
-          <button
-            onClick={() => send()}
-            disabled={loading || input.trim().length === 0}
-            style={{
-              width: 36,
-              height: 36,
-              border: "none",
-              background: "transparent",
-              cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.4 : 1,
-              fontSize: 18,
-            }}
-          >
-            ↑
-          </button>
+
+<button
+  onClick={() => send()}
+  disabled={loading || !hasText}
+  className={`${styles.sendBtn} ${hasText ? styles.active : ""}`}
+>
+  <img src="/icons/send.svg" alt="Send" className={styles.sendIcon} />
+</button>
+
+
+
         </div>
       </div>
     </div>
