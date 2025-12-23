@@ -233,48 +233,38 @@
 }
 
 
-.followUps {
-  margin-top: 20px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(17, 17, 17, 0.08);
+.followUps{
+  margin-top: 18px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
-/* El botón ahora parece un link */
-.followUpBtn {
+.followUpBtn{
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+
+  color: rgba(17,17,17,0.45);
+  font-size: 16px;
+  line-height: 1.35;
+
   display: inline-flex;
   align-items: center;
   gap: 10px;
-
-  background: transparent;
-  border: none;
-  padding: 0;
-
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.4;
-  color: rgba(17, 17, 17, 0.55);
-
-  cursor: pointer;
-  text-align: left;
-  width: fit-content;
 }
 
-.followUpBtn:hover {
-  color: rgb(255, 94, 0);
+.followUpBtn:hover{
+  color: rgb(255,92,0);
 }
 
-.followUpBtn:active {
-  transform: translateY(1px);
+.followUpBtn:focus-visible{
+  outline: none;
+  color: rgb(255,92,0);
 }
 
-.followUpBtn:focus-visible {
-  outline: 2px solid rgba(17, 17, 17, 0.18);
-  outline-offset: 4px;
-  border-radius: 6px;
-}
 
 /* Icono ↳ */
 .followUpIcon {
@@ -286,30 +276,24 @@
 .sendBtn{
   width: 36px;
   height: 36px;
+  border: 0;
   background: transparent;
-  border: none;
+  cursor: pointer;
+  color: rgba(17,17,17,0.35); /* gris por defecto */
   display:flex;
   align-items:center;
   justify-content:center;
-  cursor:pointer;
-
-  color: #b5b5b5;          /* gris por defecto */
-  transition: color .2s ease;
 }
 
-.sendBtn.active{
-  color: rgb(255,92,0);    /* naranja cuando hay texto */
+.sendBtnActive{
+  color: rgb(255,92,0); /* naranja */
 }
 
 .sendBtn:disabled{
-  cursor:not-allowed;
-  opacity:.4;
+  cursor: not-allowed;
+  opacity: .5;
 }
 
-/* IMPORTANTE: el <img> no hereda color.
-   Si tu SVG depende de currentColor, tienes que renderizarlo inline
-   o usar mask. */
 .sendIcon{
-  width: 18px;
-  height: 18px;
+  display:block;
 }

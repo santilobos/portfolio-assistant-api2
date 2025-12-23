@@ -151,18 +151,18 @@ React.useEffect(() => {
     {/* Follow-up questions SOLO bajo la última respuesta */}
     {isLastAssistant && !loading && (
       <div className={styles.followUps}>
-        {followUps.map((q) => (
-          <button
-  key={q}
-  onClick={() => send(q)}
-  className={styles.followUpBtn}
->
-  <span className={styles.followUpIcon}>↳</span>
-  <span>{q}</span>
-</button>
+  {followUps.map((q) => (
+    <button
+      key={q}
+      onClick={() => send(q)}
+      className={styles.followUpBtn}
+      type="button"
+    >
+      ↳ {q}
+    </button>
+  ))}
+</div>
 
-        ))}
-      </div>
     )}
   </div>
 )
@@ -216,10 +216,24 @@ React.useEffect(() => {
 <button
   onClick={() => send()}
   disabled={loading || !hasText}
-  className={`${styles.sendBtn} ${hasText ? styles.active : ""}`}
+  className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
+  aria-label="Send"
 >
-  <img src="/icons/send.svg" alt="Send" className={styles.sendIcon} />
+  <svg
+    className={styles.sendIcon}
+    width="24"
+    height="24"
+    viewBox="0 0 960 960"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <path
+      d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"
+      fill="currentColor"
+    />
+  </svg>
 </button>
+
 
 
 
