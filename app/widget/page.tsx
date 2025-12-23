@@ -35,6 +35,46 @@ export default function Widget() {
 
 const typingIntervalRef = React.useRef<number | null>(null)
 
+React.useEffect(() => {
+  const setVH = () => {
+    const vv = window.visualViewport
+    const h = vv?.height ?? window.innerHeight
+    document.documentElement.style.setProperty("--vvh", `${h}px`)
+  }
+
+  setVH()
+  window.visualViewport?.addEventListener("resize", setVH)
+  window.visualViewport?.addEventListener("scroll", setVH)
+  window.addEventListener("resize", setVH)
+
+  return () => {
+    window.visualViewport?.removeEventListener("resize", setVH)
+    window.visualViewport?.removeEventListener("scroll", setVH)
+    window.removeEventListener("resize", setVH)
+  }
+}, [])
+
+
+React.useEffect(() => {
+  const setVH = () => {
+    const vv = window.visualViewport
+    const h = vv?.height ?? window.innerHeight
+    document.documentElement.style.setProperty("--vvh", `${h}px`)
+  }
+
+  setVH()
+  window.visualViewport?.addEventListener("resize", setVH)
+  window.visualViewport?.addEventListener("scroll", setVH)
+  window.addEventListener("resize", setVH)
+
+  return () => {
+    window.visualViewport?.removeEventListener("resize", setVH)
+    window.visualViewport?.removeEventListener("scroll", setVH)
+    window.removeEventListener("resize", setVH)
+  }
+}, [])
+
+
 function typeAssistantMessage(fullText: string) {
   if (typingIntervalRef.current) {
     window.clearInterval(typingIntervalRef.current)
@@ -347,7 +387,11 @@ setMessages((prev) => [
 ]
 
   return (
-    <div className={`${styles.app} ${aeonik.className}`}>
+    <div
+  className={`${styles.app} ${aeonik.className}`}
+  style={{ height: "var(--vvh)", maxHeight: "var(--vvh)" }}
+>
+
        <ChatHeader
       onReset={() => {
         setMessages([])
@@ -442,7 +486,15 @@ setMessages((prev) => [
 
 
       {/* Input */}
-      <div style={{ padding: 14, borderTop: "1px solid rgba(0,0,0,0.12)" }}>
+      <div
+  style={{
+    padding: 14,
+    paddingBottom: "calc(14px + env(safe-area-inset-bottom))",
+    borderTop: "1px solid rgba(0,0,0,0.12)",
+    background: "#fff",
+  }}
+>
+
         <div
           style={{
             display: "flex",
