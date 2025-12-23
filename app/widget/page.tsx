@@ -78,17 +78,41 @@ function Icon({ src, alt }: { src: string; alt: string }) {
   )
 }
 
-const iconBtn: React.CSSProperties = {
+const iconBtnBase: React.CSSProperties = {
   width: 32,
   height: 32,
   borderRadius: 999,
-  border: "1px solid rgba(0,0,0,0.12)",
-  background: "#fff",
+  border: "none",
+  background: "transparent",
   display: "grid",
   placeItems: "center",
   cursor: "pointer",
   padding: 0,
+  transition: "background-color 0.15s ease",
 }
+
+const iconInfo: React.CSSProperties = {
+  color: "rgba(0,0,0,0.45)", // gris
+}
+
+const iconAction: React.CSSProperties = {
+  color: "#000", // negro
+}
+
+
+
+function withHover(bg = "rgba(0,0,0,0.06)") {
+  return {
+    onMouseEnter: (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.backgroundColor = bg
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.backgroundColor = "transparent"
+    },
+  }
+}
+
+
 
 
 function ChatHeader({
@@ -176,38 +200,44 @@ function ChatHeader({
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: azeret.style.fontFamily }}>
   <div style={{ fontWeight: 400, letterSpacing: 0.5 }}>
-    CHAT LLM
+    CHATLLM
   </div>
 
   <button
-    ref={btnRef}
-    onClick={() => setOpen(v => !v)}
-    aria-label="Info"
-    style={iconBtn}
-  >
-    <Icon src="/icons/info.svg" alt="Info" />
-  </button>
+  ref={btnRef}
+  onClick={() => setOpen(v => !v)}
+  aria-label="Info"
+  style={{ ...iconBtnBase, ...iconInfo }}
+  {...withHover("rgba(0,0,0,0.06)")}
+>
+  <Icon src="/icons/info.svg" alt="Info" />
+</button>
+
 </div>
 
 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
   <button
-    onClick={onReset}
-    aria-label="Reset"
-    style={iconBtn}
-  >
-    <Icon src="/icons/reset.svg" alt="Reset" />
-  </button>
+  onClick={onReset}
+  aria-label="Reset"
+  style={{ ...iconBtnBase, ...iconAction }}
+  {...withHover("rgba(0,0,0,0.08)")}
+>
+  <Icon src="/icons/reset.svg" alt="Reset" />
+</button>
+
 
   <button
-    onClick={() => {
-      window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")
-      onClose()
-    }}
-    aria-label="Close"
-    style={iconBtn}
-  >
-    <Icon src="/icons/close.svg" alt="Close" />
-  </button>
+  onClick={() => {
+    window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")
+    onClose()
+  }}
+  aria-label="Close"
+  style={{ ...iconBtnBase, ...iconAction }}
+  {...withHover("rgba(0,0,0,0.08)")}
+>
+  <Icon src="/icons/close.svg" alt="Close" />
+</button>
+
 </div>
 
       </div>
