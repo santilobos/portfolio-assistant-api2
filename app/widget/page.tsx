@@ -4,6 +4,8 @@ import * as React from "react"
 
 import styles from "./page.module.css"
 
+import { useLayoutEffect } from "react"
+
 import { Azeret_Mono } from "next/font/google"
 
 const azeret = Azeret_Mono({
@@ -26,6 +28,26 @@ const aeonik = localFont({
 type Msg = { role: "user" | "assistant"; content: string }
 
 export default function Widget() {
+  useLayoutEffect(() => {
+    const setVH = () => {
+      const vv = window.visualViewport
+      const h = Math.floor(vv?.height ?? window.innerHeight)
+      document.documentElement.style.setProperty("--vvh", `${h}px`)
+    }
+
+    setVH()
+
+    window.visualViewport?.addEventListener("resize", setVH)
+    window.visualViewport?.addEventListener("scroll", setVH)
+    window.addEventListener("resize", setVH)
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", setVH)
+      window.visualViewport?.removeEventListener("scroll", setVH)
+      window.removeEventListener("resize", setVH)
+    }
+  }, [])
+  
   const [messages, setMessages] = React.useState<Msg[]>([])
   const [input, setInput] = React.useState("")
   const [loading, setLoading] = React.useState(false)
@@ -34,6 +56,10 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null)
 
 const typingIntervalRef = React.useRef<number | null>(null)
+
+
+
+
 
 function typeAssistantMessage(fullText: string) {
   if (typingIntervalRef.current) {
@@ -491,3 +517,5 @@ setMessages((prev) => [
     </div>
   )
 }
+
+
