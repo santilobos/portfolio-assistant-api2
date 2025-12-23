@@ -190,7 +190,7 @@ function ChatHeader({
     top: 0,
     zIndex: 50,
     background: "#fff",
-    borderBottom: "1px solid rgba(198,209,221,)",
+    borderBottom: "1px solid rgba(198,209,221,100)",
     padding: "0 16px",              // 👈 sin padding vertical
     display: "flex",
     alignItems: "center",
