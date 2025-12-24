@@ -251,17 +251,16 @@
 
 @media (max-width: 768px) {
   .app {
-    position: fixed;
+    position: fixed !important; /* Forzamos que no se mueva */
     top: 0;
     left: 0;
-    width: 100%;
-    /* Cambia 100dvh por 100vh o una altura fija si notas que parpadea */
-    height: 100dvh; 
-    z-index: 9999;
-    
-    /* ESTO ES CLAVE: */
-    overflow: hidden; 
-    touch-action: manipulation; /* Evita gestos extraños del navegador */
+    right: 0;
+    bottom: 0;
+    height: 100% !important; /* Cambiamos 100dvh por 100% para que el teclado no lo achique */
+    width: 100vw;
+    z-index: 99999;
+    background: #ffffff;
+    overflow: hidden;
   }
 
   .messages {

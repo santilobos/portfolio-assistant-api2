@@ -370,21 +370,30 @@ React.useEffect(() => {
           padding: "10px 12px" 
         }}>
           <input 
-            value={input} 
-            onChange={e => setInput(e.target.value)} 
-            onKeyDown={e => e.key === "Enter" && send()} 
-            // ESTO EVITA QUE EL TOQUE CIERRE EL OVERLAY EN ANDROID
-            onClick={(e) => e.stopPropagation()} 
-            onTouchEnd={(e) => e.stopPropagation()}
-            placeholder="Ask about me…" 
-            style={{ 
-              flex: 1, 
-              border: "none", 
-              outline: "none", 
-              fontSize: "16px", 
-              padding: "8px 0"
-            }} 
-          />
+          value={input} 
+          onChange={e => setInput(e.target.value)} 
+          onKeyDown={e => e.key === "Enter" && send()} 
+          // Modifica estos eventos así:
+          onTouchStart={(e) => {
+            // Esto evita que el navegador dispare eventos extra que cierran el overlay
+            e.stopPropagation();
+          }}
+          onFocus={(e) => {
+            e.stopPropagation();
+            // Forzamos al scroll a quedarse quieto para que Framer no se pierda
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+          }}
+          placeholder="Ask about me…" 
+          style={{ 
+            flex: 1, 
+            border: "none", 
+            outline: "none", 
+            fontSize: "16px", 
+            padding: "8px 0",
+            background: "transparent"
+          }} 
+        />
                     <button 
             onClick={() => send()} 
             disabled={loading || !hasText} 
