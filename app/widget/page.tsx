@@ -88,6 +88,20 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null)
   const typingIntervalRef = React.useRef<NodeJS.Timeout | null>(null)
 
+React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        document.body.style.overflow = "hidden";
+        window.parent.postMessage({ type: "CHAT_OPEN_MOBILE" }, "*");
+      }
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+
   // Función de escritura robusta
   function typeAssistantMessage(fullText: string) {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)

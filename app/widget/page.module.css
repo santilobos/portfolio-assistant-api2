@@ -223,3 +223,41 @@
 .app :global(svg) {
   display: block;
 }
+
+/* --- Diseño Mobile (Estilo Rachel Chen) --- */
+
+@media (max-width: 768px) {
+  .app {
+    /* Ocupa toda la pantalla */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh; /* dvh es mejor para navegadores móviles (evita la barra de URL) */
+    z-index: 9999;
+    border-radius: 0; /* Quitamos bordes redondeados en mobile */
+    background: #ffffff; /* Fondo sólido para que no se vea lo de atrás */
+  }
+
+  .messages {
+    padding: 16px; /* Ajustamos un poco el aire en mobile */
+  }
+
+  .chatTitle {
+    font-size: 1.5rem; /* Título un poco más pequeño para que no rompa */
+  }
+
+  /* El header en mobile suele ser fijo para que no se pierda al hacer scroll */
+  .header {
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Ajuste de botones para que sean más fáciles de tocar con el dedo */
+  .quickBtn, .followUpBtn {
+    padding: 18px 16px; 
+    font-size: 1rem;
+  }
+}
