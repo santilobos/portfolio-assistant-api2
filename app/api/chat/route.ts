@@ -42,32 +42,31 @@ function buildSystemPrompt(intent: string) {
 }
 
 export async function POST(req: Request) {
-  // 1. Extraemos el cuerpo de la petición
   const body = await req.json().catch(() => ({}));
   
-  // 2. Registramos los mensajes que llegan
-  const incoming = body.messages || [];
-  
-  // 3. CAPTURA SEGURA: Buscamos el último mensaje del usuario
-  // Si no lo encuentra, pondremos un texto de aviso para depurar en Helicone
-  const lastUser = incoming.length > 0 
-    ? [...incoming].reverse().find((m: any) => m.role === "user")?.content 
-    : "No se detectó pregunta en el body";
+  // ESTO ES PARA DEPURAR: Veremos en la consola de Vercel qué llega
+  console.log("Cuerpo recibido:", JSON.stringify(body));
 
-  // 4. LLAMADA A OPENAI + HELICONE
+  // Intentamos capturar los mensajes de varias formas comunes
+  const incoming = body.messages || body.history || [];
+  
+  // Capturamos la pregunta
+  const lastUser = [...incoming].reverse().find((m: any) => m.role === "user")?.content 
+    || body.prompt // A veces los widgets envían el texto en 'prompt'
+    || "Pregunta no encontrada en el JSON";
+
   const completion = await client.chat.completions.create(
     {
-      model: "gpt-4o-mini", //
+      model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: BASE_SYSTEM_PROMPT }, //
+        { role: "system", content: BASE_SYSTEM_PROMPT },
         ...incoming
       ],
       temperature: 0.7,
     },
     {
       headers: {
-        // Importante: Usar minúsculas si así configuraste la columna
-        "Helicone-Property-User-Question": String(lastUser).substring(0, 200),
+        "Helicone-Property-User-Question": String(lastUser),
       },
     }
   );
