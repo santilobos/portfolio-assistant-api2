@@ -52,21 +52,14 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
   
   return (
     <div style={{
-      height: 56, 
-      position: "sticky", 
-      top: 0, 
-      zIndex: 50, 
-      background: "#fff",
-      borderBottom: "1px solid rgba(198, 209, 221, 1)", 
-      padding: "0 16px",
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "space-between", 
-      boxSizing: "border-box",
+      height: 56, position: "sticky", top: 0, zIndex: 50, background: "#fff",
+      borderBottom: "1px solid rgba(198, 209, 221, 1)", padding: "0 16px",
+      display: "flex", alignItems: "center", justifyContent: "space-between", boxSizing: "border-box",
     }}>
-      {/* SECCIÓN IZQUIERDA: Logo e Info */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: azeret.style.fontFamily }}>
-        <div style={{ fontSize: "0.9rem", fontWeight: 400, letterSpacing: 0.5 }}>CHATLLM</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, position: "relative" }}>
+        <div style={{ fontSize: "0.9rem", fontWeight: 400, letterSpacing: 0.5, fontFamily: azeret.style.fontFamily }}>CHATLLM</div>
+        
+        {/* BOTÓN INFO */}
         <button 
           ref={btnRef} 
           onClick={() => setOpen(!open)} 
@@ -74,17 +67,42 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
         >
           <Icon src="/icons/info.svg" alt="Info" />
         </button>
+
+        {/* POPOVER INFORMATIVO */}
+        {open && (
+          <>
+            {/* Overlay invisible para cerrar al hacer clic fuera */}
+            <div 
+              style={{ position: 'fixed', inset: 0, zIndex: 60 }} 
+              onClick={() => setOpen(false)} 
+            />
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              marginTop: "8px",
+              width: "240px",
+              padding: "12px",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              zIndex: 70,
+              fontSize: "0.75rem",
+              lineHeight: "1.4",
+              color: "#4a5568",
+              fontFamily: "inherit"
+            }}>
+              <strong>CHATLLM</strong> is an AI chatbot. May contain hallucinations. Responses are logged for research and development purposes.
+            </div>
+          </>
+        )}
       </div>
 
-      {/* SECCIÓN DERECHA: Reset y Cerrar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <button 
-          onClick={onReset} 
-          className="iconBtn"
-        >
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <button onClick={onReset} className="iconBtn">
           <Icon src="/icons/reset.svg" alt="Reset" />
         </button>
-
         <button 
           onClick={() => {
             if (typeof window !== "undefined") {
