@@ -287,19 +287,17 @@ React.useEffect(() => {
       </motion.div>
     ) : (
       <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        style={{ 
-          width: "100%", 
-          display: "flex", 
-          flexDirection: "column", 
-          gap: "20px",
-          /* FIX: Empuja el contenido hacia abajo para que no flote arriba */
-          marginTop: "auto",
-          /* Asegura que los mensajes más largos no se corten */
-          minHeight: "min-content" 
-        }}
-      >
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  style={{ 
+    width: "100%", 
+    display: "flex", 
+    flexDirection: "column", 
+    gap: "32px", // Aumentamos el espacio entre pregunta y respuesta
+    marginTop: "auto",
+    paddingBottom: "20px" 
+  }}
+>
         {messages.map((m, i) => {
           const isLastAssistant = m.role === "assistant" && i === messages.length - 1
           
