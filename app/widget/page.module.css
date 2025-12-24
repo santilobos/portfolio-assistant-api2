@@ -12,11 +12,12 @@
 }
 
 .messages {
-  flex: 1; /* OBLIGATORIO: Esto empuja el input al fondo */
-  overflow-y: auto;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 10px 0; /* Espacio para que no pegue a los bordes */
+  overflow-y: auto;
+  /* Aplicamos los mismos 14px que tiene tu caja de input */
+  padding: 0 14px; 
   -webkit-overflow-scrolling: touch;
 }
 
