@@ -44,16 +44,11 @@ function buildSystemPrompt(intent: string) {
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   
-  // ESTO ES PARA DEPURAR: Veremos en la consola de Vercel qué llega
-  console.log("Cuerpo recibido:", JSON.stringify(body));
-
-  // Intentamos capturar los mensajes de varias formas comunes
-  const incoming = body.messages || body.history || [];
+  // 1. Extraemos el array que ahora enviamos desde el page.tsx
+  const incoming = body.messages || [];
   
-  // Capturamos la pregunta
-  const lastUser = [...incoming].reverse().find((m: any) => m.role === "user")?.content 
-    || body.prompt // A veces los widgets envían el texto en 'prompt'
-    || "Pregunta no encontrada en el JSON";
+  // 2. Capturamos la última pregunta del usuario para Helicone
+  const lastUser = incoming.findLast((m: any) => m.role === "user")?.content || "Pregunta no encontrada";
 
   const completion = await client.chat.completions.create(
     {
@@ -66,7 +61,8 @@ export async function POST(req: Request) {
     },
     {
       headers: {
-        "Helicone-Property-User-Question": String(lastUser),
+        // Esto llenará por fin la columna en tu dashboard
+        "Helicone-Property-User-Question": lastUser,
       },
     }
   );

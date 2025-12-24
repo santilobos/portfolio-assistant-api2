@@ -188,28 +188,29 @@ React.useEffect(() => {
     setIntroKey(prev => prev + 1) // Dispara la animación de nuevo
   }
 
-  async function send(text?: string) {
-    const q = (text ?? input).trim()
-    if (!q || loading) return
-    
-    setInput("")
-    setLoading(true)
-    
-    setMessages(prev => [...prev, { role: "user", content: q }, { role: "assistant", content: "" }])
-    
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: q }),
-      })
-      const data = await res.json()
-      const answer = data.answer ?? data.text ?? data.reply ?? ""
-      typeAssistantMessage(answer)
-    } catch (e) {
-      typeAssistantMessage("Sorry, something went wrong.")
-    }
+ async function send(text?: string) {
+  const q = (text ?? input).trim();
+  if (!q || loading) return;
+  
+  setInput("");
+  setLoading(true);
+  
+  // Guardamos el nuevo estado de mensajes para enviarlo
+  const newMessages: Msg[] = [...messages, { role: "user", content: q }];
+  setMessages([...newMessages, { role: "assistant", content: "" }]);
+  
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // CAMBIO CLAVE: Enviamos 'messages' (el array completo) no 'message'
+      body: JSON.stringify({ messages: newMessages }), 
+    });
+    // ... resto del código
+  } catch (e) {
+    typeAssistantMessage("Sorry, something went wrong.");
   }
+}
 
   const quick = ["What projects have you worked on?", "What was your role and impact?", "How do you approach design systems?"]
   const followUps = ["What makes your design approach unique?", "How do you approach product strategy?", "What technologies do you use?"]
