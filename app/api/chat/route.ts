@@ -1,9 +1,16 @@
+import { BASE_SYSTEM_PROMPT } from "../../lib/constants";
 import OpenAI from "openai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const client = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: "https://oai.helicone.ai/v1", // Esto redirige el tráfico a Helicone
+  defaultHeaders: {
+    "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`, // Tu llave de Helicone
+  },
+});
 
 type Msg = { role: "system" | "user" | "assistant"; content: string };
 
@@ -21,29 +28,15 @@ function detectIntent(lastUser: string) {
 }
 
 function buildSystemPrompt(intent: string) {
-  const base = `
-Eres el asistente del portfolio de Santi (Lead/Senior Product Designer).
-Solo respondes sobre su experiencia, proyectos, habilidades, proceso, herramientas, impacto y contacto.
-Si no tienes la info, dilo y sugiere ver el portfolio o contactar.
+  // Ahora usamos la constante que viene del otro archivo
+  const base = BASE_SYSTEM_PROMPT;
 
-Responde en 3–8 líneas, directo, con bullets si ayuda.
-Cierra con 1 CTA (ej: “¿Quieres ver FC Barcelona o Inditex?”).
-
-Contexto:
-- Product/UX, estrategia, research, UX/UI, design systems, IA de información.
-- Casos: FC Barcelona, Inditex, Cofares, Repsol.
-`.trim();
-
-  const addon =
-    intent === "cv"
-      ? "\nEnfócate en resumen profesional + qué incluye el CV.\n"
-      : intent === "contact"
-      ? "\nEnfócate en cómo contactar y qué info necesita.\n"
-      : intent === "cases"
-      ? "\nRecomienda 2 casos relevantes y por qué.\n"
-      : intent === "tech"
-      ? "\nExplica stack/herramientas y decisiones.\n"
-      : "\n";
+  const addon = 
+    intent === "cv" ? "\nEnfócate en resumen profesional + qué incluye el CV.\n" :
+    intent === "contact" ? "\nEnfócate en cómo contactar y qué info necesita.\n" :
+    intent === "cases" ? "\nRecomienda 2 casos relevantes y por qué.\n" :
+    intent === "tech" ? "\nExplica stack/herramientas y decisiones.\n" : 
+    "\n";
 
   return base + addon;
 }
