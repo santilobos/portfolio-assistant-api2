@@ -48,11 +48,12 @@ export async function POST(req: Request) {
   const lastUser = [...incoming].reverse().find(m => m.role === "user")?.content ?? "";
   const intent = detectIntent(lastUser);
 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4.1-mini",
-    temperature: 0.4,
-    messages: [{ role: "system", content: buildSystemPrompt(intent) }, ...incoming],
-  });
+  // AHORA (Correcto)
+const completion = await client.chat.completions.create({
+  model: "gpt-4o-mini", // <--- Usa la "o" de Omni
+  temperature: 0.4,
+  messages: [{ role: "system", content: buildSystemPrompt(intent) }, ...incoming],
+});
 
   return Response.json({
     intent,
