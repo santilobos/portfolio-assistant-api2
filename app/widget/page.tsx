@@ -176,41 +176,59 @@ export default function Widget() {
   }
 
   async function send(text?: string) {
-    const q = (text ?? input).trim();
-    if (!q || loading) return;
-    
-    setInput("");
-    setLoading(true);
-    
-    const newMessages: Msg[] = [...messages, { role: "user", content: q }];
-    // Añadimos el mensaje del asistente vacío (esto activará el estado 'thinking')
-    setMessages([...newMessages, { role: "assistant", content: "" }]);
-    
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }), 
-      });
+  const q = (text ?? input).trim();
+  if (!q || loading) return;
+  
+  setInput("");
+  setLoading(true);
+  
+  const newMessages: Msg[] = [...messages, { role: "user", content: q }];
+  setMessages([...newMessages, { role: "assistant", content: "" }]);
+  
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ messages: newMessages }), 
+    });
 
-      if (!res.ok) throw new Error("API Error");
-
-      const data = await res.json();
-      const assistantReply = data.choices?.[0]?.message?.content || data.content || "No response received.";
-      
-      typeText(assistantReply);
-
-    } catch (e) {
-      console.error(e);
-      setLoading(false);
-      setMessages(prev => {
-        const next = [...prev];
-        const last = next[next.length - 1];
-        if (last) last.content = "Sorry, I'm having trouble connecting right now.";
-        return next;
-      });
+    if (!res.ok) {
+      const errorData = await res.text();
+      throw new Error(`API Error: ${res.status} - ${errorData}`);
     }
+
+    const data = await res.json();
+    console.log("Datos recibidos de la API:", data);
+
+    // Basado en tu captura de Helicone, la respuesta debería estar aquí:
+    const assistantReply = 
+      data.choices?.[0]?.message?.content || 
+      data.content || 
+      data.message ||
+      (typeof data === 'string' ? data : null);
+
+    if (!assistantReply) {
+      console.error("Estructura de datos inesperada:", data);
+      throw new Error("No se pudo extraer el contenido de la respuesta.");
+    }
+    
+    typeText(assistantReply);
+
+  } catch (e) {
+    console.error("Error en la petición:", e);
+    setLoading(false);
+    setMessages(prev => {
+      const next = [...prev];
+      const last = next[next.length - 1];
+      if (last && last.role === "assistant") {
+        last.content = "Lo siento, hubo un error al procesar la respuesta. Revisa la consola.";
+      }
+      return next;
+    });
   }
+}
 
   const quick = ["What projects have you worked on?", "What was your role and impact?", "How do you approach design systems?"]
   const followUps = ["What makes your design approach unique?", "How do you approach product strategy?", "What technologies do you use?"]
