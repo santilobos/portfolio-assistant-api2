@@ -41,31 +41,36 @@ function buildSystemPrompt(intent: string) {
   return base + addon;
 }
 
+// En app/api/chat/route.ts
+
+// En app/api/chat/route.ts
+
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const incoming: Msg[] = clampHistory(body.messages || []);
 
+  // Extraemos la última pregunta para Helicone
   const lastUser = [...incoming].reverse().find(m => m.role === "user")?.content ?? "";
-  const intent = detectIntent(lastUser);
 
-// Sustituye tu bloque de const completion por este:
-
-const completion = await client.chat.completions.create(
-  {
-    model: "gpt-4o-mini",
-    messages: [{ role: "system", content: buildSystemPrompt(intent) }, ...incoming],
-    temperature: 0.4,
-  },
-  {
-    headers: {
-      // Usamos todo en minúsculas para que coincida con tu columna de Helicone
-      "Helicone-Property-User-Question": lastUser, 
+  const completion = await client.chat.completions.create(
+    {
+      model: "gpt-4o-mini",
+      messages: [
+        // 1. Ponemos el System Prompt puro (el de constants.ts)
+        { role: "system", content: BASE_SYSTEM_PROMPT },
+        // 2. Pasamos todo el historial que viene de la web
+        ...incoming 
+      ],
+      temperature: 0.7, // Subimos un poco para mejorar la fluidez como en el Playground
     },
-  }
-);
+    {
+      headers: {
+        "Helicone-Property-User-Question": lastUser,
+      },
+    }
+  );
 
   return Response.json({
-    intent,
     reply: completion.choices[0]?.message?.content?.trim() ?? "",
   });
 }
