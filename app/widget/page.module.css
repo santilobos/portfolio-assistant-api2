@@ -262,22 +262,42 @@
   }
 }
 
-/* Este código va en tu archivo .css en VS Code */
 .iconBtn {
-  background: transparent;
-  border: none;
+  background: transparent !important;
+  border: none !important;
+  /* Quitamos el outline por defecto para que no salga siempre */
+  outline: none; 
+  
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  color: #666; /* Color del SVG inicial */
+  transition: all 0.2s ease-in-out;
+  color: #666666;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .iconBtn:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: #000; /* El SVG se oscurece por el currentColor */
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #000000;
   transform: scale(1.1);
+}
+
+/* ESTO ES LO IMPORTANTE:
+   Solo se activa cuando el usuario usa el TABULADOR 
+*/
+.iconBtn:focus-visible {
+  outline: 2px solid #0070f3 !important; /* Un azul estándar de foco o el color de tu marca */
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Evitamos que el foco de "clic" ensucie el diseño 
+   pero mantenemos la accesibilidad
+*/
+.iconBtn:focus:not(:focus-visible) {
+  outline: none !important;
 }
