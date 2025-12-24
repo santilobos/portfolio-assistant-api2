@@ -57,9 +57,9 @@ const completion = await client.chat.completions.create(
     temperature: 0.4,
   },
   {
-    // IMPORTANTE: Este es el segundo argumento de la función .create()
     headers: {
-      "Helicone-Property-User-Question": lastUser,
+      // Usamos todo en minúsculas para que coincida con tu columna de Helicone
+      "Helicone-Property-User-Question": lastUser, 
     },
   }
 );
