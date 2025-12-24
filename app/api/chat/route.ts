@@ -6,9 +6,9 @@ export const dynamic = "force-dynamic";
 
 const client = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY,
-  baseURL: "https://oai.helicone.ai/v1", // Esto redirige el tráfico a Helicone
+  baseURL: "https://ai-gateway.helicone.ai/v1", // La URL que viste en la captura de Helicone
   defaultHeaders: {
-    "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`, // Tu llave de Helicone
+    "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
   },
 });
 
