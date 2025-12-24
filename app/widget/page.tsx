@@ -188,43 +188,33 @@ export default function Widget() {
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messages: newMessages }), 
     });
 
-    if (!res.ok) {
-      const errorData = await res.text();
-      throw new Error(`API Error: ${res.status} - ${errorData}`);
-    }
+    if (!res.ok) throw new Error("Error en la comunicación con el servidor");
 
     const data = await res.json();
-    console.log("Datos recibidos de la API:", data);
+    console.log("Datos recibidos:", data);
 
-    // Basado en tu captura de Helicone, la respuesta debería estar aquí:
-    const assistantReply = 
-      data.choices?.[0]?.message?.content || 
-      data.content || 
-      data.message ||
-      (typeof data === 'string' ? data : null);
+    // CAMBIO CLAVE: Tu API devuelve la respuesta en la propiedad 'reply'
+    const assistantReply = data.reply;
 
     if (!assistantReply) {
-      console.error("Estructura de datos inesperada:", data);
-      throw new Error("No se pudo extraer el contenido de la respuesta.");
+      console.error("No se encontró la propiedad 'reply' en:", data);
+      throw new Error("Formato de respuesta incorrecto");
     }
     
+    // Iniciamos la animación de escritura con el texto real
     typeText(assistantReply);
 
   } catch (e) {
-    console.error("Error en la petición:", e);
+    console.error("Error detallado:", e);
     setLoading(false);
     setMessages(prev => {
       const next = [...prev];
       const last = next[next.length - 1];
-      if (last && last.role === "assistant") {
-        last.content = "Lo siento, hubo un error al procesar la respuesta. Revisa la consola.";
-      }
+      if (last) last.content = "Lo siento, no pude obtener una respuesta.";
       return next;
     });
   }
