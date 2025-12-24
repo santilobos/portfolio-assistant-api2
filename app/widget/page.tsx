@@ -52,21 +52,39 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
   
   return (
     <div style={{
-      height: 56, position: "sticky", top: 0, zIndex: 50, background: "#fff",
-      borderBottom: "1px solid rgba(198,209,221,100)", padding: "0 16px",
-      display: "flex", alignItems: "center", justifyContent: "space-between", boxSizing: "border-box",
+      height: 56, 
+      position: "sticky", 
+      top: 0, 
+      zIndex: 50, 
+      background: "#fff",
+      borderBottom: "1px solid rgba(198, 209, 221, 1)", 
+      padding: "0 16px",
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "space-between", 
+      boxSizing: "border-box",
     }}>
+      {/* SECCIÓN IZQUIERDA: Logo e Info */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: azeret.style.fontFamily }}>
         <div style={{ fontSize: "0.9rem", fontWeight: 400, letterSpacing: 0.5 }}>CHATLLM</div>
-        <button ref={btnRef} onClick={() => setOpen(!open)} style={{ background: "transparent", border: "none", cursor: "pointer" }}>
+        <button 
+          ref={btnRef} 
+          onClick={() => setOpen(!open)} 
+          className="iconBtn"
+        >
           <Icon src="/icons/info.svg" alt="Info" />
         </button>
       </div>
+
+      {/* SECCIÓN DERECHA: Reset y Cerrar */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <button onClick={onReset} style={{ background: "transparent", border: "none", cursor: "pointer" }}>
+        <button 
+          onClick={onReset} 
+          className="iconBtn"
+        >
           <Icon src="/icons/reset.svg" alt="Reset" />
         </button>
-        {/* BOTÓN DE CIERRE CON POSTMESSAGE DIRECTO */}
+
         <button 
           onClick={() => {
             if (typeof window !== "undefined") {
@@ -74,7 +92,7 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
             }
             onClose();
           }} 
-          style={{ background: "transparent", border: "none", cursor: "pointer" }}
+          className="iconBtn"
         >
           <Icon src="/icons/close.svg" alt="Close" />
         </button>

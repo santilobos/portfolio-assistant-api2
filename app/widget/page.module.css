@@ -261,3 +261,23 @@
     font-size: 1rem;
   }
 }
+
+/* Este código va en tu archivo .css en VS Code */
+.iconBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #666; /* Color del SVG inicial */
+}
+
+.iconBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000; /* El SVG se oscurece por el currentColor */
+  transform: scale(1.1);
+}
