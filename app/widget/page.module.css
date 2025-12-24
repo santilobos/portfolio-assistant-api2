@@ -1,4 +1,4 @@
-/*
+
 
  --- Base del Widget --- 
 .app {
@@ -12,7 +12,7 @@
   overflow: hidden;
 }
 
-/* --- Área de Mensajes --- 
+
 .messages {
   flex: 1;
   overflow-y: auto;
@@ -23,34 +23,7 @@
   scroll-behavior: smooth;
 }
 
-/* page.module.css */
-.app {
-  display: flex;
-  flex-direction: column;
-  /* Usa dvh para que se ajuste cuando sale el teclado */
-  height: 100dvh; 
-  width: 100%;
-  position: fixed; /* Evita que el fondo haga scroll */
-  top: 0;
-  left: 0;
-  background: #fff;
-  overflow: hidden;
-}
 
-.messages {
-  flex: 1; /* Esto empuja el input hacia abajo */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 20px;
-}
-
-.inputContainer {
-  padding: 14px;
-  padding-bottom: env(safe-area-inset-bottom, 14px); /* Respeta el área de la 'rayita' del iPhone */
-  border-top: 1px solid rgba(0,0,0,0.12);
-  background: #fff;
-  z-index: 100;
-}
 
 /* --- Filas y Burbujas --- */
 .assistantRow {
