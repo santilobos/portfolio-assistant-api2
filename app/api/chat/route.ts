@@ -1,73 +1,29 @@
+import { openai } from '@ai-sdk/openai';
+import { streamText } from 'ai';
 import { BASE_SYSTEM_PROMPT } from "../../lib/constants";
-import OpenAI from "openai";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-const client = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY,
-  baseURL: "https://ai-gateway.helicone.ai/v1",
-  defaultHeaders: {
-    "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-  },
-});
-
-type Msg = { role: "system" | "user" | "assistant"; content: string };
-
-function clampHistory(messages: Msg[], max = 12) {
-  return Array.isArray(messages) ? messages.slice(-max) : [];
-}
-
-function detectIntent(lastUser: string) {
-  const t = (lastUser || "").toLowerCase();
-  if (/(cv|resume|curriculum|pdf)/.test(t)) return "cv";
-  if (/(contacto|contact|email|correo|linkedin)/.test(t)) return "contact";
-  if (/(proyecto|case|caso|fc barcelona|inditex|repsol|cofares)/.test(t)) return "cases";
-  if (/(stack|tech|tecnolog|framer|react|next|tokens|design system)/.test(t)) return "tech";
-  return "general";
-}
-
-function buildSystemPrompt(intent: string) {
-  // Ahora usamos la constante que viene del otro archivo
-  const base = BASE_SYSTEM_PROMPT;
-
-  const addon = 
-    intent === "cv" ? "\nEnfócate en resumen profesional + qué incluye el CV.\n" :
-    intent === "contact" ? "\nEnfócate en cómo contactar y qué info necesita.\n" :
-    intent === "cases" ? "\nRecomienda 2 casos relevantes y por qué.\n" :
-    intent === "tech" ? "\nExplica stack/herramientas y decisiones.\n" : 
-    "\n";
-
-  return base + addon;
-}
+export const runtime = 'edge';
 
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => ({}));
+  const { messages } = await req.json();
   
-  // 1. Extraemos el array que ahora enviamos desde el page.tsx
-  const incoming = body.messages || [];
-  
-  // 2. Capturamos la última pregunta del usuario para Helicone
-  const lastUser = incoming.findLast((m: any) => m.role === "user")?.content || "Pregunta no encontrada";
+  // Extraemos la última pregunta para Helicone
+  const lastUser = messages.findLast((m: any) => m.role === "user")?.content || "";
 
-  const completion = await client.chat.completions.create(
-    {
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: BASE_SYSTEM_PROMPT },
-        ...incoming
-      ],
-      temperature: 0.7,
+  const result = await streamText({
+    model: openai('gpt-4o-mini'),
+    messages: [
+      { role: "system", content: BASE_SYSTEM_PROMPT },
+      ...messages
+    ],
+    temperature: 0.7,
+    // Headers de Helicone para analítica
+    headers: {
+      "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
+      "Helicone-Property-User-Question": lastUser,
     },
-    {
-      headers: {
-        // Esto llenará por fin la columna en tu dashboard
-        "Helicone-Property-User-Question": lastUser,
-      },
-    }
-  );
-
-  return Response.json({
-    reply: completion.choices[0]?.message?.content?.trim() ?? "",
   });
+
+  // ESTA ES LA FUNCIÓN CORRECTA PARA TU VERSIÓN
+  return result.toTextStreamResponse();
 }
