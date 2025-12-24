@@ -38,7 +38,7 @@ const itemVariants: Variants = {
   },
 }
 
-// --- 2. COMPONENTES AUXILIARES (ICONOS Y HEADER) ---
+// --- 2. COMPONENTES AUXILIARES ---
 
 function Icon({ src, alt }: { src: string; alt: string }) {
   return (
@@ -175,6 +175,8 @@ export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([])
   const [input, setInput] = React.useState("")
   const [loading, setLoading] = React.useState(false)
+  const [introKey, setIntroKey] = React.useState(0) // Clave para reiniciar animación
+  
   const hasText = input.trim().length > 0
   const listRef = React.useRef<HTMLDivElement | null>(null)
   const typingIntervalRef = React.useRef<number | null>(null)
@@ -196,6 +198,13 @@ export default function Widget() {
       }
     }, 10)
   }
+
+  const handleReset = () => {
+    setMessages([]);
+    setInput("");
+    setLoading(false);
+    setIntroKey(prev => prev + 1); // Incrementamos la key para forzar re-animación
+  };
 
   async function send(text?: string) {
     const q = (text ?? input).trim()
@@ -226,7 +235,7 @@ export default function Widget() {
   return (
     <div className={`${styles.app} ${aeonik.className}`}>
       <ChatHeader 
-        onReset={() => { setMessages([]); setInput(""); setLoading(false); }} 
+        onReset={handleReset} 
         onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} 
       />
 
@@ -256,8 +265,16 @@ export default function Widget() {
         })}
 
         {messages.length === 0 && (
-          <motion.div className={styles.intro} variants={containerVariants} initial="hidden" animate="visible">
-            <motion.div variants={itemVariants} className={styles.chatTitle}>Hey, what would you like to know?</motion.div>
+          <motion.div 
+            key={introKey} // <--- Key dinámica para reiniciar animación
+            className={styles.intro} 
+            variants={containerVariants} 
+            initial="hidden" 
+            animate="visible"
+          >
+            <motion.div variants={itemVariants} className={styles.chatTitle}>
+              Hey, what would you like to know?
+            </motion.div>
             <div className={styles.quickGrid}>
               {quick.map(q => (
                 <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.quickBtn}>
@@ -271,9 +288,21 @@ export default function Widget() {
 
       <div style={{ padding: 14, borderTop: "1px solid rgba(0,0,0,0.12)" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center", background: "#fff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask about me…" style={{ flex: 1, border: "none", outline: "none", fontSize: 14 }} />
-          <button onClick={() => send()} disabled={loading || !hasText} className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}>
-            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor"><path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/></svg>
+          <input 
+            value={input} 
+            onChange={e => setInput(e.target.value)} 
+            onKeyDown={e => e.key === "Enter" && send()} 
+            placeholder="Ask about me…" 
+            style={{ flex: 1, border: "none", outline: "none", fontSize: 14 }} 
+          />
+          <button 
+            onClick={() => send()} 
+            disabled={loading || !hasText} 
+            className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
+          >
+            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor">
+              <path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/>
+            </svg>
           </button>
         </div>
       </div>
