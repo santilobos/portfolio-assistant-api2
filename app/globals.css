@@ -21,6 +21,8 @@ body {
   font-family: var(--font-aeonik), system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
+
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -162,4 +164,19 @@ button.iconBtn:focus:not(:focus-visible) {
     position: fixed !important;
     top: 60px !important;
   }
+}
+
+/* Fuerza a que el contenedor de Next.js ocupe toda la pantalla */
+html, body, [data-reactroot] {
+  height: 100%;
+  overflow: hidden; /* Evita scrolls dobles en móviles */
+}
+
+/* Ajuste para el body */
+body {
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100dvh; /* Usa dvh aquí también */
+  display: flex;
+  flex-direction: column;
 }

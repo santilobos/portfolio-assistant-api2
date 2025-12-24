@@ -52,12 +52,31 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
   
   return (
     <div style={{
-      height: 56, position: "sticky", top: 0, zIndex: 50, background: "#fff",
-      borderBottom: "1px solid rgba(198, 209, 221, 1)", padding: "0 16px",
-      display: "flex", alignItems: "center", justifyContent: "space-between", boxSizing: "border-box",
+      height: 56, 
+      position: "sticky", 
+      top: 0, 
+      zIndex: 50, 
+      background: "#ffffff",
+      borderBottom: "1px solid rgba(198, 209, 221, 1)", 
+      padding: "0 16px",
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "space-between", 
+      boxSizing: "border-box",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, position: "relative" }}>
-        <div style={{ fontSize: "0.9rem", fontWeight: 400, letterSpacing: 0.5, fontFamily: azeret.style.fontFamily }}>CHATLLM</div>
+        {/* Mantenemos fontWeight 400 pero aseguramos color negro puro y nitidez */}
+        <div style={{ 
+          fontSize: "0.9rem", 
+          fontWeight: 400, 
+          color: "#000000", 
+          letterSpacing: 0.5, 
+          fontFamily: azeret.style.fontFamily,
+          WebkitFontSmoothing: "antialiased",
+          MozOsxFontSmoothing: "grayscale"
+        }}>
+          CHATLLM
+        </div>
         
         <button 
           ref={btnRef} 
@@ -87,9 +106,9 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
               zIndex: 70,
               fontSize: "0.75rem",
               lineHeight: "1.4",
-              color: "#4a5568",
+              color: "#000000", 
             }}>
-              <strong>CHATLLM</strong> is an AI chatbot. May contain hallucinations. Responses are logged for research and development purposes.
+              <strong style={{ fontWeight: 700 }}>CHATLLM</strong> is an AI chatbot. May contain hallucinations. Responses are logged for research and development purposes.
             </div>
           </>
         )}
@@ -244,88 +263,97 @@ React.useEffect(() => {
       />
 
       <div ref={listRef} className={styles.messages}>
-        <AnimatePresence mode="wait">
-          {messages.length === 0 ? (
-            <motion.div 
-              key={`intro-${introKey}`} 
-              className={styles.intro} 
-              variants={containerVariants} 
-              initial="hidden" 
-              animate="visible"
-              exit={{ opacity: 0, y: -10 }}
-              style={{ width: "100%" }} // Asegura que ocupe el ancho
-            >
-              <motion.div variants={itemVariants} className={styles.chatTitle}>
-                Hey, what would you like to know?
-              </motion.div>
-              <div className={styles.quickGrid}>
-                {quick.map(q => (
-                  <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.quickBtn}>
-                    {q}
-                  </motion.button>
-                ))}
+  <AnimatePresence mode="wait">
+    {messages.length === 0 ? (
+      <motion.div 
+        key={`intro-${introKey}`} 
+        className={styles.intro} 
+        variants={containerVariants} 
+        initial="hidden" 
+        animate="visible"
+        exit={{ opacity: 0, y: -10 }}
+        style={{ width: "100%" }} 
+      >
+        <motion.div variants={itemVariants} className={styles.chatTitle}>
+          Hey, what would you like to know?
+        </motion.div>
+        <div className={styles.quickGrid}>
+          {quick.map(q => (
+            <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.quickBtn}>
+              {q}
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
+    ) : (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{ 
+          width: "100%", 
+          display: "flex", 
+          flexDirection: "column", 
+          gap: "20px",
+          /* FIX: Empuja el contenido hacia abajo para que no flote arriba */
+          marginTop: "auto",
+          /* Asegura que los mensajes más largos no se corten */
+          minHeight: "min-content" 
+        }}
+      >
+        {messages.map((m, i) => {
+          const isLastAssistant = m.role === "assistant" && i === messages.length - 1
+          
+          if (m.role === "user") {
+            return (
+              <div key={i} className={styles.userRow}>
+                <div className={styles.userBubble}>{m.content}</div>
               </div>
-            </motion.div>
-          ) : (
-            /* CAMBIO CLAVE: Usamos motion.div aquí para que AnimatePresence funcione correctamente 
-               y quitamos gap: 20px si está causando desplazamientos raros arriba */
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              style={{ width: "100%", display: "flex", flexDirection: "column", gap: "20px" }}
-            >
-              {messages.map((m, i) => {
-                const isLastAssistant = m.role === "assistant" && i === messages.length - 1
-                
-                if (m.role === "user") {
-                  return (
-                    <div key={i} className={styles.userRow}>
-                      <div className={styles.userBubble}>{m.content}</div>
-                    </div>
-                  )
-                }
+            )
+          }
 
-                if (m.content === "" && loading && isLastAssistant) {
-                  return (
-                    <div key={i} className={styles.assistantRow}>
-                      {/* Corregimos el alto del thinking para móviles */}
-                      <div className={styles.thinking} style={{ minHeight: '24px' }}>thinking…</div>
-                    </div>
-                  )
-                }
+          if (m.content === "" && loading && isLastAssistant) {
+            return (
+              <div key={i} className={styles.assistantRow}>
+                {/* Fix de carga móvil: evita el salto visual (Flash) */}
+                <div className={styles.thinking} style={{ minHeight: '24px', display: 'flex', alignItems: 'center' }}>
+                  thinking…
+                </div>
+              </div>
+            )
+          }
 
-                return (
-                  <div key={i} className={styles.assistantRow}>
-                    <div className={styles.assistantText}>{m.content}</div>
-                    {isLastAssistant && !loading && m.content !== "" && (
-                      <motion.div 
-                        variants={containerVariants} 
-                        initial="hidden" 
-                        animate="visible" 
-                        className={styles.followUpsContainer}
+          return (
+            <div key={i} className={styles.assistantRow}>
+              <div className={styles.assistantText}>{m.content}</div>
+              {isLastAssistant && !loading && m.content !== "" && (
+                <motion.div 
+                  variants={containerVariants} 
+                  initial="hidden" 
+                  animate="visible" 
+                  className={styles.followUpsContainer}
+                >
+                  <div className={styles.divider} />
+                  <div className={styles.followUps}>
+                    {followUps.map(q => (
+                      <motion.button 
+                        key={q} 
+                        variants={itemVariants} 
+                        onClick={() => send(q)} 
+                        className={styles.followUpBtn}
                       >
-                        <div className={styles.divider} />
-                        <div className={styles.followUps}>
-                          {followUps.map(q => (
-                            <motion.button 
-                              key={q} 
-                              variants={itemVariants} 
-                              onClick={() => send(q)} 
-                              className={styles.followUpBtn}
-                            >
-                              ↳ {q}
-                            </motion.button>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
+                        ↳ {q}
+                      </motion.button>
+                    ))}
                   </div>
-                )
-              })}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+                </motion.div>
+              )}
+            </div>
+          )
+        })}
+      </motion.div>
+    )}
+  </AnimatePresence>
+</div>
 
       {/* ÁREA DE INPUT: Añadimos padding inferior para el área segura de móviles */}
       <div style={{ 

@@ -1,25 +1,23 @@
 
 
- --- Base del Widget --- 
 .app {
-  height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #F5F6F7;
-  color: #111111;
-  color-scheme: light;
-  font-family: inherit;
-  overflow: hidden;
+  height: 100dvh; 
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #ffffff;
 }
 
-
 .messages {
-  flex: 1;
+  flex: 1; /* OBLIGATORIO: Esto empuja el input al fondo */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  /* Esto ayuda a que el scroll sea suave en móviles */
-  -webkit-overflow-scrolling: touch; 
+  padding: 10px 0; /* Espacio para que no pegue a los bordes */
+  -webkit-overflow-scrolling: touch;
 }
 
 
