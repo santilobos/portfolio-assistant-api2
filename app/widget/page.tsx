@@ -77,7 +77,7 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
       </div>
 
       {/* SECCIÓN DERECHA: Reset y Cerrar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <button 
           onClick={onReset} 
           className="iconBtn"
