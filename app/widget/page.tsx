@@ -129,18 +129,25 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null)
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
 
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const isMobile = window.innerWidth <= 768;
-      if (isMobile) {
-        document.body.style.overflow = "hidden";
-        window.parent.postMessage({ type: "CHAT_OPEN_MOBILE" }, "*");
-      }
+React.useEffect(() => {
+  if (typeof window !== "undefined") {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      // Bloquea el scroll del sitio de fondo por completo
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+      
+      window.parent.postMessage({ type: "CHAT_OPEN_MOBILE" }, "*");
     }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
+  }
+  return () => {
+    document.documentElement.style.overflow = "auto";
+    document.body.style.overflow = "auto";
+    document.body.style.position = "static";
+  };
+}, []);
 
   // Función de escritura integrada
   const typeText = (fullText: string) => {
@@ -316,12 +323,18 @@ export default function Widget() {
       <div style={{ padding: 14, borderTop: "1px solid rgba(0,0,0,0.12)" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center", background: "#fff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
           <input 
-            value={input} 
-            onChange={e => setInput(e.target.value)} 
-            onKeyDown={e => e.key === "Enter" && send()} 
-            placeholder="Ask about me…" 
-            style={{ flex: 1, border: "none", outline: "none", fontSize: 14 }} 
-          />
+  value={input} 
+  onChange={e => setInput(e.target.value)} 
+  onKeyDown={e => e.key === "Enter" && send()} 
+  placeholder="Ask about me…" 
+  style={{ 
+    flex: 1, 
+    border: "none", 
+    outline: "none", 
+    fontSize: "16px", // <--- Obligatorio 16px para evitar el zoom en iPhone
+    padding: "8px 0"
+  }} 
+/>
           <button 
             onClick={() => send()} 
             disabled={loading || !hasText} 
