@@ -253,6 +253,7 @@ React.useEffect(() => {
               initial="hidden" 
               animate="visible"
               exit={{ opacity: 0, y: -10 }}
+              style={{ width: "100%" }} // Asegura que ocupe el ancho
             >
               <motion.div variants={itemVariants} className={styles.chatTitle}>
                 Hey, what would you like to know?
@@ -266,7 +267,13 @@ React.useEffect(() => {
               </div>
             </motion.div>
           ) : (
-            <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "20px" }}>
+            /* CAMBIO CLAVE: Usamos motion.div aquí para que AnimatePresence funcione correctamente 
+               y quitamos gap: 20px si está causando desplazamientos raros arriba */
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              style={{ width: "100%", display: "flex", flexDirection: "column", gap: "20px" }}
+            >
               {messages.map((m, i) => {
                 const isLastAssistant = m.role === "assistant" && i === messages.length - 1
                 
@@ -278,11 +285,11 @@ React.useEffect(() => {
                   )
                 }
 
-                // Mostrar "thinking" solo si es el último mensaje, está vacío y el fetch está en curso
                 if (m.content === "" && loading && isLastAssistant) {
                   return (
                     <div key={i} className={styles.assistantRow}>
-                      <div className={styles.thinking}>thinking…</div>
+                      {/* Corregimos el alto del thinking para móviles */}
+                      <div className={styles.thinking} style={{ minHeight: '24px' }}>thinking…</div>
                     </div>
                   )
                 }
@@ -315,26 +322,40 @@ React.useEffect(() => {
                   </div>
                 )
               })}
-            </div>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div style={{ padding: 14, borderTop: "1px solid rgba(0,0,0,0.12)" }}>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", background: "#fff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
+      {/* ÁREA DE INPUT: Añadimos padding inferior para el área segura de móviles */}
+      <div style={{ 
+        padding: "14px 14px 24px 14px", 
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", 
+        borderTop: "1px solid rgba(0,0,0,0.12)",
+        background: "#fff" 
+      }}>
+        <div style={{ 
+          display: "flex", 
+          gap: 10, 
+          alignItems: "center", 
+          background: "#fff", 
+          border: "1px solid rgba(0,0,0,0.15)", 
+          borderRadius: 6, 
+          padding: "10px 12px" 
+        }}>
           <input 
-  value={input} 
-  onChange={e => setInput(e.target.value)} 
-  onKeyDown={e => e.key === "Enter" && send()} 
-  placeholder="Ask about me…" 
-  style={{ 
-    flex: 1, 
-    border: "none", 
-    outline: "none", 
-    fontSize: "16px", // <--- Obligatorio 16px para evitar el zoom en iPhone
-    padding: "8px 0"
-  }} 
-/>
+            value={input} 
+            onChange={e => setInput(e.target.value)} 
+            onKeyDown={e => e.key === "Enter" && send()} 
+            placeholder="Ask about me…" 
+            style={{ 
+              flex: 1, 
+              border: "none", 
+              outline: "none", 
+              fontSize: "16px", 
+              padding: "8px 0"
+            }} 
+          />
           <button 
             onClick={() => send()} 
             disabled={loading || !hasText} 

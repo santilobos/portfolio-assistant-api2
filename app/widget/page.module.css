@@ -16,13 +16,11 @@
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  scroll-behavior: smooth;
+  /* Esto ayuda a que el scroll sea suave en móviles */
+  -webkit-overflow-scrolling: touch; 
 }
-
 
 
 /* --- Filas y Burbujas --- */
