@@ -263,7 +263,7 @@ React.useEffect(() => {
       />
 
       <div ref={listRef} className={styles.messages}>
-  <AnimatePresence mode="wait">
+  <AnimatePresence mode="popLayout">
     {messages.length === 0 ? (
       <motion.div 
         key={`intro-${introKey}`} 
@@ -373,6 +373,9 @@ React.useEffect(() => {
             value={input} 
             onChange={e => setInput(e.target.value)} 
             onKeyDown={e => e.key === "Enter" && send()} 
+            // ESTO EVITA QUE EL TOQUE CIERRE EL OVERLAY EN ANDROID
+            onClick={(e) => e.stopPropagation()} 
+            onTouchEnd={(e) => e.stopPropagation()}
             placeholder="Ask about me…" 
             style={{ 
               flex: 1, 
@@ -382,7 +385,7 @@ React.useEffect(() => {
               padding: "8px 0"
             }} 
           />
-          <button 
+                    <button 
             onClick={() => send()} 
             disabled={loading || !hasText} 
             className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
