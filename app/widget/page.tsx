@@ -66,7 +66,16 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
         <button onClick={onReset} style={{ background: "transparent", border: "none", cursor: "pointer" }}>
           <Icon src="/icons/reset.svg" alt="Reset" />
         </button>
-        <button onClick={onClose} style={{ background: "transparent", border: "none", cursor: "pointer" }}>
+        {/* BOTÓN DE CIERRE CON POSTMESSAGE DIRECTO */}
+        <button 
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.parent.postMessage("close-widget", "*");
+            }
+            onClose();
+          }} 
+          style={{ background: "transparent", border: "none", cursor: "pointer" }}
+        >
           <Icon src="/icons/close.svg" alt="Close" />
         </button>
       </div>
