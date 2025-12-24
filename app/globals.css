@@ -141,3 +141,25 @@ button.iconBtn:focus:not(:focus-visible) {
 .popoverAnimation {
   animation: fadeInPopover 0.2s ease-out forwards;
 }
+
+/* --- OPTIMIZACIÓN MOBILE --- */
+@media (max-width: 600px) {
+  /* Reducimos un poco el padding del header para ganar espacio */
+  .ChatHeader { 
+    padding: 0 12px !important;
+  }
+
+  /* Hacemos que los botones de la grid ocupen todo el ancho cómodamente */
+  .quickBtn {
+    padding: 14px !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Ajustamos el popover de Info para que no se salga de la pantalla */
+  .popoverArrow {
+    width: calc(100vw - 32px) !important; /* Margen de 16px a cada lado */
+    left: 16px !important;
+    position: fixed !important;
+    top: 60px !important;
+  }
+}
