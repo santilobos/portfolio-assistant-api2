@@ -17,7 +17,7 @@ const aeonik = localFont({
   style: "normal",
 })
 
-// --- 1. VARIANTES DE ANIMACIÓN (ESTILO RACHEL CHEN) ---
+// --- 1. VARIANTES DE ANIMACIÓN ---
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -59,7 +59,6 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
       <div style={{ display: "flex", alignItems: "center", gap: 10, position: "relative" }}>
         <div style={{ fontSize: "0.9rem", fontWeight: 400, letterSpacing: 0.5, fontFamily: azeret.style.fontFamily }}>CHATLLM</div>
         
-        {/* BOTÓN INFO */}
         <button 
           ref={btnRef} 
           onClick={() => setOpen(!open)} 
@@ -68,10 +67,8 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
           <Icon src="/icons/info.svg" alt="Info" />
         </button>
 
-        {/* POPOVER INFORMATIVO */}
         {open && (
           <>
-            {/* Overlay invisible para cerrar al hacer clic fuera */}
             <div 
               style={{ position: 'fixed', inset: 0, zIndex: 60 }} 
               onClick={() => setOpen(false)} 
@@ -91,7 +88,6 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
               fontSize: "0.75rem",
               lineHeight: "1.4",
               color: "#4a5568",
-              fontFamily: "inherit"
             }}>
               <strong>CHATLLM</strong> is an AI chatbot. May contain hallucinations. Responses are logged for research and development purposes.
             </div>
@@ -127,13 +123,13 @@ export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([])
   const [input, setInput] = React.useState("")
   const [loading, setLoading] = React.useState(false)
-  const [introKey, setIntroKey] = React.useState(0) // Controla el reinicio de la animación
+  const [introKey, setIntroKey] = React.useState(0)
   
   const hasText = input.trim().length > 0
   const listRef = React.useRef<HTMLDivElement | null>(null)
-  const typingIntervalRef = React.useRef<NodeJS.Timeout | null>(null)
+  const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
 
-React.useEffect(() => {
+  React.useEffect(() => {
     if (typeof window !== "undefined") {
       const isMobile = window.innerWidth <= 768;
       if (isMobile) {
@@ -146,20 +142,11 @@ React.useEffect(() => {
     };
   }, []);
 
-
-  // Función de escritura robusta
-  function typeAssistantMessage(fullText: string) {
+  // Función de escritura integrada
+  const typeText = (fullText: string) => {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
     
     let i = 0
-    setMessages(prev => {
-      const next = [...prev]
-      if (next[next.length - 1]?.role === "assistant") {
-        next[next.length - 1].content = ""
-      }
-      return next
-    })
-
     typingIntervalRef.current = setInterval(() => {
       i += 2
       const chunk = fullText.slice(0, i)
@@ -185,32 +172,45 @@ React.useEffect(() => {
     setMessages([])
     setInput("")
     setLoading(false)
-    setIntroKey(prev => prev + 1) // Dispara la animación de nuevo
+    setIntroKey(prev => prev + 1)
   }
 
- async function send(text?: string) {
-  const q = (text ?? input).trim();
-  if (!q || loading) return;
-  
-  setInput("");
-  setLoading(true);
-  
-  // Guardamos el nuevo estado de mensajes para enviarlo
-  const newMessages: Msg[] = [...messages, { role: "user", content: q }];
-  setMessages([...newMessages, { role: "assistant", content: "" }]);
-  
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      // CAMBIO CLAVE: Enviamos 'messages' (el array completo) no 'message'
-      body: JSON.stringify({ messages: newMessages }), 
-    });
-    // ... resto del código
-  } catch (e) {
-    typeAssistantMessage("Sorry, something went wrong.");
+  async function send(text?: string) {
+    const q = (text ?? input).trim();
+    if (!q || loading) return;
+    
+    setInput("");
+    setLoading(true);
+    
+    const newMessages: Msg[] = [...messages, { role: "user", content: q }];
+    // Añadimos el mensaje del asistente vacío (esto activará el estado 'thinking')
+    setMessages([...newMessages, { role: "assistant", content: "" }]);
+    
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: newMessages }), 
+      });
+
+      if (!res.ok) throw new Error("API Error");
+
+      const data = await res.json();
+      const assistantReply = data.choices?.[0]?.message?.content || data.content || "No response received.";
+      
+      typeText(assistantReply);
+
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
+      setMessages(prev => {
+        const next = [...prev];
+        const last = next[next.length - 1];
+        if (last) last.content = "Sorry, I'm having trouble connecting right now.";
+        return next;
+      });
+    }
   }
-}
 
   const quick = ["What projects have you worked on?", "What was your role and impact?", "How do you approach design systems?"]
   const followUps = ["What makes your design approach unique?", "How do you approach product strategy?", "What technologies do you use?"]
@@ -263,6 +263,7 @@ React.useEffect(() => {
                   )
                 }
 
+                // Mostrar "thinking" solo si es el último mensaje, está vacío y el fetch está en curso
                 if (m.content === "" && loading && isLastAssistant) {
                   return (
                     <div key={i} className={styles.assistantRow}>
@@ -304,7 +305,6 @@ React.useEffect(() => {
         </AnimatePresence>
       </div>
 
-      {/* Input Area */}
       <div style={{ padding: 14, borderTop: "1px solid rgba(0,0,0,0.12)" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center", background: "#fff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
           <input 
