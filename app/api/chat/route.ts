@@ -48,16 +48,21 @@ export async function POST(req: Request) {
   const lastUser = [...incoming].reverse().find(m => m.role === "user")?.content ?? "";
   const intent = detectIntent(lastUser);
 
- const completion = await client.chat.completions.create({
-  model: "gpt-4o-mini",
-  messages: [{ role: "system", content: buildSystemPrompt(intent) }, ...incoming],
-  temperature: 0.4,
-}, {
-  // Las opciones extra como headers personalizados van en este segundo objeto
-  headers: {
-    "Helicone-Property-User-Question": lastUser,
+// Sustituye tu bloque de const completion por este:
+
+const completion = await client.chat.completions.create(
+  {
+    model: "gpt-4o-mini",
+    messages: [{ role: "system", content: buildSystemPrompt(intent) }, ...incoming],
+    temperature: 0.4,
   },
-});
+  {
+    // IMPORTANTE: Este es el segundo argumento de la función .create()
+    headers: {
+      "Helicone-Property-User-Question": lastUser,
+    },
+  }
+);
 
   return Response.json({
     intent,
