@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 const client = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY,
-  baseURL: "https://ai-gateway.helicone.ai/v1", // La URL que viste en la captura de Helicone
+  baseURL: "https://ai-gateway.helicone.ai/v1",
   defaultHeaders: {
     "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
   },
@@ -48,11 +48,15 @@ export async function POST(req: Request) {
   const lastUser = [...incoming].reverse().find(m => m.role === "user")?.content ?? "";
   const intent = detectIntent(lastUser);
 
-  // AHORA (Correcto)
-const completion = await client.chat.completions.create({
-  model: "gpt-4o-mini", // <--- Usa la "o" de Omni
-  temperature: 0.4,
+ const completion = await client.chat.completions.create({
+  model: "gpt-4o-mini",
   messages: [{ role: "system", content: buildSystemPrompt(intent) }, ...incoming],
+  temperature: 0.4,
+}, {
+  // Las opciones extra como headers personalizados van en este segundo objeto
+  headers: {
+    "Helicone-Property-User-Question": lastUser,
+  },
 });
 
   return Response.json({
