@@ -263,41 +263,44 @@
 }
 
 .iconBtn {
+  /* Forzamos fondo transparente y eliminamos bordes/sombras */
   background: transparent !important;
   border: none !important;
-  /* Quitamos el outline por defecto para que no salga siempre */
-  outline: none; 
+  outline: none !important;
+  box-shadow: none !important;
   
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  display: flex;
+  /* Reset de apariencia de sistema */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  
+  /* Alineación y espaciado */
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease-in-out;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  
+  /* Color del icono y suavizado */
   color: #666666;
-  appearance: none;
-  -webkit-appearance: none;
+  transition: all 0.2s ease-in-out;
 }
 
+/* Efecto HOVER: Solo aquí debe aparecer el fondo */
 .iconBtn:hover {
   background: rgba(0, 0, 0, 0.05) !important;
   color: #000000;
   transform: scale(1.1);
 }
 
-/* ESTO ES LO IMPORTANTE:
-   Solo se activa cuando el usuario usa el TABULADOR 
-*/
+/* ACCESIBILIDAD: El borde solo aparece al usar el teclado (Tab) */
 .iconBtn:focus-visible {
-  outline: 2px solid #0070f3 !important; /* Un azul estándar de foco o el color de tu marca */
+  outline: 2px solid rgb(255, 92, 0) !important; /* Usamos tu naranja de marca */
   outline-offset: 2px;
-  border-radius: 50%;
 }
 
-/* Evitamos que el foco de "clic" ensucie el diseño 
-   pero mantenemos la accesibilidad
-*/
+/* Evitamos el borde de enfoque cuando se hace clic con el ratón */
 .iconBtn:focus:not(:focus-visible) {
   outline: none !important;
+  box-shadow: none !important;
 }
