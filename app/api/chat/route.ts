@@ -41,31 +41,33 @@ function buildSystemPrompt(intent: string) {
   return base + addon;
 }
 
-// En app/api/chat/route.ts
-
-// En app/api/chat/route.ts
-
 export async function POST(req: Request) {
+  // 1. Extraemos el cuerpo de la petición
   const body = await req.json().catch(() => ({}));
-  const incoming: Msg[] = clampHistory(body.messages || []);
+  
+  // 2. Registramos los mensajes que llegan
+  const incoming = body.messages || [];
+  
+  // 3. CAPTURA SEGURA: Buscamos el último mensaje del usuario
+  // Si no lo encuentra, pondremos un texto de aviso para depurar en Helicone
+  const lastUser = incoming.length > 0 
+    ? [...incoming].reverse().find((m: any) => m.role === "user")?.content 
+    : "No se detectó pregunta en el body";
 
-  // Extraemos la última pregunta para Helicone
-  const lastUser = [...incoming].reverse().find(m => m.role === "user")?.content ?? "";
-
+  // 4. LLAMADA A OPENAI + HELICONE
   const completion = await client.chat.completions.create(
     {
-      model: "gpt-4o-mini",
+      model: "gpt-4o-mini", //
       messages: [
-        // 1. Ponemos el System Prompt puro (el de constants.ts)
-        { role: "system", content: BASE_SYSTEM_PROMPT },
-        // 2. Pasamos todo el historial que viene de la web
-        ...incoming 
+        { role: "system", content: BASE_SYSTEM_PROMPT }, //
+        ...incoming
       ],
-      temperature: 0.7, // Subimos un poco para mejorar la fluidez como en el Playground
+      temperature: 0.7,
     },
     {
       headers: {
-        "Helicone-Property-User-Question": lastUser,
+        // Importante: Usar minúsculas si así configuraste la columna
+        "Helicone-Property-User-Question": String(lastUser).substring(0, 200),
       },
     }
   );
