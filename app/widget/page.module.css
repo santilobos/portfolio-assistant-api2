@@ -231,6 +231,7 @@
   outline: none;
   border: none;
   font-family: inherit;
+  font-size: 16px !important; /* <--- AÑADE ESTA LÍNEA */
 }
 
 .app :global(input::placeholder) {
@@ -250,15 +251,17 @@
 
 @media (max-width: 768px) {
   .app {
-    /* Ocupa toda la pantalla */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100dvh; /* dvh es mejor para navegadores móviles (evita la barra de URL) */
+    /* Cambia 100dvh por 100vh o una altura fija si notas que parpadea */
+    height: 100dvh; 
     z-index: 9999;
-    border-radius: 0; /* Quitamos bordes redondeados en mobile */
-    background: #ffffff; /* Fondo sólido para que no se vea lo de atrás */
+    
+    /* ESTO ES CLAVE: */
+    overflow: hidden; 
+    touch-action: manipulation; /* Evita gestos extraños del navegador */
   }
 
   .messages {

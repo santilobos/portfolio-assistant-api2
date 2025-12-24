@@ -37,6 +37,8 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1, // Esto evita que el móvil haga zoom al tocar el input
+  userScalable: false, // Opcional: impide que el usuario haga zoom manual
   viewportFit: "cover",
 }
 
