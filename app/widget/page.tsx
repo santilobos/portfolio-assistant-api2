@@ -148,27 +148,37 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null)
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // --- FIX PARA ANDROID 15 / TCL NXT PAPER ---
-  // Esta función fuerza al navegador a centrar el input cuando el teclado aparece
- const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+  // --- 1. CONFIGURACIÓN DE SCROLL Y FOCO (SOLUCIÓN MÓVIL REAL) ---
+  
+  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
-    // Aumentamos un poco el tiempo para asegurar que el teclado del TCL esté 100% visible
-    setTimeout(() => {
-        // Opción A: Desplazar el elemento al centro
+    
+    const doScroll = () => {
+        // Opción A: Desplazar el elemento al centro de la vista
         e.target.scrollIntoView({ behavior: "smooth", block: "center" });
         
-        // Opción B (Refuerzo): Forzar al cuerpo del widget a subir
+        // Opción B (Refuerzo): Forzar al cuerpo del widget a subir por si el iframe está bloqueado
         window.scrollTo({
             top: e.target.offsetTop - 50,
             behavior: 'smooth'
         });
-    }, 500); 
-};
+    };
+
+    // Doble disparo para asegurar que funcione tras recargar en dispositivos Android reales
+    setTimeout(doScroll, 100);
+    setTimeout(doScroll, 500); 
+  };
 
   React.useEffect(() => {
+    // Evita que el navegador intente recordar la posición de scroll tras un refresco de página
+    if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+    }
+
     if (typeof window !== "undefined") {
       const isMobile = window.innerWidth <= 768;
       if (isMobile) {
+        // Bloqueo estricto del scroll del fondo
         document.documentElement.style.overflow = "hidden";
         document.body.style.overflow = "hidden";
         document.body.style.position = "fixed";
@@ -183,6 +193,8 @@ export default function Widget() {
       document.body.style.position = "static";
     };
   }, []);
+
+  // --- 2. LÓGICA DE ANIMACIÓN Y COMUNICACIÓN ---
 
   const typeText = (fullText: string) => {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
@@ -214,10 +226,13 @@ export default function Widget() {
   async function send(text?: string) {
     const q = (text ?? input).trim();
     if (!q || loading) return;
+    
     setInput("");
     setLoading(true);
+    
     const newMessages: Msg[] = [...messages, { role: "user", content: q }];
     setMessages([...newMessages, { role: "assistant", content: "" }]);
+    
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -247,8 +262,10 @@ export default function Widget() {
   const quick = ["What projects have you worked on?", "What was your role and impact?", "How do you approach design systems?"]
   const followUps = ["What makes your design approach unique?", "How do you approach product strategy?", "What technologies do you use?"]
 
+  // --- 3. RENDERIZADO DEL COMPONENTE ---
+
   return (
-    <div className={`${styles.app} ${aeonik.className}`} style={{ background: "#ffffff" }}>
+    <div className={`${styles.app} ${aeonik.className}`} style={{ background: "#ffffff", height: "100%", display: "flex", flexDirection: "column" }}>
       <ChatHeader 
         onReset={handleReset} 
         onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} 
@@ -289,42 +306,47 @@ export default function Widget() {
         </AnimatePresence>
       </div>
 
-      <div style={{ padding: "14px 14px 24px 14px", paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", borderTop: "1px solid rgba(0,0,0,0.12)", background: "#fff" }}>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", background: "#fff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
+      <div style={{ padding: "14px", paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", borderTop: "1px solid rgba(0,0,0,0.12)", background: "#ffffff" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-end", background: "#ffffff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
           <textarea 
-        value={input} 
-        onChange={e => {
-          setInput(e.target.value);
-          // Ajuste automático de altura según el contenido
-          e.target.style.height = 'inherit';
-          e.target.style.height = `${e.target.scrollHeight}px`;
-        }} 
-        onKeyDown={e => {
-          // Envía con Enter, pero permite salto de línea con Shift + Enter
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            send();
-          }
-        }} 
-        onFocus={handleFocus}
-        onTouchStart={(e) => e.stopPropagation()}
-        placeholder="Ask about me…" 
-        rows={1}
-        style={{ 
-          flex: 1, 
-          border: "none", 
-          outline: "none", 
-          fontSize: "16px", // Evita zoom en iPhone 17 / Android 15
-          padding: "8px 0",
-          background: "transparent",
-          resize: "none",      // Desactiva el tirador manual de redimensión
-          maxHeight: "150px",  // Altura máxima antes de permitir scroll interno
-          fontFamily: "inherit",
-          overflowY: "auto",
-          lineHeight: "1.4"
-        }} 
-/>
-          <button onClick={() => send()} disabled={loading || !hasText} className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}>
+            value={input} 
+            onChange={e => {
+              setInput(e.target.value);
+              // Crecimiento vertical automático
+              e.target.style.height = 'auto';
+              e.target.style.height = `${e.target.scrollHeight}px`;
+            }} 
+            onKeyDown={e => {
+              // Envía con Enter, pero permite Shift+Enter para nuevas líneas
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }} 
+            onFocus={handleFocus}
+            onTouchStart={(e) => e.stopPropagation()}
+            placeholder="Ask about me…" 
+            rows={1}
+            style={{ 
+              flex: 1, 
+              border: "none", 
+              outline: "none", 
+              fontSize: "16px", 
+              padding: "8px 0",
+              background: "transparent",
+              resize: "none",
+              maxHeight: "150px",
+              fontFamily: "inherit",
+              lineHeight: "1.4",
+              overflowY: "auto"
+            }} 
+          />
+          <button 
+            onClick={() => send()} 
+            disabled={loading || !hasText} 
+            className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
+            style={{ marginBottom: "4px" }}
+          >
             <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor"><path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/></svg>
           </button>
         </div>
