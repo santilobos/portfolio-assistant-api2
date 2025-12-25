@@ -150,7 +150,7 @@ export default function Widget() {
 
   // --- FIX PARA ANDROID 15 / TCL NXT PAPER ---
   // Esta función fuerza al navegador a centrar el input cuando el teclado aparece
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
     // 400ms es el tiempo ideal para que el teclado termine de subir en Android 15
     setTimeout(() => {
@@ -287,15 +287,39 @@ export default function Widget() {
 
       <div style={{ padding: "14px 14px 24px 14px", paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", borderTop: "1px solid rgba(0,0,0,0.12)", background: "#fff" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center", background: "#fff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
-          <input 
-            value={input} 
-            onChange={e => setInput(e.target.value)} 
-            onKeyDown={e => e.key === "Enter" && send()} 
-            onFocus={handleFocus} // <--- ASIGNADO AQUÍ
-            onTouchStart={(e) => e.stopPropagation()}
-            placeholder="Ask about me…" 
-            style={{ flex: 1, border: "none", outline: "none", fontSize: "16px", padding: "8px 0", background: "transparent" }} 
-          />
+          <textarea 
+        value={input} 
+        onChange={e => {
+          setInput(e.target.value);
+          // Ajuste automático de altura según el contenido
+          e.target.style.height = 'inherit';
+          e.target.style.height = `${e.target.scrollHeight}px`;
+        }} 
+        onKeyDown={e => {
+          // Envía con Enter, pero permite salto de línea con Shift + Enter
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            send();
+          }
+        }} 
+        onFocus={handleFocus}
+        onTouchStart={(e) => e.stopPropagation()}
+        placeholder="Ask about me…" 
+        rows={1}
+        style={{ 
+          flex: 1, 
+          border: "none", 
+          outline: "none", 
+          fontSize: "16px", // Evita zoom en iPhone 17 / Android 15
+          padding: "8px 0",
+          background: "transparent",
+          resize: "none",      // Desactiva el tirador manual de redimensión
+          maxHeight: "150px",  // Altura máxima antes de permitir scroll interno
+          fontFamily: "inherit",
+          overflowY: "auto",
+          lineHeight: "1.4"
+        }} 
+/>
           <button onClick={() => send()} disabled={loading || !hasText} className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}>
             <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor"><path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/></svg>
           </button>
