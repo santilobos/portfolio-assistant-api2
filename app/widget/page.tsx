@@ -148,29 +148,17 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null)
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // --- 1. CONFIGURACIÓN DE SCROLL Y FOCO (SOLUCIÓN MÓVIL REAL) ---
-  
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
-    
     const doScroll = () => {
-        // Opción A: Desplazar el elemento al centro de la vista
         e.target.scrollIntoView({ behavior: "smooth", block: "center" });
-        
-        // Opción B (Refuerzo): Forzar al cuerpo del widget a subir por si el iframe está bloqueado
-        window.scrollTo({
-            top: e.target.offsetTop - 50,
-            behavior: 'smooth'
-        });
+        window.scrollTo({ top: e.target.offsetTop - 50, behavior: 'smooth' });
     };
-
-    // Doble disparo para asegurar que funcione tras recargar en dispositivos Android reales
     setTimeout(doScroll, 100);
     setTimeout(doScroll, 500); 
   };
 
   React.useEffect(() => {
-    // Evita que el navegador intente recordar la posición de scroll tras un refresco de página
     if ('scrollRestoration' in window.history) {
         window.history.scrollRestoration = 'manual';
     }
@@ -178,11 +166,13 @@ export default function Widget() {
     if (typeof window !== "undefined") {
       const isMobile = window.innerWidth <= 768;
       if (isMobile) {
-        // Bloqueo estricto del scroll del fondo
+        // Bloqueo total del scroll del navegador
         document.documentElement.style.overflow = "hidden";
+        document.documentElement.style.overscrollBehavior = "none";
         document.body.style.overflow = "hidden";
         document.body.style.position = "fixed";
         document.body.style.width = "100%";
+        document.body.style.height = "100%";
         
         window.parent.postMessage({ type: "CHAT_OPEN_MOBILE" }, "*");
       }
@@ -193,8 +183,6 @@ export default function Widget() {
       document.body.style.position = "static";
     };
   }, []);
-
-  // --- 2. LÓGICA DE ANIMACIÓN Y COMUNICACIÓN ---
 
   const typeText = (fullText: string) => {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
@@ -226,20 +214,16 @@ export default function Widget() {
   async function send(text?: string) {
     const q = (text ?? input).trim();
     if (!q || loading) return;
-    
     setInput("");
     setLoading(true);
-    
     const newMessages: Msg[] = [...messages, { role: "user", content: q }];
     setMessages([...newMessages, { role: "assistant", content: "" }]);
-    
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: newMessages }), 
       });
-      if (!res.ok) throw new Error("Error en la comunicación");
       const data = await res.json();
       typeText(data.reply);
     } catch (e) {
@@ -262,16 +246,34 @@ export default function Widget() {
   const quick = ["What projects have you worked on?", "What was your role and impact?", "How do you approach design systems?"]
   const followUps = ["What makes your design approach unique?", "How do you approach product strategy?", "What technologies do you use?"]
 
-  // --- 3. RENDERIZADO DEL COMPONENTE ---
-
   return (
-    <div className={`${styles.app} ${aeonik.className}`} style={{ background: "#ffffff", height: "100%", display: "flex", flexDirection: "column" }}>
-      <ChatHeader 
-        onReset={handleReset} 
-        onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} 
-      />
+    <div className={`${styles.app} ${aeonik.className}`} 
+         style={{ 
+           background: "#ffffff", 
+           height: "100dvh", // Altura dinámica para móvil
+           display: "flex", 
+           flexDirection: "column",
+           overflow: "hidden", // Bloquea scroll externo
+           overscrollBehavior: "none", // Evita el rebote de Android/iOS
+           position: "relative"
+         }}>
+      
+      {/* HEADER: Con touchAction none para que el dedo no lo mueva */}
+      <div style={{ touchAction: "none" }}>
+        <ChatHeader 
+          onReset={handleReset} 
+          onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} 
+        />
+      </div>
 
-      <div ref={listRef} className={styles.messages}>
+      {/* MENSAJES: El ÚNICO lugar donde permitimos scroll con el dedo */}
+      <div ref={listRef} className={styles.messages} 
+           style={{ 
+             flex: 1, 
+             overflowY: "auto", 
+             WebkitOverflowScrolling: "touch",
+             touchAction: "pan-y" 
+           }}>
         <AnimatePresence mode="popLayout">
           {messages.length === 0 ? (
             <motion.div key={`intro-${introKey}`} className={styles.intro} variants={containerVariants} initial="hidden" animate="visible" exit={{ opacity: 0, y: -10 }} style={{ width: "100%" }}>
@@ -306,18 +308,23 @@ export default function Widget() {
         </AnimatePresence>
       </div>
 
-      <div style={{ padding: "14px", paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", borderTop: "1px solid rgba(0,0,0,0.12)", background: "#ffffff" }}>
+      {/* ÁREA DE TEXTO: Bloqueamos touchAction para que al escribir no se mueva el widget */}
+      <div style={{ 
+        padding: "14px", 
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", 
+        borderTop: "1px solid rgba(0,0,0,0.12)", 
+        background: "#ffffff",
+        touchAction: "none" // Clave para bloquear el scroll del dedo aquí
+      }}>
         <div style={{ display: "flex", gap: 10, alignItems: "flex-end", background: "#ffffff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
           <textarea 
             value={input} 
             onChange={e => {
               setInput(e.target.value);
-              // Crecimiento vertical automático
               e.target.style.height = 'auto';
               e.target.style.height = `${e.target.scrollHeight}px`;
             }} 
             onKeyDown={e => {
-              // Envía con Enter, pero permite Shift+Enter para nuevas líneas
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 send();
