@@ -148,44 +148,50 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null)
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
 
-React.useEffect(() => {
-  if (typeof window !== "undefined") {
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile) {
-      // Bloquea el scroll del sitio de fondo por completo
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-      
-      window.parent.postMessage({ type: "CHAT_OPEN_MOBILE" }, "*");
-    }
-  }
-  return () => {
-    document.documentElement.style.overflow = "auto";
-    document.body.style.overflow = "auto";
-    document.body.style.position = "static";
+  // --- FIX PARA ANDROID 15 / TCL NXT PAPER ---
+  // Esta función fuerza al navegador a centrar el input cuando el teclado aparece
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    // 400ms es el tiempo ideal para que el teclado termine de subir en Android 15
+    setTimeout(() => {
+      e.target.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 400);
   };
-}, []);
 
-  // Función de escritura integrada
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+        document.body.style.width = "100%";
+        
+        window.parent.postMessage({ type: "CHAT_OPEN_MOBILE" }, "*");
+      }
+    }
+    return () => {
+      document.documentElement.style.overflow = "auto";
+      document.body.style.overflow = "auto";
+      document.body.style.position = "static";
+    };
+  }, []);
+
   const typeText = (fullText: string) => {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
-    
     let i = 0
     typingIntervalRef.current = setInterval(() => {
       i += 2
       const chunk = fullText.slice(0, i)
-      
       setMessages((prev) => {
         const next = [...prev]
         const last = next[next.length - 1]
-        if (last && last.role === "assistant") {
-          last.content = chunk
-        }
+        if (last && last.role === "assistant") last.content = chunk
         return next
       })
-
       if (i >= fullText.length) {
         if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
         setLoading(false)
@@ -202,52 +208,31 @@ React.useEffect(() => {
   }
 
   async function send(text?: string) {
-  const q = (text ?? input).trim();
-  if (!q || loading) return;
-  
-  setInput("");
-  setLoading(true);
-  
-  const newMessages: Msg[] = [...messages, { role: "user", content: q }];
-  setMessages([...newMessages, { role: "assistant", content: "" }]);
-  
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: newMessages }), 
-    });
-
-    if (!res.ok) throw new Error("Error en la comunicación con el servidor");
-
-    const data = await res.json();
-    console.log("Datos recibidos:", data);
-
-    // CAMBIO CLAVE: Tu API devuelve la respuesta en la propiedad 'reply'
-    const assistantReply = data.reply;
-
-    if (!assistantReply) {
-      console.error("No se encontró la propiedad 'reply' en:", data);
-      throw new Error("Formato de respuesta incorrecto");
+    const q = (text ?? input).trim();
+    if (!q || loading) return;
+    setInput("");
+    setLoading(true);
+    const newMessages: Msg[] = [...messages, { role: "user", content: q }];
+    setMessages([...newMessages, { role: "assistant", content: "" }]);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: newMessages }), 
+      });
+      if (!res.ok) throw new Error("Error en la comunicación");
+      const data = await res.json();
+      typeText(data.reply);
+    } catch (e) {
+      setLoading(false);
+      setMessages(prev => {
+        const next = [...prev];
+        const last = next[next.length - 1];
+        if (last) last.content = "Lo siento, no pude obtener una respuesta.";
+        return next;
+      });
     }
-    
-    // Iniciamos la animación de escritura con el texto real
-    typeText(assistantReply);
-
-  } catch (e) {
-    console.error("Error detallado:", e);
-    setLoading(false);
-    setMessages(prev => {
-      const next = [...prev];
-      const last = next[next.length - 1];
-      if (last) last.content = "Lo siento, no pude obtener una respuesta.";
-      return next;
-    });
   }
-}
-
-  const quick = ["What projects have you worked on?", "What was your role and impact?", "How do you approach design systems?"]
-  const followUps = ["What makes your design approach unique?", "How do you approach product strategy?", "What technologies do you use?"]
 
   React.useEffect(() => {
     if (listRef.current) {
@@ -255,153 +240,64 @@ React.useEffect(() => {
     }
   }, [messages, loading])
 
+  const quick = ["What projects have you worked on?", "What was your role and impact?", "How do you approach design systems?"]
+  const followUps = ["What makes your design approach unique?", "How do you approach product strategy?", "What technologies do you use?"]
+
   return (
-    <div className={`${styles.app} ${aeonik.className}`}>
+    <div className={`${styles.app} ${aeonik.className}`} style={{ background: "#ffffff" }}>
       <ChatHeader 
         onReset={handleReset} 
         onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} 
       />
 
       <div ref={listRef} className={styles.messages}>
-  <AnimatePresence mode="popLayout">
-    {messages.length === 0 ? (
-      <motion.div 
-        key={`intro-${introKey}`} 
-        className={styles.intro} 
-        variants={containerVariants} 
-        initial="hidden" 
-        animate="visible"
-        exit={{ opacity: 0, y: -10 }}
-        style={{ width: "100%" }} 
-      >
-        <motion.div variants={itemVariants} className={styles.chatTitle}>
-          Hey, what would you like to know?
-        </motion.div>
-        <div className={styles.quickGrid}>
-          {quick.map(q => (
-            <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.quickBtn}>
-              {q}
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
-    ) : (
-      <motion.div 
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  style={{ 
-    width: "100%", 
-    display: "flex", 
-    flexDirection: "column", 
-    gap: "32px", // Aumentamos el espacio entre pregunta y respuesta
-    marginTop: "auto",
-    paddingBottom: "20px" 
-  }}
->
-        {messages.map((m, i) => {
-          const isLastAssistant = m.role === "assistant" && i === messages.length - 1
-          
-          if (m.role === "user") {
-            return (
-              <div key={i} className={styles.userRow}>
-                <div className={styles.userBubble}>{m.content}</div>
+        <AnimatePresence mode="popLayout">
+          {messages.length === 0 ? (
+            <motion.div key={`intro-${introKey}`} className={styles.intro} variants={containerVariants} initial="hidden" animate="visible" exit={{ opacity: 0, y: -10 }} style={{ width: "100%" }}>
+              <motion.div variants={itemVariants} className={styles.chatTitle}>Hey, what would you like to know?</motion.div>
+              <div className={styles.quickGrid}>
+                {quick.map(q => (
+                  <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.quickBtn}>{q}</motion.button>
+                ))}
               </div>
-            )
-          }
-
-          if (m.content === "" && loading && isLastAssistant) {
-            return (
-              <div key={i} className={styles.assistantRow}>
-                {/* Fix de carga móvil: evita el salto visual (Flash) */}
-                <div className={styles.thinking} style={{ minHeight: '24px', display: 'flex', alignItems: 'center' }}>
-                  thinking…
-                </div>
-              </div>
-            )
-          }
-
-          return (
-            <div key={i} className={styles.assistantRow}>
-              <div className={styles.assistantText}>{m.content}</div>
-              {isLastAssistant && !loading && m.content !== "" && (
-                <motion.div 
-                  variants={containerVariants} 
-                  initial="hidden" 
-                  animate="visible" 
-                  className={styles.followUpsContainer}
-                >
-                  <div className={styles.divider} />
-                  <div className={styles.followUps}>
-                    {followUps.map(q => (
-                      <motion.button 
-                        key={q} 
-                        variants={itemVariants} 
-                        onClick={() => send(q)} 
-                        className={styles.followUpBtn}
-                      >
-                        ↳ {q}
-                      </motion.button>
-                    ))}
+            </motion.div>
+          ) : (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "32px", marginTop: "auto", paddingBottom: "20px" }}>
+              {messages.map((m, i) => {
+                const isLastAssistant = m.role === "assistant" && i === messages.length - 1
+                if (m.role === "user") return <div key={i} className={styles.userRow}><div className={styles.userBubble}>{m.content}</div></div>
+                if (m.content === "" && loading && isLastAssistant) return <div key={i} className={styles.assistantRow}><div className={styles.thinking}>thinking…</div></div>
+                return (
+                  <div key={i} className={styles.assistantRow}>
+                    <div className={styles.assistantText}>{m.content}</div>
+                    {isLastAssistant && !loading && m.content !== "" && (
+                      <motion.div variants={containerVariants} initial="hidden" animate="visible" className={styles.followUpsContainer}>
+                        <div className={styles.divider} /><div className={styles.followUps}>
+                          {followUps.map(q => <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.followUpBtn}>↳ {q}</motion.button>)}
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
-                </motion.div>
-              )}
-            </div>
-          )
-        })}
-      </motion.div>
-    )}
-  </AnimatePresence>
-</div>
+                )
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-      {/* ÁREA DE INPUT: Añadimos padding inferior para el área segura de móviles */}
-      <div style={{ 
-        padding: "14px 14px 24px 14px", 
-        paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", 
-        borderTop: "1px solid rgba(0,0,0,0.12)",
-        background: "#fff" 
-      }}>
-        <div style={{ 
-          display: "flex", 
-          gap: 10, 
-          alignItems: "center", 
-          background: "#fff", 
-          border: "1px solid rgba(0,0,0,0.15)", 
-          borderRadius: 6, 
-          padding: "10px 12px" 
-        }}>
+      <div style={{ padding: "14px 14px 24px 14px", paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", borderTop: "1px solid rgba(0,0,0,0.12)", background: "#fff" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", background: "#fff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
           <input 
-          value={input} 
-          onChange={e => setInput(e.target.value)} 
-          onKeyDown={e => e.key === "Enter" && send()} 
-          // Modifica estos eventos así:
-          onTouchStart={(e) => {
-            // Esto evita que el navegador dispare eventos extra que cierran el overlay
-            e.stopPropagation();
-          }}
-          onFocus={(e) => {
-            e.stopPropagation();
-            // Forzamos al scroll a quedarse quieto para que Framer no se pierda
-            window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
-          }}
-          placeholder="Ask about me…" 
-          style={{ 
-            flex: 1, 
-            border: "none", 
-            outline: "none", 
-            fontSize: "16px", 
-            padding: "8px 0",
-            background: "transparent"
-          }} 
-        />
-                    <button 
-            onClick={() => send()} 
-            disabled={loading || !hasText} 
-            className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
-          >
-            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor">
-              <path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/>
-            </svg>
+            value={input} 
+            onChange={e => setInput(e.target.value)} 
+            onKeyDown={e => e.key === "Enter" && send()} 
+            onFocus={handleFocus} // <--- ASIGNADO AQUÍ
+            onTouchStart={(e) => e.stopPropagation()}
+            placeholder="Ask about me…" 
+            style={{ flex: 1, border: "none", outline: "none", fontSize: "16px", padding: "8px 0", background: "transparent" }} 
+          />
+          <button onClick={() => send()} disabled={loading || !hasText} className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}>
+            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor"><path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/></svg>
           </button>
         </div>
       </div>
