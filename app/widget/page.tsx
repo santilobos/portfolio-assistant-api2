@@ -150,16 +150,20 @@ export default function Widget() {
 
   // --- FIX PARA ANDROID 15 / TCL NXT PAPER ---
   // Esta función fuerza al navegador a centrar el input cuando el teclado aparece
-  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+ const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
-    // 400ms es el tiempo ideal para que el teclado termine de subir en Android 15
+    // Aumentamos un poco el tiempo para asegurar que el teclado del TCL esté 100% visible
     setTimeout(() => {
-      e.target.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }, 400);
-  };
+        // Opción A: Desplazar el elemento al centro
+        e.target.scrollIntoView({ behavior: "smooth", block: "center" });
+        
+        // Opción B (Refuerzo): Forzar al cuerpo del widget a subir
+        window.scrollTo({
+            top: e.target.offsetTop - 50,
+            behavior: 'smooth'
+        });
+    }, 500); 
+};
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
