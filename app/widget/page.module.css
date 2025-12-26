@@ -2,13 +2,15 @@
 .app {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Importante: 100% del iframe, no del viewport */
+  /* IMPORTANTE: height 100% para que use el espacio que le da Framer */
+  height: 100%; 
   width: 100%;
+  position: relative; /* Relative es clave para que no flote sobre la web */
   background: #ffffff;
-  position: relative; /* Cambiado de fixed a relative */
   overflow: hidden;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
-
 .messages {
   flex: 1;
   overflow-y: auto;
@@ -234,15 +236,12 @@
 }
 
 /* --- SOLUCIÓN AL BUG DE DESAPARICIÓN --- */
+/* Forzamos que en Desktop no haya comportamientos de ocultación */
 @media (min-width: 1024px) {
   .app {
-    position: relative !important;
     display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    position: relative !important;
     transform: none !important;
-    height: 100% !important;
-    width: 100% !important;
   }
 }
 

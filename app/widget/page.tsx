@@ -149,19 +149,20 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // 1. SOLUCIÓN AL BUG DE FRAMER: Avisa al padre que se mantenga abierto en Desktop
-  React.useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        window.parent?.postMessage({ type: "CHAT_FORCE_OPEN" }, "*");
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize(); 
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Variantes para animaciones
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 }
+  };
 
-  // 2. Control de scroll automático
+  // Preguntas sugeridas iniciales
+  const quick = [
+    "¿En qué proyectos has trabajado?", 
+    "¿Cuál es tu impacto en negocio?", 
+    "¿Cómo diseñas sistemas de diseño?"
+  ];
+
+  // Auto-scroll al final
   React.useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
@@ -191,9 +192,7 @@ export default function Widget() {
       if (i >= fullText.length) {
         if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
         setLoading(false);
-        if (suggestions && suggestions.length > 0) {
-          setDynamicFollowUps(suggestions);
-        }
+        if (suggestions && suggestions.length > 0) setDynamicFollowUps(suggestions);
       }
     }, 15);
   };
@@ -246,8 +245,6 @@ export default function Widget() {
     }
   }
 
-  const quick = ["¿En qué proyectos has trabajado?", "¿Cuál es tu impacto en negocio?", "¿Cómo diseñas sistemas de diseño?"];
-
   return (
     <div className={`${styles.app} ${aeonik.className}`}>
       <ChatHeader 
@@ -274,11 +271,13 @@ export default function Widget() {
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               {messages.map((m, i) => {
                 const isLastAssistant = m.role === "assistant" && i === messages.length - 1;
+                
                 if (m.role === "user") return (
                   <div key={i} className={styles.userRow}>
                     <div className={styles.userBubble}>{m.content}</div>
                   </div>
                 );
+
                 return (
                   <div key={i} className={styles.assistantRow}>
                     {m.content === "" && loading && isLastAssistant ? (
@@ -286,11 +285,18 @@ export default function Widget() {
                     ) : (
                       <div className={styles.assistantText}>{m.content}</div>
                     )}
+                    
                     {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (
-                      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className={styles.followUpsContainer}>
+                      <motion.div 
+                        initial={{ opacity: 0, y: 5 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        className={styles.followUpsContainer}
+                      >
                         <div className={styles.followUps}>
                           {dynamicFollowUps.map(q => (
-                            <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>{q}</button>
+                            <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>
+                               {q}
+                            </button>
                           ))}
                         </div>
                       </motion.div>
