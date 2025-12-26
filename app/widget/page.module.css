@@ -130,6 +130,8 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  /* Aumentamos el espacio con el texto de la respuesta */
+  margin-top: 24px; 
 }
 
 .divider {
@@ -149,16 +151,16 @@
 .followUpBtn {
   border: none;
   background: transparent;
-  padding: 12px 14px; /* Más área de clic, como en la imagen */
+  padding: 8px;
   text-align: left;
   font-size: 0.95rem;
   color: #4b5563; /* Gris profesional */
   cursor: pointer;
-  border-radius: 10px; /* Bordes suaves para el fondo naranja */
+  border-radius: 4px; /* Bordes suaves para el fondo naranja */
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   line-height: 1.4;
 }
@@ -166,7 +168,7 @@
 
 /* Efecto HOVER: El fondo naranja ligero de la referencia */
 .followUpBtn:hover {
-  background-color: #fff3e0 !important; /* El naranja suave que pediste */
+  background-color: #fffcf6 !important; /* El naranja suave que pediste */
   color: rgb(255, 92, 0); /* El naranja de marca para el texto */
   transform: none; /* Eliminamos el desplazamiento para que se sienta más UI de sistema */
 }
@@ -179,21 +181,55 @@
 }
 
 /* --- Input y Composer --- */
-.sendBtn {
-  width: 36px;
-  height: 36px;
-  border: 0;
+
+.inputContainer {
+  padding: 14px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 14px);
+  border-top: 1px solid rgba(0,0,0,0.12);
+  background: #ffffff;
+}
+
+.composer {
+  display: flex; 
+  gap: 10px; 
+  align-items: flex-end; 
+  background: #ffffff; 
+  border: 1px solid rgba(0,0,0,0.15); 
+  border-radius: 6px; /* Corregido de borderRadius a border-radius */
+  padding: 10px 12px;
+}
+
+.composer textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  padding: 8px 0;
   background: transparent;
+  resize: none;
+  max-height: 150px;
+  font-family: inherit;
+  line-height: 1.4;
+  overflow-y: auto;
+  color: #000;
+}
+
+
+/* El botón de enviar ahora se alinea mejor */
+.sendBtn {
+  margin-bottom: 4px; 
+  background: transparent;
+  border: none;
   cursor: pointer;
-  color: rgba(17, 17, 17, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease, transform 0.1s ease;
+  color: rgba(0, 0, 0, 0.2);
+  transition: color 0.2s ease;
 }
 
 .sendBtnActive {
-  color: rgb(255, 92, 0);
+  color: rgb(255, 92, 0) !important;
 }
 
 .sendBtnActive:hover {
@@ -341,4 +377,19 @@
 .iconBtn:focus:not(:focus-visible) {
   outline: none !important;
   box-shadow: none !important;
+}
+
+.textArea {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  padding: 8px 0;
+  background: transparent;
+  resize: none;
+  max-height: 150px;
+  font-family: inherit;
+  line-height: 1.4;
+  overflow-y: auto;
+  color: #000;
 }

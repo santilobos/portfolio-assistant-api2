@@ -294,7 +294,7 @@ export default function Widget() {
                         <div className={styles.followUps}>
                           {dynamicFollowUps.map(q => (
                             <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>
-                              ↳ {q}
+                               {q}
                             </button>
                           ))}
                         </div>
@@ -316,7 +316,7 @@ export default function Widget() {
             onChange={e => setInput(e.target.value)} 
             onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
             onFocus={handleFocus}
-            placeholder="Pregúntame lo que quieras..." 
+            placeholder="¿Qué te gustaría saber sobre mí?" 
             rows={1}
           />
           <button onClick={() => send()} disabled={loading || !hasText} className={styles.sendBtn}>
