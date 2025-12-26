@@ -310,20 +310,36 @@ export default function Widget() {
 
       {/* Input Area */}
       <div className={styles.inputContainer}>
-        <div className={styles.inputWrapper}>
+        <div className={styles.composer}>
           <textarea 
             value={input} 
-            onChange={e => setInput(e.target.value)} 
-            onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
+            onChange={e => {
+              setInput(e.target.value);
+              e.target.style.height = 'auto';
+              e.target.style.height = `${e.target.scrollHeight}px`;
+            }} 
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }} 
             onFocus={handleFocus}
+            className={styles.textArea}
             placeholder="¿Qué te gustaría saber sobre mí?" 
             rows={1}
           />
-          <button onClick={() => send()} disabled={loading || !hasText} className={styles.sendBtn}>
-            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor"><path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/></svg>
+          <button 
+            onClick={() => send()} 
+            disabled={loading || !hasText} 
+            className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
+          >
+            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor">
+              <path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/>
+            </svg>
           </button>
         </div>
       </div>
-    </div>
-  )
-}
+    </div> // Este cierra el div principal de .app
+  ); // Este cierra el return
+} // Este cierra la función Widget
