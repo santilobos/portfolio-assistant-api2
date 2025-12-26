@@ -134,34 +134,48 @@
 
 .divider {
   height: 1px;
-  background-color: #e6e6e6;
-  margin: 24px 0 16px;
+  background-color: #f1f1f1; /* Un poco más suave */
+  margin: 20px 0 12px;
   width: 100%;
 }
 
 .followUps {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 4px; /* Espaciado más compacto entre filas */
+  width: 100%;
 }
 
 .followUpBtn {
   border: none;
-  background: none;
-  padding: 4px 0;
+  background: transparent;
+  padding: 12px 14px; /* Más área de clic, como en la imagen */
   text-align: left;
-  font-size: 1rem;
-  color: #6b7280;
+  font-size: 0.95rem;
+  color: #4b5563; /* Gris profesional */
   cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 10px; /* Bordes suaves para el fondo naranja */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
+  line-height: 1.4;
 }
 
+
+/* Efecto HOVER: El fondo naranja ligero de la referencia */
 .followUpBtn:hover {
+  background-color: #fff3e0 !important; /* El naranja suave que pediste */
+  color: rgb(255, 92, 0); /* El naranja de marca para el texto */
+  transform: none; /* Eliminamos el desplazamiento para que se sienta más UI de sistema */
+}
+
+/* El símbolo ↳ con el color de acento */
+.followUpBtn::before {
+  content: "↳";
   color: rgb(255, 92, 0);
-  transform: translateX(6px);
+  font-weight: bold;
 }
 
 /* --- Input y Composer --- */
