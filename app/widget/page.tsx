@@ -140,18 +140,15 @@ type Msg = { role: "user" | "assistant"; content: string }
 
 function sanitizeAssistantText(text: string) {
   return text
-    // quita markdown fuerte
+    // markdown fuerte
     .replace(/\*\*/g, "")
     .replace(/\*/g, "")
     .replace(/`/g, "")
     .replace(/_/g, "")
     .replace(/#{1,6}\s?/g, "")
 
-    // evita listas con guión
+    // evita listas markdown con guión
     .replace(/^\s*-\s+/gm, "")
-
-    // limpia arrows
-    .replace(/↳/g, "")
 
     // normaliza espacios
     .replace(/\n{3,}/g, "\n\n")
@@ -246,13 +243,18 @@ export default function Widget() {
       });
       const data = await res.json();
       
-      const parts = data.reply.split('###');
-      const mainContent = parts[0].trim();
-      const suggestions = parts[1] 
-        ? parts[1].split('\n')
-            .map((s: string) => s.replace('↳', '').trim())
-            .filter((s: string) => s.length > 0)
-        : [];
+      const [mainRaw, followRaw] = data.reply.split("###", 2);
+      const mainContent = sanitizeAssistantText(mainRaw ?? "");
+
+      const suggestions = followRaw
+  ?  followRaw
+      .split("\n")
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.startsWith("↳"))
+      .map((s: string) => sanitizeAssistantText(s.replace(/^↳\s?/, "")))
+      .filter((s: string) => s.length >= 6 && s.length <= 90)
+  : [];
+
 
       typeText(mainContent, suggestions);
     } catch (e) {
