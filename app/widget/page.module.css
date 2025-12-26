@@ -2,22 +2,28 @@
 .app {
   display: flex;
   flex-direction: column;
-  /* IMPORTANTE: height 100% para que use el espacio que le da Framer */
   height: 100%; 
   width: 100%;
-  position: relative; /* Relative es clave para que no flote sobre la web */
+  position: relative; 
   background: #ffffff;
+  /* IMPORTANTE: overflowAnchor bloquea el salto de 1px al hacer focus */
+  overflow-anchor: none;
   overflow: hidden;
   opacity: 1 !important;
   visibility: visible !important;
+  /* Fix carga 24-12: fondo sólido inmediato [cite: 2025-12-24] */
+  contain: content; 
 }
+
 .messages {
   flex: 1;
   overflow-y: auto;
   padding: 20px 14px;
   display: flex;
   flex-direction: column;
-  gap: 24px; /* Espaciado entre burbujas */
+  gap: 24px;
+  /* Evita que el scroll de mensajes mueva el header de la web */
+  overscroll-behavior: contain; 
 }
 
 /* --- Filas y Burbujas --- */
@@ -100,7 +106,7 @@
   transform: translateY(-2px);
 }
 
-/* --- Sugerencias (Follow Ups) estilo RachelLM --- */
+/* --- Sugerencias (Follow Ups) --- */
 .followUpsContainer {
   width: 100%;
   display: flex;
@@ -150,7 +156,7 @@
   font-weight: bold;
 }
 
-/* --- Input y Composer (Corregido Ancho Total) --- */
+/* --- Input y Composer --- */
 .inputContainer {
   width: 100%;
   padding: 14px;
@@ -187,6 +193,8 @@
   overflow-y: auto;
   color: #000;
   display: block;
+  /* FIX: scroll-margin evita que el navegador desplace el iframe al hacer focus */
+  scroll-margin-top: 100vh;
 }
 
 .sendBtn {
@@ -205,67 +213,35 @@
   color: rgb(255, 92, 0) !important;
 }
 
-.sendBtn:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-/* --- Animaciones --- */
-.thinking {
-  font-size: 14px;
-  color: rgba(17, 17, 17, 0.35);
-  background: linear-gradient(90deg, rgba(17,17,17,0.2) 0%, rgba(17,17,17,0.6) 40%, rgba(17,17,17,0.2) 80%);
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmer 1.6s infinite linear;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* --- Reset Globales --- */
-.app :global(input) {
-  -webkit-appearance: none;
-  appearance: none;
-  outline: none;
-  border: none;
-  font-size: 16px !important;
-}
-
-/* --- SOLUCIÓN AL BUG DE DESAPARICIÓN --- */
-/* Forzamos que en Desktop no haya comportamientos de ocultación */
+/* --- SOLUCIÓN AL BUG DE DESAPARICIÓN Y SALTO 1PX --- */
 @media (min-width: 1024px) {
   .app {
     display: flex !important;
-    position: relative !important;
-    transform: none !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    /* Bloqueamos el movimiento para que las líneas de los headers coincidan */
+    contain: strict; 
+    overflow-anchor: none;
+  }
+  
+  .textArea:focus {
+    /* Clava el textarea en su sitio sin mover el frame superior */
+    scroll-margin: 0;
   }
 }
-
-@media (max-width: 1023px) {
-  .app {
-    /* Aquí solo estilos visuales, evita position: fixed 
-       si Framer ya controla la posición del iframe */
-    font-size: 16px;
-  }
-}
-
-
 
 /* --- Mobile Fixes --- */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   .app {
     height: 100% !important;
-    width: 100vw;
+    /* En móvil permitimos que el sistema gestione el teclado libremente */
+    overflow-anchor: auto;
+    contain: none;
   }
-  .messages {
-    padding: 16px;
-  }
-  .followUpBtn {
-    padding: 12px; 
+  .inputContainer {
+    /* Previene que el teclado tape el input en móviles modernos */
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
 }
 
