@@ -144,15 +144,20 @@ export default function Widget() {
   const [loading, setLoading] = React.useState(false)
   const [introKey, setIntroKey] = React.useState(0)
   
+  // Estado para las preguntas sugeridas dinámicas
+  const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([])
+
   const hasText = input.trim().length > 0
   const listRef = React.useRef<HTMLDivElement | null>(null)
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
 
+  // CORRECCIÓN DEL ERROR: Tipado explícito para evitar el error en onFocus
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
+    const target = e.target; // Referencia local para los timeouts
     const doScroll = () => {
-        e.target.scrollIntoView({ behavior: "smooth", block: "center" });
-        window.scrollTo({ top: e.target.offsetTop - 50, behavior: 'smooth' });
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        window.scrollTo({ top: target.offsetTop - 50, behavior: 'smooth' });
     };
     setTimeout(doScroll, 100);
     setTimeout(doScroll, 500); 
@@ -166,7 +171,6 @@ export default function Widget() {
     if (typeof window !== "undefined") {
       const isMobile = window.innerWidth <= 768;
       if (isMobile) {
-        // Bloqueo total del scroll del navegador
         document.documentElement.style.overflow = "hidden";
         document.documentElement.style.overscrollBehavior = "none";
         document.body.style.overflow = "hidden";
@@ -184,7 +188,7 @@ export default function Widget() {
     };
   }, []);
 
-  const typeText = (fullText: string) => {
+  const typeText = (fullText: string, suggestions?: string[]) => {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
     let i = 0
     typingIntervalRef.current = setInterval(() => {
@@ -199,6 +203,8 @@ export default function Widget() {
       if (i >= fullText.length) {
         if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
         setLoading(false)
+        // Se activan las sugerencias al terminar de escribir para evitar el "flash" visual
+        if (suggestions) setDynamicFollowUps(suggestions)
       }
     }, 15)
   }
@@ -208,16 +214,21 @@ export default function Widget() {
     setMessages([])
     setInput("")
     setLoading(false)
+    setDynamicFollowUps([])
     setIntroKey(prev => prev + 1)
   }
 
   async function send(text?: string) {
     const q = (text ?? input).trim();
     if (!q || loading) return;
+    
     setInput("");
     setLoading(true);
+    setDynamicFollowUps([]); // Limpieza de botones previos
+
     const newMessages: Msg[] = [...messages, { role: "user", content: q }];
     setMessages([...newMessages, { role: "assistant", content: "" }]);
+    
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -225,7 +236,9 @@ export default function Widget() {
         body: JSON.stringify({ messages: newMessages }), 
       });
       const data = await res.json();
-      typeText(data.reply);
+      
+      // Enviamos la respuesta y las sugerencias a la función de tipeo
+      typeText(data.reply, data.suggestions);
     } catch (e) {
       setLoading(false);
       setMessages(prev => {
@@ -243,22 +256,21 @@ export default function Widget() {
     }
   }, [messages, loading])
 
+  // Preguntas sugeridas fijas para la pantalla de inicio
   const quick = ["What projects have you worked on?", "What was your role and impact?", "How do you approach design systems?"]
-  const followUps = ["What makes your design approach unique?", "How do you approach product strategy?", "What technologies do you use?"]
 
   return (
     <div className={`${styles.app} ${aeonik.className}`} 
          style={{ 
            background: "#ffffff", 
-           height: "100dvh", // Altura dinámica para móvil
+           height: "100dvh", 
            display: "flex", 
            flexDirection: "column",
-           overflow: "hidden", // Bloquea scroll externo
-           overscrollBehavior: "none", // Evita el rebote de Android/iOS
+           overflow: "hidden", 
+           overscrollBehavior: "none", 
            position: "relative"
          }}>
       
-      {/* HEADER: Con touchAction none para que el dedo no lo mueva */}
       <div style={{ touchAction: "none" }}>
         <ChatHeader 
           onReset={handleReset} 
@@ -266,7 +278,6 @@ export default function Widget() {
         />
       </div>
 
-      {/* MENSAJES: El ÚNICO lugar donde permitimos scroll con el dedo */}
       <div ref={listRef} className={styles.messages} 
            style={{ 
              flex: 1, 
@@ -293,10 +304,13 @@ export default function Widget() {
                 return (
                   <div key={i} className={styles.assistantRow}>
                     <div className={styles.assistantText}>{m.content}</div>
-                    {isLastAssistant && !loading && m.content !== "" && (
+                    {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (
                       <motion.div variants={containerVariants} initial="hidden" animate="visible" className={styles.followUpsContainer}>
-                        <div className={styles.divider} /><div className={styles.followUps}>
-                          {followUps.map(q => <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.followUpBtn}>↳ {q}</motion.button>)}
+                        <div className={styles.divider} />
+                        <div className={styles.followUps}>
+                          {dynamicFollowUps.map(q => (
+                            <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.followUpBtn}>↳ {q}</motion.button>
+                          ))}
                         </div>
                       </motion.div>
                     )}
@@ -308,13 +322,12 @@ export default function Widget() {
         </AnimatePresence>
       </div>
 
-      {/* ÁREA DE TEXTO: Bloqueamos touchAction para que al escribir no se mueva el widget */}
       <div style={{ 
         padding: "14px", 
         paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)", 
         borderTop: "1px solid rgba(0,0,0,0.12)", 
         background: "#ffffff",
-        touchAction: "none" // Clave para bloquear el scroll del dedo aquí
+        touchAction: "none"
       }}>
         <div style={{ display: "flex", gap: 10, alignItems: "flex-end", background: "#ffffff", border: "1px solid rgba(0,0,0,0.15)", borderRadius: 6, padding: "10px 12px" }}>
           <textarea 
