@@ -138,6 +138,29 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
 
 type Msg = { role: "user" | "assistant"; content: string }
 
+const OUT_OF_SCOPE_FOLLOWUPS = [
+  "¿Quieres que te cuente un proyecto con métricas (Barça / Mediapro / Depasify)?",
+  "¿Te interesa más Design Systems (tokens) o optimización de conversión (CRO)?",
+  "¿Prefieres que te hable de mi proceso (discovery → delivery) o de impacto?",
+] as const;
+
+function isCompensationQuestion(q: string) {
+  const t = q.toLowerCase();
+  return (
+    t.includes("salario") ||
+    t.includes("sueldo") ||
+    t.includes("cuanto cobras") ||
+    t.includes("cuánto cobras") ||
+    t.includes("expectativa salarial") ||
+    t.includes("compensación") ||
+    t.includes("remuneración") ||
+    t.includes("rate") ||
+    t.includes("day rate") ||
+    t.includes("hourly") ||
+    t.includes("salary")
+  );
+}
+
 function sanitizeAssistantText(text: string) {
   return text
     // markdown fuerte
@@ -156,12 +179,15 @@ function sanitizeAssistantText(text: string) {
 }
 
 
+
 export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([]);
   const [input, setInput] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [introKey, setIntroKey] = React.useState(0);
   const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([]);
+  const [lastUserQuestion, setLastUserQuestion] = React.useState("");
+
 
   const hasText = input.trim().length > 0;
   const listRef = React.useRef<HTMLDivElement | null>(null);
@@ -256,7 +282,15 @@ export default function Widget() {
   : [];
 
 
-      typeText(mainContent, suggestions);
+      const finalSuggestions =
+  suggestions.length > 0
+    ? suggestions
+    : isCompensationQuestion(q)
+      ? [...OUT_OF_SCOPE_FOLLOWUPS]
+      : [];
+
+typeText(mainContent, finalSuggestions);
+
     } catch (e) {
       setLoading(false);
       setMessages(prev => {
