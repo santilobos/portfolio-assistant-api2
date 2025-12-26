@@ -281,7 +281,7 @@ export default function Widget() {
                 return (
                   <div key={i} className={styles.assistantRow}>
                     {m.content === "" && loading && isLastAssistant ? (
-                      <div className={styles.thinking}>Escribiendo...</div>
+                      <div className={styles.thinking}>Thinking...</div>
                     ) : (
                       <div className={styles.assistantText}>{m.content}</div>
                     )}
