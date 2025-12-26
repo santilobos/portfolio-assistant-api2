@@ -2,20 +2,21 @@
 .app {
   display: flex;
   flex-direction: column;
-  /* En lugar de fixed, usamos relative para que se adapte al iframe de Framer */
-  position: relative; 
+  /* IMPORTANTE: Usamos height 100% para que llene el iframe de Framer */
   height: 100%; 
   width: 100%;
+  position: relative; /* Cambiado de fixed a relative */
   background: #ffffff;
   overflow: hidden;
 }
+
 .messages {
   flex: 1;
+  overflow-y: auto;
+  padding: 20px 14px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  padding: 0 14px; 
-  -webkit-overflow-scrolling: touch;
+  gap: 24px; /* Espaciado entre burbujas */
 }
 
 /* --- Filas y Burbujas --- */

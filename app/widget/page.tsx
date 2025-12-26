@@ -139,67 +139,73 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
 type Msg = { role: "user" | "assistant"; content: string }
 
 export default function Widget() {
-  const [messages, setMessages] = React.useState<Msg[]>([])
-  const [input, setInput] = React.useState("")
-  const [loading, setLoading] = React.useState(false)
-  const [introKey, setIntroKey] = React.useState(0)
-  
-  const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([])
+  const [messages, setMessages] = React.useState<Msg[]>([]);
+  const [input, setInput] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [introKey, setIntroKey] = React.useState(0);
+  const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([]);
 
-  const hasText = input.trim().length > 0
-  const listRef = React.useRef<HTMLDivElement | null>(null)
-  const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
+  const hasText = input.trim().length > 0;
+  const listRef = React.useRef<HTMLDivElement | null>(null);
+  const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 1. SOLUCIÓN AL BUG DE FRAMER: Avisa al padre que se mantenga abierto en Desktop
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        window.parent?.postMessage({ type: "CHAT_FORCE_OPEN" }, "*");
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize(); 
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 2. Control de scroll automático
+  React.useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [messages, loading, dynamicFollowUps]);
 
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
     const target = e.target;
-    const doScroll = () => {
-        target.scrollIntoView({ behavior: "smooth", block: "center" });
-        window.scrollTo({ top: target.offsetTop - 50, behavior: 'smooth' });
-    };
-    setTimeout(doScroll, 100);
-    setTimeout(doScroll, 500); 
+    setTimeout(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
   };
 
-  React.useEffect(() => {
-    if ('scrollRestoration' in window.history) {
-        window.history.scrollRestoration = 'manual';
-    }
-    // ... lógica de scroll y mobile que ya tenías ...
-  }, []);
-
-  // Función de escritura mejorada
   const typeText = (fullText: string, suggestions?: string[]) => {
-    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
-    let i = 0
+    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+    let i = 0;
     typingIntervalRef.current = setInterval(() => {
-      i += 2
-      const chunk = fullText.slice(0, i)
+      i += 2;
+      const chunk = fullText.slice(0, i);
       setMessages((prev) => {
-        const next = [...prev]
-        const last = next[next.length - 1]
-        if (last && last.role === "assistant") last.content = chunk
-        return next
-      })
+        const next = [...prev];
+        const last = next[next.length - 1];
+        if (last && last.role === "assistant") last.content = chunk;
+        return next;
+      });
       if (i >= fullText.length) {
-        if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
-        setLoading(false)
-        // Solo activamos botones cuando el texto termina de escribirse
+        if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+        setLoading(false);
         if (suggestions && suggestions.length > 0) {
-          setDynamicFollowUps(suggestions)
+          setDynamicFollowUps(suggestions);
         }
       }
-    }, 15)
-  }
+    }, 15);
+  };
 
   const handleReset = () => {
-    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
-    setMessages([])
-    setInput("")
-    setLoading(false)
-    setDynamicFollowUps([])
-    setIntroKey(prev => prev + 1)
-  }
+    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+    setMessages([]);
+    setInput("");
+    setLoading(false);
+    setDynamicFollowUps([]);
+    setIntroKey(prev => prev + 1);
+  };
 
   async function send(text?: string) {
     const q = (text ?? input).trim();
@@ -207,7 +213,7 @@ export default function Widget() {
     
     setInput("");
     setLoading(true);
-    setDynamicFollowUps([]); // LIMPIEZA: Evita el "flash" de botones viejos
+    setDynamicFollowUps([]); 
 
     const newMessages: Msg[] = [...messages, { role: "user", content: q }];
     setMessages([...newMessages, { role: "assistant", content: "" }]);
@@ -220,12 +226,8 @@ export default function Widget() {
       });
       const data = await res.json();
       
-      // LÓGICA DE SEPARACIÓN DINÁMICA
-      // Dividimos la respuesta por el delimitador ### que configuramos en constants.ts
       const parts = data.reply.split('###');
       const mainContent = parts[0].trim();
-      
-      // Extraemos las preguntas si existen, limpiando saltos de línea y símbolos
       const suggestions = parts[1] 
         ? parts[1].split('\n')
             .map((s: string) => s.replace('↳', '').trim())
@@ -244,42 +246,39 @@ export default function Widget() {
     }
   }
 
-  React.useEffect(() => {
-    if (listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight
-    }
-  }, [messages, loading])
-
-  const quick = ["¿En qué proyectos has trabajado?", "¿Cuál es tu impacto en negocio?", "¿Cómo diseñas sistemas de diseño?"]
+  const quick = ["¿En qué proyectos has trabajado?", "¿Cuál es tu impacto en negocio?", "¿Cómo diseñas sistemas de diseño?"];
 
   return (
-    <div className={`${styles.app} ${aeonik.className}`} 
-         style={{ background: "#ffffff", height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      
-      <ChatHeader onReset={handleReset} onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} />
+    <div className={`${styles.app} ${aeonik.className}`}>
+      <ChatHeader 
+        onReset={handleReset} 
+        onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} 
+      />
 
-      <div ref={listRef} className={styles.messages} style={{ flex: 1, overflowY: "auto", padding: "20px" }}>
+      <div ref={listRef} className={styles.messages}>
         <AnimatePresence mode="popLayout">
           {messages.length === 0 ? (
-            <motion.div key={`intro-${introKey}`} className={styles.intro}>
-              <motion.div variants={itemVariants} className={styles.chatTitle}>Hola, ¿qué te gustaría saber sobre mi trayectoria?</motion.div>
+            <motion.div key={`intro-${introKey}`} className={styles.intro} initial="hidden" animate="visible">
+              <motion.div variants={itemVariants} className={styles.chatTitle}>
+                Hola, ¿qué te gustaría saber sobre mi trayectoria?
+              </motion.div>
               <div className={styles.quickGrid}>
                 {quick.map(q => (
-                  <button key={q} onClick={() => send(q)} className={styles.quickBtn}>{q}</button>
+                  <button key={q} onClick={() => send(q)} className={styles.quickBtn}>
+                    {q}
+                  </button>
                 ))}
               </div>
             </motion.div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               {messages.map((m, i) => {
-                const isLastAssistant = m.role === "assistant" && i === messages.length - 1
-                
+                const isLastAssistant = m.role === "assistant" && i === messages.length - 1;
                 if (m.role === "user") return (
                   <div key={i} className={styles.userRow}>
                     <div className={styles.userBubble}>{m.content}</div>
                   </div>
-                )
-
+                );
                 return (
                   <div key={i} className={styles.assistantRow}>
                     {m.content === "" && loading && isLastAssistant ? (
@@ -287,28 +286,23 @@ export default function Widget() {
                     ) : (
                       <div className={styles.assistantText}>{m.content}</div>
                     )}
-                    
-                    {/* BOTONES DINÁMICOS: Solo aparecen en el último mensaje y cuando termina de escribir */}
                     {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (
                       <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className={styles.followUpsContainer}>
                         <div className={styles.followUps}>
                           {dynamicFollowUps.map(q => (
-                            <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>
-                               {q}
-                            </button>
+                            <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>{q}</button>
                           ))}
                         </div>
                       </motion.div>
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Input Area */}
       <div className={styles.inputContainer}>
         <div className={styles.composer}>
           <textarea 
@@ -340,6 +334,6 @@ export default function Widget() {
           </button>
         </div>
       </div>
-    </div> // Este cierra el div principal de .app
-  ); // Este cierra el return
-} // Este cierra la función Widget
+    </div>
+  );
+}
