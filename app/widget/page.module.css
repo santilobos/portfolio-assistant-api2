@@ -46,6 +46,11 @@
   padding-top: 8px;
 }
 
+.assistantText strong {
+  font-weight: 600;
+}
+
+
 .userRow {
   display: flex;
   justify-content: flex-end;

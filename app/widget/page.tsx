@@ -163,17 +163,19 @@ function isCompensationQuestion(q: string) {
 
 function sanitizeAssistantText(text: string) {
   return text
-    // markdown fuerte
+    // remove markdown emphasis/code
     .replace(/\*\*/g, "")
     .replace(/\*/g, "")
     .replace(/`/g, "")
     .replace(/_/g, "")
-    .replace(/#{1,6}\s?/g, "")
 
-    // evita listas markdown con guión
+    // remove markdown headings ONLY at start of line (e.g., "### Title")
+    .replace(/^\s*#{1,6}\s+/gm, "")
+
+    // remove dash bullets at line start
     .replace(/^\s*-\s+/gm, "")
 
-    // normaliza espacios
+    // tidy excessive blank lines
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
@@ -340,7 +342,10 @@ typeText(mainContent, finalSuggestions);
                     {m.content === "" && loading && isLastAssistant ? (
                       <div className={styles.thinking}>Thinking...</div>
                     ) : (
-                      <div className={styles.assistantText}>{m.content}</div>
+                      <div
+                        className={styles.assistantText}
+                        dangerouslySetInnerHTML={{ __html: m.content }}
+                        />
                     )}
                     
                     {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (

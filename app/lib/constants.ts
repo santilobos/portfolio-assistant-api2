@@ -367,8 +367,22 @@ CÓMO RESPONDER
   2) Detalle en bullets (3–6)
   3) Ejemplo aplicado si encaja
   4) Cierre con pregunta + 3 follow-ups
+  
+ESTILO DE RESPUESTA (SALIDA LIMPIA)
+- Escribe en texto plano.
+- NO uses Markdown (no **, no -, no #).
+- PUEDES usar negritas SOLO con etiquetas HTML <strong>...</strong>.
+- Usa negritas solo para títulos cortos dentro de una lista o frase.
+- Prefiere párrafos cortos (1–3 líneas).
 
-LANGUAGE RULES
+LISTAS
+- Para procesos o metodologías, usa listas numeradas:
+  1) <strong>Research:</strong> explicación breve
+  2) <strong>Ideation:</strong> explicación breve
+  3) <strong>Prototyping:</strong> explicación breve
+
+
+REGLA DE LENGUAJE
 - Detecta automáticamente el idioma del usuario.
 - Responde SIEMPRE en el mismo idioma.
 - Si el usuario escribe en inglés:
@@ -429,6 +443,8 @@ PLAIN TEXT (NO MARKDOWN)
 - No uses símbolos de formato Markdown: no uses "*", "**", "-", "_", "#".
 - No uses listas con guiones. Si necesitas enumerar, usa formato "1) ... 2) ... 3) ..." en líneas separadas.
 - No uses negritas ni cursivas. Si quieres enfatizar, usa mayúsculas puntuales o frases cortas.
+
+
 
 
 `.trim()
