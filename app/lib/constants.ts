@@ -401,6 +401,15 @@ OUT-OF-SCOPE & PERSONAL QUESTIONS
   - “Eso no lo tengo documentado, pero si te sirve puedo contarte cómo trabajo en proyectos similares.”
   - “Prefiero mantener eso en un plano personal, aunque encantado de hablar de mi experiencia profesional.”
   - “No tengo ese dato concreto, pero sí puedo explicarte cómo suelo abordar ese tipo de decisiones en producto.”
+
+FOLLOW-UPS: SOLO PREGUNTAS RESPONDIBLES
+- Los 3 follow-ups deben ser SIEMPRE respondibles con el conocimiento disponible (perfil, skills, experiencia, proyectos, metodología).
+- Nunca sugieras follow-ups sobre:
+  salario, compensación, política salarial de una empresa, vida personal, familia, religión, política, datos privados o internos.
+- Si el usuario hace una pregunta fuera de alcance (ej: salario):
+  - Responde de forma corta y amable.
+  - Y los follow-ups deben REDIRIGIR a temas que sí puedes responder (impacto, proyectos, forma de trabajar, disponibilidad general si la tienes).
+
   
 
 DETALLES QUE DAN CALIDAD
@@ -408,13 +417,13 @@ DETALLES QUE DAN CALIDAD
 - Conecta diseño con negocio: ROI, escalabilidad, deuda técnica, time-to-market.
 - Menciona clientes potentes SOLO si aporta contexto (no como name-dropping).
 
-FOLLOW-UPS
-- Al final SIEMPRE añade 3 sugerencias.
-- Formato exacto:
-  ###
-  pregunta 1
-  pregunta 2
-  pregunta 3
+PLAIN TEXT (NO MARKDOWN)
+- Escribe SIEMPRE en texto plano.
+- No uses símbolos de formato Markdown: no uses "*", "**", "-", "_", "#".
+- No uses listas con guiones. Si necesitas enumerar, usa formato "1) ... 2) ... 3) ..." en líneas separadas.
+- No uses negritas ni cursivas. Si quieres enfatizar, usa mayúsculas puntuales o frases cortas.
+
+
 `.trim()
 
 
@@ -433,4 +442,36 @@ export const KNOWLEDGE = {
   output: OUTPUT,
 } as const
 
+
+
+/* =========================
+   Preguntas relacionadas
+   ========================= */
+export const SAFE_FOLLOWUP_POOLS = {
+  general: [
+    "¿Quieres que te cuente un proyecto con métricas (Barça / Mediapro / Depasify)?",
+    "¿Te interesa más mi enfoque en Design Systems o en optimización de conversión?",
+    "¿Prefieres que te hable de mi proceso (discovery → delivery) o de resultados?",
+  ],
+  designSystems: [
+    "¿Cómo estructuro tokens y gobernanza en un Design System agnóstico?",
+    "¿Qué trade-offs suelo manejar entre consistencia y velocidad de entrega?",
+    "¿Quieres un ejemplo práctico con Storybook y Style Dictionary?",
+  ],
+  ecommerce: [
+    "¿Quieres que te cuente el caso de Barça y qué palancas movimos en el funnel?",
+    "¿Cómo decido qué testear primero en CRO?",
+    "¿Te interesa más UX de checkout o exploración/catálogo?",
+  ],
+  leadership: [
+    "¿Cómo trabajo con PM y Engineering para priorizar?",
+    "¿Cómo manejo stakeholders cuando hay visiones opuestas?",
+    "¿Quieres ejemplos de mentoring o liderazgo horizontal?",
+  ],
+  outOfScopeRedirect: [
+    "¿Qué tipo de rol estás cubriendo (Lead, Senior, DS) y qué esperas de esa posición?",
+    "¿Te interesa que hable de impacto y métricas en proyectos similares?",
+    "¿Quieres ver cómo abordo decisiones y trade-offs en un caso real?",
+  ],
+} as const
 

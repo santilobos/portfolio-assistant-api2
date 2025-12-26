@@ -138,6 +138,27 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
 
 type Msg = { role: "user" | "assistant"; content: string }
 
+function sanitizeAssistantText(text: string) {
+  return text
+    // quita markdown fuerte
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/`/g, "")
+    .replace(/_/g, "")
+    .replace(/#{1,6}\s?/g, "")
+
+    // evita listas con guión
+    .replace(/^\s*-\s+/gm, "")
+
+    // limpia arrows
+    .replace(/↳/g, "")
+
+    // normaliza espacios
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+
 export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([]);
   const [input, setInput] = React.useState("");
