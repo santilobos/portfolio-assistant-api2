@@ -144,6 +144,21 @@ button.iconBtn:focus:not(:focus-visible) {
   animation: fadeInPopover 0.2s ease-out forwards;
 }
 
+/* --- FIX PERSISTENCIA DESKTOP --- */
+@media (min-width: 1024px) {
+  /* Forzamos que el asistente sea visible si la pantalla es grande, 
+     anulando cualquier estado 'closed' de móvil */
+  .app {
+    position: relative !important;
+    display: flex !important;
+    transform: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 400px; /* O el ancho que tengas para tu side panel */
+    height: 100% !important;
+  }
+}
+
 /* --- OPTIMIZACIÓN MOBILE --- */
 @media (max-width: 600px) {
   /* Reducimos un poco el padding del header para ganar espacio */

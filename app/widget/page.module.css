@@ -2,14 +2,13 @@
 .app {
   display: flex;
   flex-direction: column;
-  height: 100dvh; 
+  /* En lugar de fixed, usamos relative para que se adapte al iframe de Framer */
+  position: relative; 
+  height: 100%; 
   width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
   background: #ffffff;
+  overflow: hidden;
 }
-
 .messages {
   flex: 1;
   display: flex;
@@ -237,10 +236,8 @@
 /* --- Mobile Fixes --- */
 @media (max-width: 768px) {
   .app {
-    position: fixed !important;
     height: 100% !important;
     width: 100vw;
-    overflow: hidden;
   }
   .messages {
     padding: 16px;
