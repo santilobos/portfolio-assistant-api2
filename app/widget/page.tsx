@@ -215,6 +215,20 @@ export default function Widget() {
     }
   }, [messages, loading, dynamicFollowUps]);
 
+// Enviar posición del mouse a Framer para el Trailing Dot
+    React.useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            window.parent.postMessage({
+                type: "widget-mouse-move",
+                x: e.clientX,
+                y: e.clientY
+            }, "*");
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+        return () => window.removeEventListener("mousemove", handleMouseMove);
+    }, []);
+
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
     const target = e.target;
