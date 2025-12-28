@@ -5,7 +5,7 @@
   height: 100%; 
   width: 100%;
   position: relative; 
-  background: #ffffff;
+  background: #f5f5f5;
   /* IMPORTANTE: overflowAnchor bloquea el salto de 1px al hacer focus */
   overflow-anchor: none;
   overflow: hidden;
@@ -37,10 +37,11 @@
 }
 
 .assistantText {
-  font-size: 1rem;
-  line-height: 1.6;
+  font-family: var(--font-aeonik);
+  font-size: 0.9rem;
+  line-height: 1.7rem;
   font-weight: 500;
-  color: #000000;
+  color: #4d4d4d;
   max-width: 100%;
   white-space: pre-wrap;
   padding-top: 8px;
@@ -59,12 +60,28 @@
 }
 
 .userBubble {
-  background: #f0f0f0;
-  padding: 12px 16px;
-  border-radius: 18px;
+  font-family: var(--font-aeonik);
+  line-height: 1.4rem;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 4px;
+  /* CAMBIO: Añadimos 'solid' y el color gris que prefieras */
+  border: 1px solid rgba(198, 209, 221, 1); 
   max-width: 85%;
-  color: #000;
-  font-size: 0.95rem;
+  color: #000000;
+  font-size: 0.9rem;
+}
+
+.bulletLine {
+  display: block;
+  margin-left: 1.2rem;   /* Desplaza el bloque a la derecha */
+  text-indent: -1.2rem;  /* Mantiene el bullet en su sitio y alinea el texto que sigue */
+  margin-bottom: 8px;
+}
+
+.assistantText strong {
+  font-weight: 700;
+  color: #000000;
 }
 
 /* --- Intro (Estado Inicial) --- */
@@ -77,6 +94,7 @@
 }
 
 .chatTitle {
+  font-family: var(--font-aeonik);
   font-size: 1.8rem;
   font-weight: 500;
   line-height: 1.3;
@@ -93,11 +111,12 @@
 }
 
 .quickBtn {
+  font-family: var(--font-aeonik);
   text-align: left;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid #d6dce3;
-  background: #ffffff;
+  padding: 8px;
+  border-radius: 4px;
+  border:none;
+  background: #f5f5f5;
   color: #4b5563;
   font-size: 0.95rem;
   cursor: pointer;
@@ -107,7 +126,7 @@
 .quickBtn:hover {
   color: rgb(255, 92, 0);
   border-color: rgb(255, 92, 0);
-  background: rgba(255, 92, 0, 0.02);
+  background:#f5f5f5;
   transform: translateY(-2px);
 }
 
@@ -134,12 +153,13 @@
 }
 
 .followUpBtn {
+  font-family: var(--font-aeonik);
   border: none;
   background: transparent;
-  padding: 10px 12px;
+  padding: 4px 16px;
   text-align: left;
   font-size: 0.95rem;
-  color: #4b5563;
+  color: #999999;
   cursor: pointer;
   border-radius: 8px;
   transition: all 0.2s ease;
@@ -151,14 +171,18 @@
 }
 
 .followUpBtn:hover {
-  background-color: #fff3e0 !important;
+  color: rgb(255, 92, 0);
+}
+
+/* Añade esta regla para la flecha */
+.followUpBtn:hover::before {
   color: rgb(255, 92, 0);
 }
 
 .followUpBtn::before {
   content: "↳";
-  color: rgb(255, 92, 0);
-  font-weight: bold;
+  color: #999999;
+  font-weight: 200;
 }
 
 /* --- Input y Composer --- */
@@ -188,7 +212,7 @@
   width: 100%;
   border: none;
   outline: none;
-  font-size: 16px;
+  font-size: 1rem;
   padding: 8px 0;
   background: transparent;
   resize: none;
@@ -196,8 +220,9 @@
   font-family: inherit;
   line-height: 1.4;
   overflow-y: auto;
-  color: #000;
+  color: #7b7b7b;
   display: block;
+  font-family: var(--font-aeonik);
   /* FIX: scroll-margin evita que el navegador desplace el iframe al hacer focus */
   scroll-margin-top: 100vh;
 }
@@ -247,6 +272,7 @@
   .inputContainer {
     /* Previene que el teclado tape el input en móviles modernos */
     padding-bottom: max(14px, env(safe-area-inset-bottom));
+    background: #f5f5f5;
   }
 }
 
@@ -256,7 +282,7 @@
   border: none !important;
   padding: 8px;
   cursor: pointer;
-  border-radius: 50%;
+  border-radius: 4px;
   color: #666666;
   transition: all 0.2s ease;
   display: flex;
@@ -267,4 +293,53 @@
 .iconBtn:hover {
   background: rgba(0, 0, 0, 0.05) !important;
   color: #000000;
+}
+
+.thinking {
+  font-family: var(--font-azeret), monospace; /* Para que use tu fuente de código */
+  font-size: 0.85rem;
+  color: rgb(255, 92, 0); /* Cambia aquí el color al naranja de tu portfolio */
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Si tienes una animación de puntos o un pequeño círculo */
+.thinking::after {
+  content: "...";
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.followUpsWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e2e8f0; /* Un gris muy suave */
+  margin: 16px 0; /* Espacio arriba y abajo de la línea */
+}
+
+.followUps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Para cambiar el color del "Pensando" que pediste antes */
+.thinking {
+  color: rgb(255, 92, 0);
+  font-family: var(--font-azeret), monospace;
+  font-size: 0.85rem;
+  padding-top: 8px;
 }

@@ -9,12 +9,14 @@ import localFont from "next/font/local"
 const azeret = Azeret_Mono({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
+  variable: '--font-azeret',
 })
 
 const aeonik = localFont({
   src: "../fonts/AeonikPro-Regular.woff",
   weight: "400",
   style: "normal",
+  variable: "--font-aeonik"
 })
 
 // --- 1. VARIANTES DE ANIMACIÓN ---
@@ -56,7 +58,7 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
       position: "sticky", 
       top: 0, 
       zIndex: 50, 
-      background: "#ffffff",
+      background: "#f5f5f5",
       borderBottom: "1px solid rgba(198, 209, 221, 1)", 
       padding: "0 16px",
       display: "flex", 
@@ -75,13 +77,13 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
           WebkitFontSmoothing: "antialiased",
           MozOsxFontSmoothing: "grayscale"
         }}>
-          CHATLLM
+          SANTI.GPT
         </div>
         
         <button 
           ref={btnRef} 
           onClick={() => setOpen(!open)} 
-          className="iconBtn"
+          className={styles.iconBtn}
         >
           <Icon src="/icons/info.svg" alt="Info" />
         </button>
@@ -96,26 +98,28 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
               position: "absolute",
               top: "100%",
               left: 0,
-              marginTop: "8px",
+              marginTop: "4px",
               width: "240px",
               padding: "12px",
               backgroundColor: "#ffffff",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
+              border: "1px solid rgba(198, 209, 221, 1)", 
+              borderRadius: "4px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
               zIndex: 70,
               fontSize: "0.75rem",
+              fontFamily: azeret.style.fontFamily,
+              fontWeight: 400, 
               lineHeight: "1.4",
-              color: "#000000", 
+              color: "#656565ff", 
             }}>
-              <strong style={{ fontWeight: 700 }}>CHATLLM</strong> is an AI chatbot. May contain hallucinations. Responses are logged for research and development purposes.
+               He programado este asistente para ayudarte a conocer mi trabajo, metodologías y experiencia de manera rápida y sencilla.
             </div>
           </>
         )}
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <button onClick={onReset} className="iconBtn">
+        <button onClick={onReset} className={styles.iconBtn}>
           <Icon src="/icons/reset.svg" alt="Reset" />
         </button>
         <button 
@@ -125,7 +129,7 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
             }
             onClose();
           }} 
-          className="iconBtn"
+          className={styles.iconBtn}
         >
           <Icon src="/icons/close.svg" alt="Close" />
         </button>
@@ -139,9 +143,9 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
 type Msg = { role: "user" | "assistant"; content: string }
 
 const OUT_OF_SCOPE_FOLLOWUPS = [
-  "¿Quieres que te cuente un proyecto con métricas (Barça / Mediapro / Depasify)?",
-  "¿Te interesa más Design Systems (tokens) o optimización de conversión (CRO)?",
-  "¿Prefieres que te hable de mi proceso (discovery → delivery) o de impacto?",
+  "¿Quieres que te cuente un proyecto con métricas?" ,
+  "¿Te interesa más mis conocimientos en Design System?",
+  "¿Prefieres que te hable de mi proceso de diseño?",
 ] as const;
 
 function isCompensationQuestion(q: string) {
@@ -203,9 +207,9 @@ export default function Widget() {
 
   // Preguntas sugeridas iniciales
   const quick = [
-    "¿En qué proyectos has trabajado?", 
-    "¿Qué metodologías utilizas?", 
-    "¿Cómo generas impacto?"
+    " ↪ ¿Cuál fue tu proyecto más complejo?", 
+    " ↪ ¿Qué metodologías utilizas?", 
+    " ↪ Quiero un resumen de este portfolio"
   ];
 
   // Auto-scroll al final
@@ -312,14 +316,14 @@ typeText(mainContent, finalSuggestions);
       setMessages(prev => {
         const next = [...prev];
         const last = next[next.length - 1];
-        if (last) last.content = "Lo siento, no pude obtener una respuesta.";
+        if (last) last.content = "Mmm parece que no me han programado para responder a esta pregunta.";
         return next;
       });
     }
   }
 
   return (
-    <div className={`${styles.app} ${aeonik.className}`}>
+    <div className={`${styles.app} ${azeret.variable}`}>
       <ChatHeader 
         onReset={handleReset} 
         onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} 
@@ -330,7 +334,7 @@ typeText(mainContent, finalSuggestions);
           {messages.length === 0 ? (
             <motion.div key={`intro-${introKey}`} className={styles.intro} initial="hidden" animate="visible">
               <motion.div variants={itemVariants} className={styles.chatTitle}>
-                Hola, ¿qué te gustaría saber?
+                Hola, pregúntame algo...
               </motion.div>
               <div className={styles.quickGrid}>
                 {quick.map(q => (
@@ -354,7 +358,7 @@ typeText(mainContent, finalSuggestions);
                 return (
                   <div key={i} className={styles.assistantRow}>
                     {m.content === "" && loading && isLastAssistant ? (
-                      <div className={styles.thinking}>Thinking...</div>
+                      <div className={styles.thinking}>Pensando</div>
                     ) : (
                       <div
                         className={styles.assistantText}
@@ -368,6 +372,10 @@ typeText(mainContent, finalSuggestions);
                         animate={{ opacity: 1, y: 0 }} 
                         className={styles.followUpsContainer}
                       >
+
+                          {/* EL DIVISOR */}
+                      <div className={styles.divider} />
+
                         <div className={styles.followUps}>
                           {dynamicFollowUps.map(q => (
                             <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>
@@ -402,7 +410,7 @@ typeText(mainContent, finalSuggestions);
             }} 
             onFocus={handleFocus}
             className={styles.textArea}
-            placeholder="Pregúntame algo" 
+            placeholder="Escribe aquí..." 
             rows={1}
           />
           <button 
