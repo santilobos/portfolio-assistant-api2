@@ -207,9 +207,9 @@ export default function Widget() {
 
   // Preguntas sugeridas iniciales
   const quick = [
-    " ↪ ¿Cuál fue tu proyecto más complejo?", 
-    " ↪ ¿Qué metodologías utilizas?", 
-    " ↪ Quiero un resumen de este portfolio"
+    " → ¿Cuál fue tu proyecto más complejo?", 
+    " → ¿Qué metodologías utilizas?", 
+    " → Quiero un resumen de este portfolio"
   ];
 
   // Auto-scroll al final
@@ -334,7 +334,7 @@ typeText(mainContent, finalSuggestions);
           {messages.length === 0 ? (
             <motion.div key={`intro-${introKey}`} className={styles.intro} initial="hidden" animate="visible">
               <motion.div variants={itemVariants} className={styles.chatTitle}>
-                Hola, pregúntame algo...
+                Pregúntame sobre mi trabajo
               </motion.div>
               <div className={styles.quickGrid}>
                 {quick.map(q => (
