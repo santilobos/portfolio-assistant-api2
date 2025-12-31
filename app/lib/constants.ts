@@ -1,7 +1,3 @@
-/* =========================
-   constants.ts (refactor pro)
-   Objetivo: mejorar calidad, consistencia y control del asistente
-   ========================= */
 
 /* ---------- TYPES (opcionales pero recomendados) ---------- */
 export type Locale = "es-ES" | "en-US"
@@ -10,8 +6,10 @@ export type Project = {
   id: string
   name: string
   client: string
-  companyContext: string // dónde se hizo (Garaje / Elastic Heads / etc.)
-  period?: string
+  overview: string
+  executionTime?: string
+  methodologies?: string[]
+  roleInProject: string
   domain: Array<
     | "ecommerce"
     | "app"
@@ -35,15 +33,12 @@ export type Project = {
     | "membership"
     
   >
-  role: string
-  summary: string
-  problems: string[]
+ problems: string[]
   whatIDid: string[]
-  outcomes: Array<
+  impactMetrics: Array< // Lo que antes era outcomes
     | { kind: "metric"; value: string; note?: string }
     | { kind: "qualitative"; value: string }
   >
-  methods?: string[]
   tools?: string[]
   keywords: string[]
 }
@@ -51,38 +46,38 @@ export type Project = {
 export type ExperienceItem = {
   company: string
   period: string
-  role: string
-  highlights?: string[]
-  projects?: Array<{ name: string; achievement: string }>
+  generalRole: string // Tu cargo en la empresa (ej: Lead Product Designer)
+  companyOverview?: string // Breve descripción de la empresa si quieres
+  projects: Project[] // La lista de proyectos de esta empresa
 }
 
 /* =========================
-   1) PERFIL
+   1) PERFIL PROFESIONAL
    ========================= */
 export const PROFESSIONAL_PROFILE = {
   name: "Santi",
-  role: "Lead Product Designer",
+  role: "Senior Product Designer",
   experience: "+8 años",
-  currentLocation: "Lima, Perú (trasladado desde España por motivos familiares)",
+  currentLocation: "Lima, Perú (trasladado por amor a mi esposa peruana)",
   origin: {
     born: "Argentina (1991)",
     raised: "Málaga, España (desde los 8 años)",
-    values: ["Respeto", "Esfuerzo", "Resiliencia", "Apertura cultural"],
+    values: ["Honestidad", "Transparencia", "Respeto", "Esfuerzo", "Resiliencia", "Apertura cultural", "Comunicación clara", "Escucha activa", "Colaboración", "Curiosidad", "Liderazgo",],
   },
   bioNarrative:
-    "Nací en Argentina y me crié en Málaga. Mi trayectoria va de ordenar problemas complejos a convertirlos en productos claros, escalables y bonitos (sin perder foco en negocio).",
+    "Nací en Argentina y a los 8 años me fui a vivir a Málaga con mi familia. Estudié Comunicación Audiovisual especializándome en Diseño Multimedia. Me apasiona diseñar productos digitales funcionales y atractivos, de los que enamoran a los usuarios. Ahora estoy en Lima, Perú, lugar de donde es mi esposa, con la que llevo unos meses casado. Vine aquí para acompañarla en su nueva aventura como emprendedora de postres saludables.",
   positioning: {
     strengths: [
-      "UX strategy + ejecución (de discovery a delivery)",
-      "Design systems y tokens (agnostic, multi-theme)",
-      "Optimización de funnels y experiencia de compra",
-      "Colaboración fuerte con PM/Engineering",
+      "Product Design (UX/UI): Ayudo a resolver los problemas a los que se enfrentan los usuarios mediante la empatía, la validación de hipótesis y la iteración continua. En el proceso de trabajo diseño propuestas funcionales, escalables y estéticas para crear productos totalmente nuevos o mejorar los ya existentes. Mi objetivo es entender el negocio y su contexto en cada proyecto para definir la metodología que se ajuste mejor en cada caso.  ",
+      "Design systems: Dada la naturaleza global de las necesidades de los productos, ayudo a las empresas a crear bases sólidas para sus negocios y tomar decisiones escalables y evolutivas para su marca y su contexto. Busco crear un lenguaje sólido, preciso y común donde las decisiones sobre nomenclatura, estilo, funcionalidad, componentes, organización y metodología son rigurosamente estudiadas y validadas. Trabajo siempre con design tokens siguiendo la metodología de Atomic Design",
+      "Project Management: Gestiono proyectos digitales desde una perspectiva estratégica y colaborativa, conectando diseño, tecnología y negocio. Coordino equipos multidisciplinarios para garantizar entregas eficientes, iterativas y con foco en el usuario. Me aseguro de que cada fase del proyecto avance con claridad, sentido de prioridad y alineada a los objetivos globales del producto.",
+      "Design Ops: Ayudo a las empresas a optimizar los procesos, herramientas y dinámicas de los equipos de diseño para que trabajen de forma más ágil, escalable y conectada con el negocio. Me centro en diseñar metodologías adaptadas a cada equipo, crear automatizaciones personalizadas y fomentar una cultura de colaboración y mejora continua.",
     ],
     whatImKnownFor: [
-      "Bajar deuda de diseño",
-      "Alinear stakeholders con decisiones basadas en evidencia",
-      "Documentar sin burocracia",
-      "Cuidar microinteracciones y calidad percibida",
+      "Bajar deuda de diseño: Soy bueno generando orden dentro del caos",
+      "Pragmatismo: Entregar soluciones accionables en plazos ajustados",
+      "Lizerazgo: Elevar el nivel técnico del equipo de diseño",
+      "Puente técnico: Hablar el mismo lenguaje que los desarrolladores",
     ],
   },
 } as const
@@ -97,7 +92,7 @@ export const EDUCATION = {
   ],
   specialization: [
     { title: "Curso Project Management (Liderazgo)", institution: "General Software, Madrid", period: "2023" },
-    { title: "Bootcamp UI Development", institution: "General Software, Madrid", period: "2022" },
+    { title: "Bootcamp UI Development", institution: "General Software, Madrid", period: "2023" },
     { title: "Master Design System", institution: "Mr. Marcel School, Madrid", period: "2021" },
     { title: "Curso UX Writing", institution: "Mr. Marcel School, Madrid", period: "2018" },
   ],
@@ -108,48 +103,94 @@ export const EDUCATION = {
    ========================= */
 export const SKILLS_AND_TOOLS = {
   hardSkills: {
-    productDesign: [
+    ux: [
+      "User Research",
+      "Information Architecture",
+      "User Flows",
+      "Journey Mapping",
+      "Prototyping",
       "Product Thinking",
       "Behavioural UX",
       "Heuristic Evaluation",
-      "JTBD",
+      "Jobs To Be Done",
       "CRO",
       "A/B testing",
       "Lean UX",
+      "Design Thinking",
+      "Double Diamond",
+      "User Stories",
     ],
-    designSystems: [
+    ui: [
       "Atomic Design",
       "Design Tokens",
-      "Framework-agnostic systems",
+      "Framework-agnostic Design Systems",
+      "Pattern Libraries",
       "Style Dictionary",
       "Storybook",
-      "WCAG 2.1",
+      "Accesibility WCAG 2.1",
+      "UI Components",
+      "Variants & Figma Variables",
+      "Microinteractions",
     ],
     strategy: ["MVP definition", "RICE/MoSCoW", "Roadmap planning", "Stakeholder management", "OKRs"],
   },
   softSkills: [
     "Liderazgo horizontal",
+    "Honestidad",
     "Gestión emocional",
     "Escucha activa",
     "Mentoring",
     "Resiliencia",
     "Visión centrada en negocio",
+    "Stakeholder Alignment",
   ],
   tools: {
-    design: ["Figma", "Framer", "Webflow", "Tokens Studio", "Style Dictionary", "Zeroheight", "Adobe CC", "Miro"],
+    design: ["Figma", "Framer", "Webflow", "Tokens Studio", "Style Dictionary", "Zeroheight", "Adobe CC", "Miro", "Mural", "Lovable", "Vercel", "Visual Studio Code", "Next.js", "HTML5", "CSS3", "Javascript", "React",],
     analytics: ["Google Analytics", "Amplitude", "Hotjar", "Optimal Workshop", "Lookback"],
     collaboration: ["Notion", "Jira", "Linear", "Confluence", "Slack", "Mural", "GitHub"],
   },
 } as const
 
+export const EXPERIENCE: ExperienceItem[] = [
+  {
+    company: "Elastic Heads",
+    period: "2024 - 2025",
+    generalRole: "Lead Product Designer",
+    projects: [
+      {
+        id: "fcb-ticketing",
+        name: "Ticketing App Redesign",
+        client: "FC Barcelona",
+        overview: "Conversión e-commerce del 6% al 14% y +1.6M€ en ticketing app.",
+        executionTime: "10 meses",
+        methodologies: ["Lean UX", "User Research"],
+        roleInProject: "Lead Product Designer",
+        domain: ["sports", "ecommerce", "fan-experience"],
+        problems: ["Fricción en el checkout", "Baja conversión"],
+        whatIDid: ["Rediseño de flujos", "Prototipado"],
+        impactMetrics: [
+          { kind: "metric", value: "14%", note: "Conversión final" }
+        ],
+        keywords: ["Conversion", "ROI", "Ticketing"]
+      },
+      // Aquí añadirías el proyecto de Mediapro siguiendo la misma estructura...
+    ]
+  }
+];
+
 /* =========================
    4) EXPERIENCE (normalizado)
-   ========================= */
+   ========================= 
 export const EXPERIENCE: ExperienceItem[] = [
   {
     company: "Elastic Heads",
     period: "2024 - 2025",
     role: "Lead Product Designer",
+    projects: [
+     { name: "FC Barcelona",
+       overview: "Conversión e-commerce del 6% al 14% y +1.6M€ en ticketing app."
+      },
+    ],
     highlights: [
       "Mediapro: Reducción del 30% en detección de incidencias mediante Lean UX y priorización de señales críticas.",
       "Depasify: Incremento del 25% en captación B2B/B2C aplicando Behavioral UX en procesos de inversión.",
@@ -169,11 +210,11 @@ export const EXPERIENCE: ExperienceItem[] = [
     period: "2019 - 2023",
     role: "Design Lead / Senior Product Designer",
     projects: [
-      { name: "FC Barcelona", achievement: "Conversión e-commerce del 6% al 14% y +1.6M€ en ticketing app." },
-      { name: "Repsol", achievement: "Reducción de costes del 40% en portal global (15 países)." },
-      { name: "BBVA", achievement: "Diseño de tarjeta Aqua y concepto de apagado digital." },
-      { name: "Roche", achievement: "Rediseño app mySugr (+5M descargas)." },
-      { name: "Inditex", achievement: "Feature de compra sobre vídeo (estándar de industria)." },
+      { name: "FC Barcelona", overview: "Conversión e-commerce del 6% al 14% y +1.6M€ en ticketing app." },
+      { name: "Repsol", overview: "Reducción de costes del 40% en portal global (15 países)." },
+      { name: "BBVA", overview: "Diseño de tarjeta Aqua y concepto de apagado digital." },
+      { name: "Roche", overview: "Rediseño app mySugr (+5M descargas)." },
+      { name: "Inditex", overview: "Feature de compra sobre vídeo (estándar de industria)." },
     ],
   },
   {
@@ -182,11 +223,11 @@ export const EXPERIENCE: ExperienceItem[] = [
     role: "Middle Product Designer",
     highlights: ["Optimización de conversión para expansión en China y EE.UU."],
   },
-]
+]*/
 
 /* =========================
    5) PROJECTS DB (para respuestas con contexto + match por keywords)
-   ========================= */
+   ========================= 
 export const PROJECTS: Project[] = [
   {
     id: "mediapro-incidents",
@@ -310,7 +351,7 @@ export const PROJECTS: Project[] = [
     keywords: ["inditex", "video", "compra sobre vídeo", "retail", "ecommerce"],
   },
 ]
-
+*/
 /* =========================
    6) INTENT ROUTER (para elegir mejor qué responder)
    ========================= */
@@ -356,27 +397,22 @@ export const OUTPUT = {
 } as const
 
 /* =========================
-   8) BASE SYSTEM PROMPT (limpio y estable)
-   - OJO: aquí NO metemos JSON.stringify gigante
-   - En runtime tú ya podrás “inyectar” data si quieres, pero mejor pasarla como contexto separado
+   8) BASE SYSTEM PROMPT
    ========================= */
 export const BASE_SYSTEM_PROMPT = `
-Eres la extensión digital de Santi (Lead Product Designer, +8 años).
+Eres la extensión digital de Santi (Lead Product Designer, +8 años de experiencia profesional).
 Objetivo: responder sobre su perfil, proyectos, metodología y encaje para roles de producto/diseño.
 
 VOZ
 - Cercano, profesional y directo.
-- Con chispa, pero sin fliparte.
+- Con chispa, pero sin pasarte de gracioso.
 - Cero frases vacías. Prioriza hechos, decisiones y resultados.
 - Si una métrica no está confirmada, no la digas, no inventes números.
 
 CÓMO RESPONDER
-- Detecta la intención del usuario (recruiter, hiring manager, designer peer o casual).
-- Elige el proyecto más relevante según keywords (FC Barcelona, Repsol, Cofares Design System, Inditex, Mediapro, Depasify).
 - Estructura siempre:
   1) Respuesta directa (1-2 líneas)
-  2) Detalle en bullets con el símbolo "•" (3-6)
-  3) Ejemplo aplicado si encaja
+  2) Detalle en bullets con el símbolo "•" (entre 3 y 6 bullets)
   4) Cierre con 3 follow-ups relacionados a la pregunta para ayudar a que el usuario pueda seguir preguntando sin tener que escribir
   
 ESTILO DE RESPUESTA (SALIDA LIMPIA)
@@ -393,7 +429,7 @@ Si el usuario hace las preguntas de la Home, usa estos enfoques:
 1. "¿Cuál fue tu proyecto más complejo?": 
    - Respuesta: Sin duda fue el rediseño del portal para los empleados de Repsol Global, utilizado por más de 25.000 empleados en 15 países.
    
-   Para mí lo más complejo fue aterrizar el concepto de portal ideal con el que se sintieran identificados todos los empleados de Repsol según su país, cultura, rol y día a día dentro de la empresa. Lo conseguí gracias a una profunda fase de **research** donde pude entender realmente las necesidades de los usuarios. Finalmente conseguí diseñar una herramienta de trabajo centrada en la productividad y en la cultura de Repsol donde los usuarios puedan acceder a contenidos segmentados pensados y adaptados específicamente para cada uno de ellos.
+   Creo que lo más complejo fue aterrizar el concepto de portal ideal con el que se sintieran identificados todos los empleados de Repsol según su país, cultura, rol y día a día dentro de la empresa. Conseguir diseñar una solución que se ajusta a cada situación gracias a una profunda fase de research donde pude comprender realmente las necesidades de los usuarios. Al final pude entregar una herramienta de trabajo centrada en la productividad y en la cultura de Repsol donde los usuarios puedan acceder a contenidos segmentados pensados y adaptados específicamente para cada uno de ellos.
 
    - Follow-ups: 
    ###
@@ -513,7 +549,6 @@ export const KNOWLEDGE = {
   education: EDUCATION,
   skills: SKILLS_AND_TOOLS,
   experience: EXPERIENCE,
-  projects: PROJECTS,
   intents: INTENTS,
   output: OUTPUT,
 } as const
