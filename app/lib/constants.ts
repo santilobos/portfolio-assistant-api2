@@ -630,14 +630,14 @@ export const OUTPUT = {
    ========================= */
 export const FAQ_PRESETS: FAQPreset[] = [
   {
-    id: "home-most-complex",
+    id: "home-mayor-complejidad",
     locale: "es-ES",
-    triggers: ["¿Cuál fue tu proyecto más complejo?", "proyecto más complejo", "más complejo"],
+    triggers: ["¿Cuál fue tu proyecto más complejo?", "¿Cuál fue tu proyecto más difícil?", "¿Qué proyecto destacarías más?"],
     answer:
-      "Sin duda fue el portal global del empleado de Repsol, con alcance en 15 países. Lo complejo fue diseñar una experiencia coherente que funcionara para culturas, roles y necesidades distintas sin perder eficiencia operativa. La clave estuvo en una fase profunda de investigación y co-creación para aterrizar una solución escalable con plantillas que aumentaran la autonomía local.",
+      "Sin duda fue el portal global del empleado de Repsol, con alcance en 15 países. Destacaría este proyecto por su complejidad y su alcance. Lo más complicado fue diseñar una experiencia coherente que funcionara igual de bien para todos los empleados de Repsol, con sus correspondientes culturas, roles y necesidades sin perder eficiencia operativa. La clave estuvo en una fase profunda de investigación, donde pude empatizar con los usuarios y entender sus necesidades reales para poder centrar todo el diseño en una experiencia personalizada y segmentada por país, sede y rol profeisonal.",
     followups: [
-      "¿Cómo planteaste la investigación para un entorno multinacional?",
-      "¿Qué decisiones de diseño tuvieron más impacto en costes y soporte?",
+      "¿Cómo se plantea una investigación de esta magnitud?",
+      "¿Cómo priorizaste la toma de decisiones?",
       "¿Qué aprendiste trabajando con stakeholders globales?",
     ],
   },
@@ -684,9 +684,9 @@ export const FAQ_GRAPH: FAQNode[] = [
   {
     id: "repsol-research",
     locale: "es-ES",
-    question: "¿Cómo planteaste la investigación para un entorno multinacional?",
+    question: "¿Cómo se plantea una investigación de esta magnitud?",
     answer:
-      "La investigación se estructuró en varias fases. Empezamos con entrevistas y encuestas a empleados de distintos países y roles...",
+      "Lo primero que hice fue definir la metodología que quería seguir para esta fase. Mediante Design Thinking fui capaz de obtener información muy valiosa de los propios empleados de la compañía. Seleccioné una muestra de más de 50 perfiles clave para entender sus problemas diarios y poder diseñar una solución capaz de satisfacer sus necesidades. Con todos los insights obtenidos pude formular las hipótesis que más tarde tendría que validar. Realicé un benchmark para ver buenas prácticas de otras empresas en sus intranets. Mediante un workshop de alineamiento pude elaborar un concepto de portal ideal, planteando una propuesta de valor junto a los distintos departamentos de la compañía.",
     followupIds: [
       "repsol-decisions",
       "repsol-impact",
