@@ -1,5 +1,18 @@
 import OpenAI from "openai";
 import { BASE_SYSTEM_PROMPT } from "../../lib/constants";
+import { FAQ_PRESETS } from "../../lib/constants";
+
+function matchFAQPreset(question: string, locale: string = "es-ES") {
+  const q = question.toLowerCase();
+
+  return FAQ_PRESETS.find(preset =>
+    preset.locale === locale &&
+    preset.triggers.some(trigger =>
+      q.includes(trigger.toLowerCase())
+    )
+  );
+}
+
 
 export const runtime = "edge";
 
@@ -34,9 +47,25 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const incoming: IncomingMsg[] = Array.isArray(body.messages) ? body.messages : [];
 
+    // Última pregunta del usuario
     const lastUser =
       [...incoming].reverse().find((m) => m.role === "user")?.content ?? "";
 
+    /* ======================================================
+       1) FAQ PRESETS — respuestas deterministas
+       ====================================================== */
+    const preset = matchFAQPreset(lastUser, "es-ES");
+
+    if (preset) {
+      return Response.json({
+        reply: preset.answer,
+        followups: preset.followups ?? [],
+      });
+    }
+
+    /* ======================================================
+       2) LLM — solo si NO hay preset
+       ====================================================== */
     const completion = await client.chat.completions.create(
       {
         model: "gpt-4o-mini",
@@ -62,7 +91,9 @@ export async function POST(req: Request) {
 
     let followups = normalizeFollowups(parsed?.followups);
 
-    // Fallback (si el modelo no manda followups bien)
+    /* ======================================================
+       3) Fallback de followups (seguridad UX)
+       ====================================================== */
     if (followups.length < 1) {
       followups = [
         "¿Quieres que te lo explique con un caso real?",

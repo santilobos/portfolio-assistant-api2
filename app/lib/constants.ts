@@ -16,6 +16,7 @@ export const DOMAIN_TAGS = [
   "broadcast",
   "sports",
   "pharma",
+  "banca",
 
   // tipos de producto
   "ecommerce",
@@ -24,6 +25,7 @@ export const DOMAIN_TAGS = [
   "mobile",
   "app",
   "design-system",
+  "intranet",
 
   // audiencias
   "b2b",
@@ -119,6 +121,7 @@ export const PROFILE = {
     years: 8,
     baseLocation: "Lima, Perú",
     origin: "Argentina",
+    raised: "Madrid, Spain",
     languages: ["es", "en"],
     contact: {
       email: "santilobos21@gmail.com",
@@ -137,7 +140,7 @@ export const PROFILE = {
       "Liderazgo operativo de equipos multidisciplinares, impulsando colaboración y autonomía.",
       "Diseño centrado en impacto: mayor conversión y eficiencia, menos errores y deuda técnica.",
     ],
-    industries: ["fintech", "energy", "retail", "health", "broadcast", "sports"],
+    industries: ["fintech", "energy", "retail", "health", "broadcast", "sports", "pharma", "banca"],
     values: [
       "Honestidad",
       "Transparencia",
@@ -158,10 +161,10 @@ export const EDUCATION = {
   academic: [
     { title: "Bachiller en Diseño Multimedia", institution: "Universidad de Málaga", period: "2012 - 2016" },
     { title: "Master Digital Product Design", institution: "La Gauss, Málaga", period: "2016 - 2017" },
+    { title: "Master Design System", institution: "Mr. Marcel School, Madrid", period: "2021" },
   ],
   specialization: [
     { title: "Curso UX Writing", institution: "Mr. Marcel School, Madrid", period: "2018" },
-    { title: "Master Design System", institution: "Mr. Marcel School, Madrid", period: "2021" },
     { title: "Bootcamp UI Development", institution: "General Software, Madrid", period: "Jun 2022 - Aug 2022" },
     { title: "Curso Project Management (Liderazgo)", institution: "General Software, Madrid", period: "Mar 2023 - Sep 2023" },
   ],
@@ -246,8 +249,8 @@ export const SKILLS = {
    ========================= */
 export const PROJECTS: Project[] = [
   {
-    id: "repsol-employee-portal",
-    title: "Portal global del empleado (15 países)",
+    id: "repsol-portal-del-empleado",
+    title: "Portal global del empleado de Repsol",
     client: "Repsol",
     company: "Garaje de Ideas",
     priority: 1,
