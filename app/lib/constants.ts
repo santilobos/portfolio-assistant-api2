@@ -663,6 +663,69 @@ export const FAQ_PRESETS: FAQPreset[] = [
   },
 ]
 
+
+// ===============================
+// FAQ_NODE (CONVERSACIÓN GUIADA)
+// ===============================
+
+
+export type FAQNode = {
+  id: string
+  locale: Locale
+  question: string
+  answer: string
+  followupIds?: string[]
+}
+
+/* =========================
+   8.2) FAQ GRAPH (Guided conversation)
+   ========================= */
+export const FAQ_GRAPH: FAQNode[] = [
+  {
+    id: "repsol-research",
+    locale: "es-ES",
+    question: "¿Cómo planteaste la investigación para un entorno multinacional?",
+    answer:
+      "La investigación se estructuró en varias fases. Empezamos con entrevistas y encuestas a empleados de distintos países y roles...",
+    followupIds: [
+      "repsol-decisions",
+      "repsol-impact",
+    ],
+  },
+
+  {
+    id: "repsol-decisions",
+    locale: "es-ES",
+    question: "¿Qué decisiones de diseño tuvieron más impacto en costes y soporte?",
+    answer:
+      "Las decisiones con mayor impacto fueron la creación de plantillas reutilizables y una arquitectura de información clara...",
+    followupIds: [
+      "repsol-impact",
+      "repsol-learnings",
+    ],
+  },
+
+  {
+    id: "repsol-impact",
+    locale: "es-ES",
+    question: "¿Qué impacto tuvo el proyecto en negocio?",
+    answer:
+      "El impacto fue una reducción del 40% en costes y del 65% en soporte interno...",
+  },
+
+  {
+  id: "repsol-learnings",
+  locale: "es-ES",
+  question: "¿Qué aprendiste trabajando con stakeholders globales?",
+  answer:
+    "Aprendí a alinear expectativas con claridad, a convertir desacuerdos en decisiones y a diseñar un marco común que permita autonomía local sin romper consistencia global. La clave fue documentar acuerdos, priorizar por impacto y mantener ciclos cortos de validación con referentes de cada país.",
+},
+
+]
+
+
+
+
 // ===============================
 // SANTI.GPT – AI CONTRACT
 // ===============================

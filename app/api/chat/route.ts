@@ -1,18 +1,6 @@
 import OpenAI from "openai";
-import { BASE_SYSTEM_PROMPT } from "../../lib/constants";
-import { FAQ_PRESETS } from "../../lib/constants";
-
-function matchFAQPreset(question: string, locale: string = "es-ES") {
-  const q = question.toLowerCase();
-
-  return FAQ_PRESETS.find(preset =>
-    preset.locale === locale &&
-    preset.triggers.some(trigger =>
-      q.includes(trigger.toLowerCase())
-    )
-  );
-}
-
+import { NextResponse } from "next/server";
+import { BASE_SYSTEM_PROMPT, FAQ_PRESETS, FAQ_GRAPH } from "../../lib/constants";
 
 export const runtime = "edge";
 
@@ -25,6 +13,39 @@ const client = new OpenAI({
 });
 
 type IncomingMsg = { role: "user" | "assistant"; content: string };
+
+function matchFAQPreset(question: string, locale: string = "es-ES") {
+  const q = (question ?? "").toLowerCase().trim();
+  if (!q) return undefined;
+
+  return FAQ_PRESETS.find(
+    (preset) =>
+      preset.locale === locale &&
+      preset.triggers.some((trigger) => q.includes(trigger.toLowerCase()))
+  );
+}
+
+/**
+ * Para conversación guiada:
+ * match exacto por "question" (porque viene de tus botones).
+ */
+function matchFAQGraph(question: string, locale: string = "es-ES") {
+  const q = (question ?? "").toLowerCase().trim();
+  if (!q) return undefined;
+
+  return FAQ_GRAPH.find(
+    (node) => node.locale === locale && node.question.toLowerCase().trim() === q
+  );
+}
+
+function resolveGraphFollowups(node: (typeof FAQ_GRAPH)[number]) {
+  const ids = (node.followupIds ?? []).slice(0, 3);
+
+  return ids
+    .map((id) => FAQ_GRAPH.find((n) => n.id === id))
+    .filter(Boolean)
+    .map((n) => n!.question);
+}
 
 function safeJSONParse(text: string): any | null {
   try {
@@ -47,24 +68,33 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const incoming: IncomingMsg[] = Array.isArray(body.messages) ? body.messages : [];
 
-    // Última pregunta del usuario
     const lastUser =
       [...incoming].reverse().find((m) => m.role === "user")?.content ?? "";
 
     /* ======================================================
-       1) FAQ PRESETS — respuestas deterministas
+       1) FAQ GRAPH — conversación guiada (prioridad alta)
+       ====================================================== */
+    const graphNode = matchFAQGraph(lastUser, "es-ES");
+    if (graphNode) {
+      return NextResponse.json({
+        reply: graphNode.answer,
+        followups: resolveGraphFollowups(graphNode),
+      });
+    }
+
+    /* ======================================================
+       2) FAQ PRESETS — respuestas deterministas (home)
        ====================================================== */
     const preset = matchFAQPreset(lastUser, "es-ES");
-
     if (preset) {
-      return Response.json({
+      return NextResponse.json({
         reply: preset.answer,
         followups: preset.followups ?? [],
       });
     }
 
     /* ======================================================
-       2) LLM — solo si NO hay preset
+       3) LLM — solo si NO hay preset ni graph
        ====================================================== */
     const completion = await client.chat.completions.create(
       {
@@ -91,9 +121,6 @@ export async function POST(req: Request) {
 
     let followups = normalizeFollowups(parsed?.followups);
 
-    /* ======================================================
-       3) Fallback de followups (seguridad UX)
-       ====================================================== */
     if (followups.length < 1) {
       followups = [
         "¿Quieres que te lo explique con un caso real?",
@@ -101,9 +128,9 @@ export async function POST(req: Request) {
       ];
     }
 
-    return Response.json({ reply, followups });
+    return NextResponse.json({ reply, followups });
   } catch (error) {
     console.error("Error en /api/chat:", error);
-    return Response.json({ error: "Failed to fetch" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
 }
