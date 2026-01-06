@@ -167,24 +167,24 @@ function isCompensationQuestion(q: string) {
 
 function sanitizeAssistantText(text: string) {
   return (text ?? "")
-    // 1) elimina cualquier HTML que venga del modelo/backend
+    // elimina HTML si llegase por error
     .replace(/<\/?[^>]+>/g, "")
 
-    // 2) remove markdown emphasis/code
+    // remove markdown emphasis/code
     .replace(/\*\*/g, "")
     .replace(/\*/g, "")
     .replace(/`/g, "")
     .replace(/_/g, "")
 
-    // 3) remove markdown headings
+    // remove markdown headings ONLY at start of line
     .replace(/^\s*#{1,6}\s+/gm, "")
 
-    // 4) NO mates bullets: conviértelos a "• "
+    // convierte bullets tipo "-" a "• " (NO los mates)
     .replace(/^\s*-\s+/gm, "• ")
 
-    // 5) tidy excessive blank lines
+    // tidy excessive blank lines
     .replace(/\n{3,}/g, "\n\n")
-    .trim()
+    .trim();
 }
 
 
@@ -294,7 +294,7 @@ export default function Widget() {
       if (i >= fullText.length) {
         if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
         setLoading(false);
-        if (suggestions && suggestions.length > 0) setDynamicFollowUps(suggestions);
+        if (suggestions && suggestions.length > 0) setDynamicFollowUps(suggestions.slice(0, 3));
       }
     }, 15);
   };
@@ -325,29 +325,22 @@ export default function Widget() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: newMessages }), 
       });
-      const data = await res.json();
-      
-      const [mainRaw, followRaw] = data.reply.split("###", 2);
-      const mainContent = sanitizeAssistantText(mainRaw ?? "");
+            const data = await res.json();
 
-      const suggestions = followRaw
-  ?  followRaw
-      .split("\n")
-      .map((s: string) => s.trim())
-      .filter((s: string) => s.startsWith("↳"))
-      .map((s: string) => sanitizeAssistantText(s.replace(/^↳\s?/, "")))
-      .filter((s: string) => s.length >= 6 && s.length <= 90)
-  : [];
+      const mainContent = sanitizeAssistantText(data?.reply ?? "");
 
+      const apiFollowups = Array.isArray(data?.followups) ? data.followups : [];
 
+      // si el modelo no devuelve nada, aplicamos tu fallback para salario
       const finalSuggestions =
-  suggestions.length > 0
-    ? suggestions
-    : isCompensationQuestion(q)
-      ? [...OUT_OF_SCOPE_FOLLOWUPS]
-      : [];
+        apiFollowups.length > 0
+          ? apiFollowups.slice(0, 3)
+          : isCompensationQuestion(q)
+            ? [...OUT_OF_SCOPE_FOLLOWUPS]
+            : [];
 
-typeText(mainContent, finalSuggestions);
+      typeText(mainContent, finalSuggestions);
+
 
     } catch (e) {
       setLoading(false);
