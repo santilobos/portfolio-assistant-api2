@@ -1,359 +1,584 @@
+/* =========================
+   constants.ts — Portfolio Assistant Knowledge Pack
+   Fuente: CV Santiago Lobos (métricas publicables)
+   ========================= */
 
-/* ---------- TYPES (opcionales pero recomendados) ---------- */
+/* ---------- 0) CORE TYPES ---------- */
 export type Locale = "es-ES" | "en-US"
+
+/** Tags normalizados en minúsculas */
+export const DOMAIN_TAGS = [
+  // industrias
+  "fintech",
+  "energy",
+  "retail",
+  "health",
+  "broadcast",
+  "sports",
+  "pharma",
+
+  // tipos de producto
+  "ecommerce",
+  "platform",
+  "saas",
+  "mobile",
+  "app",
+  "design-system",
+
+  // audiencias
+  "b2b",
+  "b2c",
+  "employee-experience",
+  "customer-experience",
+  "fan-experience",
+
+  // capacidades/temas
+  "design-systems",
+  "access-control",
+  "ticketing",
+  "membership",
+  "digital-wallet",
+  "security",
+  "conversion",
+  "governance",
+  "tokens",
+  "framework-agnostic",
+] as const
+
+export type DomainTag = (typeof DOMAIN_TAGS)[number]
+
+export type ImpactMetric =
+  | { kind: "metric"; value: string; note?: string; source?: "reported" | "estimated" }
+  | { kind: "qualitative"; value: string; note?: string }
 
 export type Project = {
   id: string
-  name: string
+  title: string
   client: string
-  overview: string
-  executionTime?: string
-  methodologies?: string[]
-  roleInProject: string
-  domain: Array<
-    | "ecommerce"
-    | "app"
-    | "design-systems"
-    | "fintech"
-    | "health"
-    | "b2b"
-    | "b2c"
-    | "platform"
-    | "mobile"
-    | "retail"
-    | "pharma"
-    | "sports"
-    | "energy"
-    | "broadcast"
-    | "customer-experience"
-    | "employee-experience"
-    | "access-control"
-    | "fan-experience"
-    | "digital-wallet"
-    | "membership"
-    
-  >
- problems: string[]
-  whatIDid: string[]
-  impactMetrics: Array< // Lo que antes era outcomes
-    | { kind: "metric"; value: string; note?: string }
-    | { kind: "qualitative"; value: string }
-  >
+  company: string
+
+  /** Para priorizar ejemplos cuando hay duda */
+  priority: number // 1 = máximo
+
+  oneLiner: string
+
+  context: {
+    productType: "ecommerce" | "platform" | "app" | "design-system" | "other"
+    stage: "discovery" | "delivery" | "end-to-end"
+    timeframe?: string
+    team?: string
+    users?: string
+    markets?: string
+    constraints?: string[]
+  }
+
+  tags: DomainTag[]
+
+  problems: Array<{ label: string; detail?: string }>
+  contributions: Array<{ label: string; detail?: string }>
+
+  methods?: string[]
+  deliverables?: string[]
+  impact: ImpactMetric[]
+
   tools?: string[]
   keywords: string[]
+
+  disclosure?: {
+    tellsafe?: string[]
+    cannotSay?: string[]
+  }
 }
 
-export type ExperienceItem = {
+export type Experience = {
   company: string
   period: string
-  generalRole: string // Tu cargo en la empresa (ej: Lead Product Designer)
-  companyOverview?: string // Breve descripción de la empresa si quieres
-  projects: Project[] // La lista de proyectos de esta empresa
+  title: string
+  location?: string
+  overview?: string
+  highlights?: string[]
+  projects: string[] // project ids
+}
+
+export type FAQPreset = {
+  id: string
+  locale: Locale
+  triggers: string[]
+  answer: string
+  followups?: string[]
 }
 
 /* =========================
-   1) PERFIL PROFESIONAL
+   1) PROFILE
    ========================= */
-export const PROFESSIONAL_PROFILE = {
-  name: "Santi",
-  role: "Senior Product Designer",
-  experience: "+8 años",
-  currentLocation: "Lima, Perú (trasladado por amor a mi esposa peruana)",
-  origin: {
-    born: "Argentina (1991)",
-    raised: "Málaga, España (desde los 8 años)",
-    values: ["Honestidad", "Transparencia", "Respeto", "Esfuerzo", "Resiliencia", "Apertura cultural", "Comunicación clara", "Escucha activa", "Colaboración", "Curiosidad", "Liderazgo",],
+export const PROFILE = {
+  localeDefault: "es-ES" as Locale,
+  person: {
+    name: "Santi",
+    role: "Lead Product Designer | Design System Architect",
+    years: 8,
+    baseLocation: "Lima, Perú",
+    origin: "Argentina",
+    languages: ["es", "en"],
+    contact: {
+      email: "santilobos21@gmail.com",
+      phone: "+51 932513317",
+      linkedin: "https://www.linkedin.com/in/santi-lobos/",
+      portfolio: "https://santiagolobos.framer.website/",
+    },
   },
-  bioNarrative:
-    "Nací en Argentina y a los 8 años me fui a vivir a Málaga con mi familia. Estudié Comunicación Audiovisual especializándome en Diseño Multimedia. Me apasiona diseñar productos digitales funcionales y atractivos, de los que enamoran a los usuarios. Ahora estoy en Lima, Perú, lugar de donde es mi esposa, con la que llevo unos meses casado. Vine aquí para acompañarla en su nueva aventura como emprendedora de postres saludables.",
   positioning: {
-    strengths: [
-      "Product Design (UX/UI): Ayudo a resolver los problemas a los que se enfrentan los usuarios mediante la empatía, la validación de hipótesis y la iteración continua. En el proceso de trabajo diseño propuestas funcionales, escalables y estéticas para crear productos totalmente nuevos o mejorar los ya existentes. Mi objetivo es entender el negocio y su contexto en cada proyecto para definir la metodología que se ajuste mejor en cada caso.  ",
-      "Design systems: Dada la naturaleza global de las necesidades de los productos, ayudo a las empresas a crear bases sólidas para sus negocios y tomar decisiones escalables y evolutivas para su marca y su contexto. Busco crear un lenguaje sólido, preciso y común donde las decisiones sobre nomenclatura, estilo, funcionalidad, componentes, organización y metodología son rigurosamente estudiadas y validadas. Trabajo siempre con design tokens siguiendo la metodología de Atomic Design",
-      "Project Management: Gestiono proyectos digitales desde una perspectiva estratégica y colaborativa, conectando diseño, tecnología y negocio. Coordino equipos multidisciplinarios para garantizar entregas eficientes, iterativas y con foco en el usuario. Me aseguro de que cada fase del proyecto avance con claridad, sentido de prioridad y alineada a los objetivos globales del producto.",
-      "Design Ops: Ayudo a las empresas a optimizar los procesos, herramientas y dinámicas de los equipos de diseño para que trabajen de forma más ágil, escalable y conectada con el negocio. Me centro en diseñar metodologías adaptadas a cada equipo, crear automatizaciones personalizadas y fomentar una cultura de colaboración y mejora continua.",
+    headline:
+      "Lead Product Designer con más de 8 años en consultoría IT, especializado en Design Systems agnósticos y productos digitales complejos.",
+    valueProposition: [
+      "Alineación transversal entre negocio, tecnología y diseño para reducir fricción y avanzar con claridad.",
+      "Sistemas de diseño robustos que reducen costes, aumentan coherencia y multiplican velocidad de entrega.",
+      "Estrategia de producto basada en investigación, datos y validación continua.",
+      "Liderazgo operativo de equipos multidisciplinares, impulsando colaboración y autonomía.",
+      "Diseño centrado en impacto: mayor conversión y eficiencia, menos errores y deuda técnica.",
     ],
-    whatImKnownFor: [
-      "Bajar deuda de diseño: Soy bueno generando orden dentro del caos",
-      "Pragmatismo: Entregar soluciones accionables en plazos ajustados",
-      "Lizerazgo: Elevar el nivel técnico del equipo de diseño",
-      "Puente técnico: Hablar el mismo lenguaje que los desarrolladores",
+    industries: ["fintech", "energy", "retail", "health", "broadcast", "sports"],
+    values: [
+      "Honestidad",
+      "Transparencia",
+      "Comunicación clara",
+      "Escucha activa",
+      "Colaboración",
+      "Curiosidad",
+      "Resiliencia",
+      "Liderazgo horizontal",
     ],
   },
 } as const
 
 /* =========================
-   2) EDUCACIÓN
+   2) EDUCATION
    ========================= */
 export const EDUCATION = {
   academic: [
-    { title: "Grado en Diseño Multimedia", institution: "Universidad de Málaga", period: "2012 - 2016" },
+    { title: "Bachiller en Diseño Multimedia", institution: "Universidad de Málaga", period: "2012 - 2016" },
     { title: "Master Digital Product Design", institution: "La Gauss, Málaga", period: "2016 - 2017" },
   ],
   specialization: [
-    { title: "Curso Project Management (Liderazgo)", institution: "General Software, Madrid", period: "2023" },
-    { title: "Bootcamp UI Development", institution: "General Software, Madrid", period: "2023" },
-    { title: "Master Design System", institution: "Mr. Marcel School, Madrid", period: "2021" },
     { title: "Curso UX Writing", institution: "Mr. Marcel School, Madrid", period: "2018" },
+    { title: "Master Design System", institution: "Mr. Marcel School, Madrid", period: "2021" },
+    { title: "Bootcamp UI Development", institution: "General Software, Madrid", period: "Jun 2022 - Aug 2022" },
+    { title: "Curso Project Management (Liderazgo)", institution: "General Software, Madrid", period: "Mar 2023 - Sep 2023" },
   ],
 } as const
 
 /* =========================
    3) SKILLS & TOOLS
    ========================= */
-export const SKILLS_AND_TOOLS = {
-  hardSkills: {
-    ux: [
+export const SKILLS = {
+  hard: {
+    productDesignUX: [
+      "Product thinking",
+      "UX/UI",
       "User Research",
       "Information Architecture",
-      "User Flows",
-      "Journey Mapping",
+      "User flows",
+      "Journey mapping",
       "Prototyping",
-      "Product Thinking",
       "Behavioural UX",
-      "Heuristic Evaluation",
-      "Jobs To Be Done",
+      "Heuristic evaluation",
+      "Usability testing",
+      "UX writing",
+      "JTBD",
+      "User stories",
+      "KPI definition",
       "CRO",
       "A/B testing",
-      "Lean UX",
-      "Design Thinking",
+      "Experimentation",
       "Double Diamond",
-      "User Stories",
+      "Design Thinking",
+      "Lean UX",
     ],
-    ui: [
+    designSystemUI: [
+      "Design Systems",
       "Atomic Design",
-      "Design Tokens",
+      "Design tokens",
       "Framework-agnostic Design Systems",
-      "Pattern Libraries",
+      "Component libraries governance",
+      "Pattern libraries",
+      "Variants & Figma variables",
+      "Multi-brand theming",
+      "Microinteractions",
+      "Accessibility (WCAG 2.1)",
       "Style Dictionary",
       "Storybook",
-      "Accesibility WCAG 2.1",
-      "UI Components",
-      "Variants & Figma Variables",
-      "Microinteractions",
     ],
-    strategy: ["MVP definition", "RICE/MoSCoW", "Roadmap planning", "Stakeholder management", "OKRs"],
+    productStrategy: [
+      "MVP definition",
+      "Feature prioritization (RICE, MoSCoW, Kano)",
+      "Backlog management",
+      "Roadmap planning",
+      "Agile/Scrum",
+      "Workshop facilitation",
+      "Stakeholder management",
+      "Alignment workshops",
+      "OKRs",
+    ],
   },
-  softSkills: [
-    "Liderazgo horizontal",
+  soft: [
     "Honestidad",
-    "Gestión emocional",
+    "Transparencia",
+    "Comunicación clara y cercana",
     "Escucha activa",
+    "Gestión emocional",
+    "Creación de confianza",
     "Mentoring",
-    "Resiliencia",
-    "Visión centrada en negocio",
-    "Stakeholder Alignment",
+    "Storytelling",
+    "Resolución de conflictos",
+    "Liderazgo horizontal",
+    "Visión de producto centrada en personas y negocio",
   ],
   tools: {
-    design: ["Figma", "Framer", "Webflow", "Tokens Studio", "Style Dictionary", "Zeroheight", "Adobe CC", "Miro", "Mural", "Lovable", "Vercel", "Visual Studio Code", "Next.js", "HTML5", "CSS3", "Javascript", "React",],
-    analytics: ["Google Analytics", "Amplitude", "Hotjar", "Optimal Workshop", "Lookback"],
-    collaboration: ["Notion", "Jira", "Linear", "Confluence", "Slack", "Mural", "GitHub"],
+    design: ["Figma", "Framer", "Webflow", "Tokens Studio", "Storybook", "Style Dictionary", "Zeroheight", "Adobe CC", "Miro"],
+    analytics: ["Google Analytics", "Adobe Experience Manager", "Amplitude", "Hotjar", "Optimal Workshop", "Lookback"],
+    collaboration: ["Notion", "Jira", "Linear", "Confluence", "Slack", "Mural", "Trello", "Teams", "GitHub"],
   },
 } as const
 
-export const EXPERIENCE: ExperienceItem[] = [
-  {
-    company: "Elastic Heads",
-    period: "2024 - 2025",
-    generalRole: "Lead Product Designer",
-    projects: [
-      {
-        id: "fcb-ticketing",
-        name: "Ticketing App Redesign",
-        client: "FC Barcelona",
-        overview: "Conversión e-commerce del 6% al 14% y +1.6M€ en ticketing app.",
-        executionTime: "10 meses",
-        methodologies: ["Lean UX", "User Research"],
-        roleInProject: "Lead Product Designer",
-        domain: ["sports", "ecommerce", "fan-experience"],
-        problems: ["Fricción en el checkout", "Baja conversión"],
-        whatIDid: ["Rediseño de flujos", "Prototipado"],
-        impactMetrics: [
-          { kind: "metric", value: "14%", note: "Conversión final" }
-        ],
-        keywords: ["Conversion", "ROI", "Ticketing"]
-      },
-      // Aquí añadirías el proyecto de Mediapro siguiendo la misma estructura...
-    ]
-  }
-];
-
 /* =========================
-   4) EXPERIENCE (normalizado)
-   ========================= 
-export const EXPERIENCE: ExperienceItem[] = [
-  {
-    company: "Elastic Heads",
-    period: "2024 - 2025",
-    role: "Lead Product Designer",
-    projects: [
-     { name: "FC Barcelona",
-       overview: "Conversión e-commerce del 6% al 14% y +1.6M€ en ticketing app."
-      },
-    ],
-    highlights: [
-      "Mediapro: Reducción del 30% en detección de incidencias mediante Lean UX y priorización de señales críticas.",
-      "Depasify: Incremento del 25% en captación B2B/B2C aplicando Behavioral UX en procesos de inversión.",
-    ],
-  },
-  {
-    company: "General Software",
-    period: "2023 - 2024",
-    role: "Design System Architect",
-    highlights: [
-      "Liderazgo de sistema agnóstico multi-theme con ROI del 180% (1.9M€ de ahorro anual).",
-      "Puente entre diseño e ingeniería mediante Storybook y Style Dictionary.",
-    ],
-  },
-  {
-    company: "Garaje de Ideas",
-    period: "2019 - 2023",
-    role: "Design Lead / Senior Product Designer",
-    projects: [
-      { name: "FC Barcelona", overview: "Conversión e-commerce del 6% al 14% y +1.6M€ en ticketing app." },
-      { name: "Repsol", overview: "Reducción de costes del 40% en portal global (15 países)." },
-      { name: "BBVA", overview: "Diseño de tarjeta Aqua y concepto de apagado digital." },
-      { name: "Roche", overview: "Rediseño app mySugr (+5M descargas)." },
-      { name: "Inditex", overview: "Feature de compra sobre vídeo (estándar de industria)." },
-    ],
-  },
-  {
-    company: "VTC Projects",
-    period: "2016 - 2019",
-    role: "Middle Product Designer",
-    highlights: ["Optimización de conversión para expansión en China y EE.UU."],
-  },
-]*/
-
-/* =========================
-   5) PROJECTS DB (para respuestas con contexto + match por keywords)
-   ========================= 
+   4) PROJECTS DB (single source of truth)
+   Prioridad definida por ti: Repsol → FCB → Cofares → Mediapro → Depasify
+   ========================= */
 export const PROJECTS: Project[] = [
   {
-    id: "mediapro-incidents",
-    name: "Señales críticas y detección de incidencias",
-    client: "Mediapro",
-    companyContext: "Elastic Heads",
-    domain: ["platform", "b2b"],
-    role: "Lead Product Designer",
-    summary:
-      "Optimización de una plataforma operativa priorizando señales críticas para detectar incidencias antes y con menos fricción.",
-    problems: [
-      "Demasiadas señales/inputs → baja claridad operativa",
-      "Fricción para identificar lo importante a tiempo",
-    ],
-    whatIDid: [
-      "Alineé objetivos con negocio/operaciones",
-      "Reduje ruido y prioricé señales críticas",
-      "Iteré con Lean UX (prototipos + validación rápida)",
-    ],
-    outcomes: [{ kind: "metric", value: "-30% en detección de incidencias", note: "reportado en highlights" }],
-    methods: ["Lean UX", "Heuristic review", "Prioritización"],
-    keywords: ["mediapro", "incidencias", "b2b", "operaciones", "plataforma"],
-  },
-
-  {
-    id: "depasify-growth",
-    name: "Captación B2B/B2C para inversión",
-    client: "Depasify",
-    companyContext: "Elastic Heads",
-    domain: ["fintech", "b2b", "b2c"],
-    role: "Lead Product Designer",
-    summary:
-      "Mejora de journeys de captación aplicando Behavioral UX para reducir fricción y aumentar intención/acción.",
-    problems: ["Baja conversión en captación", "Fricción y dudas en el journey de inversión"],
-    whatIDid: [
-      "Replanteé el journey con Behavioral UX",
-      "Ajusté copy/arquitectura y microdecisiones del flujo",
-      "Iteración con feedback y analítica",
-    ],
-    outcomes: [{ kind: "metric", value: "+25% captación B2B/B2C", note: "reportado en highlights" }],
-    methods: ["Behavioural UX", "CRO", "Lean UX"],
-    keywords: ["depasify", "fintech", "captación", "behavioural", "conversion"],
-  },
-
-  {
-    id: "general-software-ds",
-    name: "Design System agnóstico multi-theme",
-    client: "General Software",
-    companyContext: "General Software",
-    domain: ["design-systems", "platform", "b2b"],
-    role: "Design System Architect",
-    summary:
-      "Sistema agnóstico y multi-theme para escalar consistencia, velocidad y reducir deuda entre equipos.",
-    problems: [
-      "Inconsistencias visuales + deuda de UI",
-      "Coste alto de mantenimiento y escalado",
-      "Desalineación diseño/ingeniería",
-    ],
-    whatIDid: [
-      "Definí arquitectura de tokens (base/semantic/alias)",
-      "Conecté diseño y código (Storybook + Style Dictionary)",
-      "Definí reglas de gobernanza para escalar sin caos",
-    ],
-    outcomes: [
-      { kind: "metric", value: "ROI 180%", note: "1.9M€ ahorro anual (según highlights)" },
-      { kind: "qualitative", value: "Mayor consistencia y velocidad de entrega entre equipos" },
-    ],
-    methods: ["Design Tokens", "Governance", "Storybook workflows"],
-    tools: ["Tokens Studio", "Style Dictionary", "Storybook", "Figma"],
-    keywords: ["design system", "tokens", "multi-theme", "agnostic", "style dictionary", "storybook", "roi"],
-  },
-
-  {
-    id: "fcb-commerce-ticketing",
-    name: "E-commerce + ticketing app",
-    client: "FC Barcelona",
-    companyContext: "Garaje de Ideas",
-    domain: ["access-control", "fan-experience", "app", "membership"],
-    role: "Design Lead / Senior Product Designer",
-    summary:
-      "Mejoras de experiencia de compra y flujos críticos en e-commerce y ticketing, enfocadas en conversión y claridad.",
-    problems: ["Fricción en compra", "Necesidad de mejorar conversión y rendimiento del funnel"],
-    whatIDid: [
-      "Lideré mejoras del funnel (IA/flow/UI patterns)",
-      "Colaboré con stakeholders para priorizar entregables de impacto",
-      "Cuidé microinteracciones y calidad percibida",
-    ],
-    outcomes: [
-      { kind: "metric", value: "Conversión e-commerce: 6% → 14%", note: "reportado en experience" },
-      { kind: "metric", value: "+1.6M€ en ticketing app", note: "reportado en experience" },
-    ],
-    methods: ["CRO", "Heurística", "Lean UX"],
-    keywords: ["barça", "fc barcelona", "fcb", "ticketing", "ecommerce", "conversión"],
-  },
-
-  {
-    id: "repsol-portal",
-    name: "Portal del empleado a nivel global",
+    id: "repsol-employee-portal",
+    title: "Portal global del empleado (15 países)",
     client: "Repsol",
-    companyContext: "Garaje de Ideas",
-    domain: ["platform", "b2b"],
-    role: "Design Lead / Senior Product Designer",
-    summary: "Reducción de costes y estandarización de experiencia en un portal global multi-país.",
-    problems: ["Coste alto de operación", "Necesidad de coherencia entre países"],
-    whatIDid: ["Estandaricé patrones", "Priorización por impacto", "Alineación cross-country"],
-    outcomes: [{ kind: "metric", value: "-40% costes en portal global (15 países)", note: "reportado en experience" }],
-    keywords: ["repsol", "portal", "global", "15 países", "costes"],
+    company: "Garaje de Ideas",
+    priority: 1,
+    oneLiner:
+      "Rediseño de experiencia del empleado a escala global para reducir costes, soporte interno y aumentar autonomía de equipos locales.",
+    context: {
+      productType: "platform",
+      stage: "end-to-end",
+      markets: "15 países",
+      users: "Equipos y empleados a escala global",
+      constraints: ["Escala multinacional", "Necesidades por país/rol", "Alineación con stakeholders globales"],
+    },
+    tags: ["energy", "platform", "b2b", "employee-experience"],
+    problems: [
+      { label: "Costes altos de producción", detail: "Dependencia operativa y baja autonomía de equipos locales." },
+      { label: "Soporte interno elevado", detail: "Fricción por experiencia desactualizada y poco clara." },
+      { label: "Necesidad de consistencia global", detail: "Coherencia sin perder necesidades locales." },
+    ],
+    contributions: [
+      { label: "Investigación profunda", detail: "Discovery para entender necesidades por rol/país y puntos de fricción." },
+      { label: "Co-creación y alineación", detail: "Workshops con líderes y equipos globales para converger en una visión común." },
+      { label: "Plantillas escalables", detail: "Diseño de plantillas para aumentar autonomía y reducir dependencia." },
+      { label: "Definición de experiencia", detail: "Arquitectura de información y patrones para claridad y eficiencia." },
+    ],
+    methods: ["Design Thinking"],
+    deliverables: ["Research synthesis", "IA", "Templates", "Prototipos", "Specs"],
+    impact: [
+      { kind: "metric", value: "-40% costes de producción", source: "reported" },
+      { kind: "metric", value: "-65% soporte interno", source: "reported" },
+      { kind: "qualitative", value: "Experiencia más moderna y centrada en el empleado", note: "Más claridad y eficiencia." },
+    ],
+    keywords: ["repsol", "portal", "empleado", "global", "15 países", "plantillas", "autonomía", "costes", "soporte"],
+  },
+
+  {
+    id: "fcb-store-checkout",
+    title: "FC Barcelona Store — Optimización de checkout",
+    client: "FC Barcelona",
+    company: "Garaje de Ideas",
+    priority: 2,
+    oneLiner:
+      "Reposicionamiento del e-commerce y optimización de flujos críticos para mejorar conversión y alinearlo con estándares retail.",
+    context: {
+      productType: "ecommerce",
+      stage: "end-to-end",
+      constraints: ["Cambio de posicionamiento", "Validación con usuarios", "Optimización de flujos críticos"],
+    },
+    tags: ["sports", "ecommerce", "retail", "b2c", "conversion", "fan-experience"],
+    problems: [
+      { label: "Conversión baja en checkout", detail: "Fricción en pasos críticos y falta de claridad en el funnel." },
+      { label: "IA poco alineada a moda/retail", detail: "E-commerce orientado a merchandising más que a experiencia fashion." },
+      { label: "Necesidad de validar con usuarios", detail: "Reducir incertidumbre con evidencia cualitativa." },
+    ],
+    contributions: [
+      { label: "Optimización de flujos críticos", detail: "Mejora de pasos y microdecisiones del checkout." },
+      { label: "Rediseño de IA", detail: "Nueva arquitectura alineada a experiencia retail." },
+      { label: "Validación con usuarios", detail: "Iteración y ajuste según feedback." },
+      { label: "Reposicionamiento", detail: "De merchandising a moda: redefinición de target y narrativa de compra." },
+    ],
+    methods: ["Design Thinking", "CRO", "User validation"],
+    deliverables: ["IA", "User flows", "Prototipos", "UI specs"],
+    impact: [{ kind: "metric", value: "Conversión checkout: 6% → 14%", source: "reported" }],
+    keywords: ["fc barcelona", "store", "ecommerce", "checkout", "conversión", "arquitectura de información", "retail"],
+  },
+
+  {
+    id: "fcb-socis-ticketing",
+    title: "App FCB Socis — Socios y ticketing",
+    client: "FC Barcelona",
+    company: "Garaje de Ideas",
+    priority: 3,
+    oneLiner:
+      "Rediseño de app de socios y ticketing para aumentar participación, facilitar liberación y reventa de asientos.",
+    context: {
+      productType: "app",
+      stage: "end-to-end",
+      constraints: ["Flujos críticos de ticketing", "Gestión múltiple de partidos", "Impacto en ingresos"],
+    },
+    tags: ["sports", "app", "mobile", "b2c", "ticketing", "membership", "fan-experience", "access-control"],
+    problems: [
+      { label: "Gestión compleja de partidos", detail: "Usuarios necesitaban gestionar múltiples partidos de forma más clara." },
+      { label: "Baja eficiencia en liberación/reventa", detail: "Fricción para operar con asientos." },
+      { label: "Necesidad de elevar compromiso", detail: "Mejorar participación y engagement con el club." },
+    ],
+    contributions: [
+      { label: "Discovery de necesidades", detail: "Identificación del pain principal: gestión múltiple de partidos." },
+      { label: "Rediseño de flujos ticketing", detail: "Liberación y reventa simplificadas y más evidentes." },
+      { label: "Mejora de UX end-to-end", detail: "Claridad, microinteracciones y reducción de fricción." },
+    ],
+    methods: ["Design Thinking"],
+    deliverables: ["User flows", "Prototipos", "IA", "Specs"],
+    impact: [{ kind: "metric", value: "+1,6M€ anuales adicionales", source: "reported", note: "Por facilitar liberación y reventa." }],
+    keywords: ["fcb socis", "ticketing", "socios", "reventa", "asientos", "app", "ingresos"],
+  },
+
+  {
+    id: "cofares-design-system",
+    title: "Design System agnóstico multi-theme",
+    client: "Cofares",
+    company: "General Software",
+    priority: 4,
+    oneLiner:
+      "Creación de Design System framework-agnostic con Atomic Design + tokens para reducir costes y aumentar velocidad y coherencia.",
+    context: {
+      productType: "design-system",
+      stage: "end-to-end",
+      constraints: ["Escalabilidad", "Gobernanza", "Alineación con C-levels y stakeholders"],
+    },
+    tags: ["pharma", "design-system", "design-systems", "platform", "b2b", "tokens", "governance", "framework-agnostic"],
+    problems: [
+      { label: "Inconsistencia y deuda de UI", detail: "Coste alto de mantenimiento y entregas desalineadas." },
+      { label: "Necesidad de escalabilidad", detail: "Sistema que aguante crecimiento, multi-brand y cambios futuros." },
+      { label: "Fricción diseño/ingeniería", detail: "Falta de un lenguaje común entre disciplinas." },
+    ],
+    contributions: [
+      { label: "Metodología Atomic Design", detail: "Estructura de componentes y reglas de composición." },
+      { label: "Arquitectura de tokens", detail: "Componentes basados en design tokens para consistencia y theming." },
+      { label: "Gobernanza y roadmap", detail: "Escalabilidad definida con stakeholders y C-levels." },
+      { label: "Medición de impacto", detail: "Métricas y ROI obtenidos con Knapsack." },
+    ],
+    methods: ["Atomic Design", "Design tokens", "Governance"],
+    deliverables: ["Component library", "Tokens", "Docs", "Guidelines", "Roadmap"],
+    impact: [
+      { kind: "metric", value: "ROI 180%", source: "reported", note: "Métricas obtenidas con Knapsack." },
+      { kind: "metric", value: "1,9M€ ahorro anual estimado", source: "reported", note: "Estimación basada en Knapsack." },
+      { kind: "qualitative", value: "Mayor coherencia y velocidad de entrega", note: "Lenguaje común entre equipos." },
+    ],
+    keywords: ["cofares", "design system", "agnóstico", "tokens", "atomic design", "knapsack", "roi", "storybook", "style dictionary"],
+  },
+
+  {
+    id: "mediapro-signal-incidents",
+    title: "Plataforma de control broadcast — Detección de incidencias",
+    client: "Mediapro",
+    company: "Elastic Heads",
+    priority: 5,
+    oneLiner:
+      "Rediseño de IA y priorización de señales críticas para acelerar detección y verificación continua en tiempo real.",
+    context: {
+      productType: "platform",
+      stage: "end-to-end",
+      constraints: ["Operación en tiempo real", "Ruido de señales", "Decisiones críticas bajo presión"],
+    },
+    tags: ["broadcast", "platform", "b2b"],
+    problems: [
+      { label: "Detección lenta de incidencias", detail: "Demasiado ruido y baja claridad operativa." },
+      { label: "Prioridad poco evidente", detail: "Señales críticas y alarmas no estaban bien jerarquizadas." },
+      { label: "Verificación poco fluida", detail: "Flujos de comprobación mejorables para decisiones rápidas." },
+    ],
+    contributions: [
+      { label: "Lean UX", detail: "Iteración rápida orientada a reducir incertidumbre y mover la aguja." },
+      { label: "Rediseño de IA", detail: "Arquitectura enfocada en lectura operativa y prioridades reales." },
+      { label: "Priorización de señales críticas", detail: "Alarmas y flujos de verificación continua para acelerar decisiones." },
+    ],
+    methods: ["Lean UX"],
+    deliverables: ["IA", "User flows", "Prototipos", "UI specs"],
+    impact: [{ kind: "metric", value: "-30% tiempo para detectar incidencias de señal", source: "reported" }],
+    keywords: ["mediapro", "broadcast", "incidencias", "señal", "tiempo real", "arquitectura de información", "lean ux"],
+  },
+
+  {
+    id: "depasify-b2b2c-growth",
+    title: "Producto financiero B2B/B2C — Captación y confianza",
+    client: "Depasify",
+    company: "Elastic Heads",
+    priority: 6,
+    oneLiner:
+      "Mejora de flujos clave (onboarding, KYC, inversión y portfolio) aplicando behavioural UX para reducir fricción y aumentar confianza.",
+    context: {
+      productType: "platform",
+      stage: "end-to-end",
+      constraints: ["Procesos críticos (KYC)", "Confianza/seguridad", "Conversión en pasos sensibles"],
+    },
+    tags: ["fintech", "platform", "b2b", "b2c", "conversion", "customer-experience"],
+    problems: [
+      { label: "Fricción en onboarding y KYC", detail: "Pérdida de usuarios en pasos sensibles." },
+      { label: "Dudas en inversión/portfolio", detail: "Necesidad de confianza en procesos críticos." },
+      { label: "Baja captación del nuevo producto", detail: "Optimización del journey completo." },
+    ],
+    contributions: [
+      { label: "Design Thinking", detail: "Replanteo de flujos clave con enfoque discovery → delivery." },
+      { label: "Behavioural UX", detail: "Principios para reducir fricción y aumentar confianza en decisiones." },
+      { label: "Optimización de journeys críticos", detail: "Onboarding, KYC, inversión y portfolio." },
+    ],
+    methods: ["Design Thinking", "Behavioural UX"],
+    deliverables: ["User flows", "Prototipos", "IA", "Copy adjustments", "Specs"],
+    impact: [{ kind: "metric", value: "+25% captación B2B/B2C", source: "reported" }],
+    keywords: ["depasify", "fintech", "captación", "b2b", "b2c", "kyc", "onboarding", "behavioural ux", "inversión"],
+  },
+
+  /* ---- Proyectos secundarios (útiles para preguntas específicas) ---- */
+  {
+    id: "bbva-aqua-card",
+    title: "Tarjeta Aqua + apagado digital",
+    client: "BBVA",
+    company: "Garaje de Ideas",
+    priority: 20,
+    oneLiner:
+      "Contribución al diseño de tarjeta Aqua y concepto de apagado digital; mejora de seguridad en pagos online con CVV dinámico.",
+    context: { productType: "other", stage: "delivery", constraints: ["Seguridad antifraude", "Adopción de nuevo modelo"] },
+    tags: ["fintech", "security", "b2c", "digital-wallet"],
+    problems: [
+      { label: "Riesgo de fraude en pagos online", detail: "Necesidad de elevar seguridad con CVV dinámico." },
+      { label: "Adopción de nuevo modelo de tarjeta", detail: "Claridad y confianza en el producto." },
+    ],
+    contributions: [
+      { label: "Diseño de producto", detail: "Aportación dentro del squad de Open Innovation." },
+      { label: "Concepto apagado digital", detail: "Propuesta para control del usuario sobre su tarjeta." },
+    ],
+    impact: [{ kind: "qualitative", value: "Mejora de seguridad percibida y control del usuario", note: "CVV dinámico + apagado digital." }],
+    keywords: ["bbva", "aqua", "cvv dinámico", "apagado digital", "fraude", "pagos online"],
   },
 
   {
     id: "inditex-video-shopping",
-    name: "Compra sobre vídeo",
+    title: "Compra sobre vídeo",
     client: "Inditex",
-    companyContext: "Garaje de Ideas",
-    domain: ["ecommerce", "retail", "b2c"],
-    role: "Design Lead / Senior Product Designer",
-    summary: "Diseño de una funcionalidad de compra sobre vídeo como innovación en experiencia retail.",
-    problems: ["Aumentar engagement y conversión con nuevos formatos"],
-    whatIDid: ["Diseño de flujo y patrones", "Alineación con negocio y viabilidad técnica"],
-    outcomes: [{ kind: "qualitative", value: "Feature adoptada como estándar de industria (según experience)" }],
-    keywords: ["inditex", "video", "compra sobre vídeo", "retail", "ecommerce"],
+    company: "Garaje de Ideas",
+    priority: 21,
+    oneLiner:
+      "Rediseño de descubrimiento y compra; aporte de feature de compra sobre vídeo cuando era innovación y hoy es estándar.",
+    context: { productType: "ecommerce", stage: "delivery", constraints: ["Innovación en discovery", "Alineación con negocio y viabilidad"] },
+    tags: ["retail", "ecommerce", "b2c", "customer-experience"],
+    problems: [
+      { label: "Mejorar discovery y compra", detail: "Optimizar proceso de exploración y conversión." },
+      { label: "Nuevos formatos de compra", detail: "Explorar vídeo como palanca de engagement." },
+    ],
+    contributions: [
+      { label: "Rediseño de procesos", detail: "Mejoras en discovery y compra." },
+      { label: "Feature compra sobre vídeo", detail: "Aporte conceptual y de UX." },
+    ],
+    impact: [{ kind: "qualitative", value: "Compra sobre vídeo como estándar actual", note: "Adopción amplia en ecommerces." }],
+    keywords: ["inditex", "video shopping", "compra sobre vídeo", "discovery", "retail"],
+  },
+
+  {
+    id: "roche-mysugr",
+    title: "mySugr — App para diabetes",
+    client: "Roche",
+    company: "Garaje de Ideas",
+    priority: 22,
+    oneLiner:
+      "Rediseño de arquitectura de información y funcionalidades clave en una app líder del sector con +5M descargas.",
+    context: { productType: "app", stage: "delivery", constraints: ["Producto con alta base instalada", "Health domain"] },
+    tags: ["health", "mobile", "app", "b2c", "customer-experience"],
+    problems: [
+      { label: "IA mejorable", detail: "Necesidad de mayor claridad en navegación y estructura." },
+      { label: "Optimizar funcionalidades core", detail: "Mejorar experiencia en tareas críticas para usuarios." },
+    ],
+    contributions: [
+      { label: "Rediseño de IA", detail: "Arquitectura más clara y alineada a necesidades." },
+      { label: "Mejora de funcionalidades clave", detail: "Ajustes de UX en flujos principales." },
+    ],
+    impact: [{ kind: "metric", value: "+5M descargas", source: "reported", note: "Producto reconocido en el sector." }],
+    keywords: ["roche", "mysugr", "diabetes", "health", "arquitectura de información", "app"],
+  },
+
+  {
+    id: "vtc-expansion-cn-us",
+    title: "Expansión de producto a China y Estados Unidos",
+    client: "VTC Projects (Producto)",
+    company: "VTC Projects",
+    priority: 30,
+    oneLiner:
+      "Mejoras de UX localizadas y optimizaciones de conversión para expansión internacional y crecimiento sostenido en ventas.",
+    context: { productType: "platform", stage: "delivery", markets: "China y Estados Unidos", constraints: ["Localización", "Optimización conversión"] },
+    tags: ["platform", "b2c", "conversion", "customer-experience"],
+    problems: [
+      { label: "Retos de localización", detail: "Adaptación de UX a mercados con necesidades distintas." },
+      { label: "Optimización de conversión", detail: "Mejoras para elevar ventas en expansión." },
+    ],
+    contributions: [
+      { label: "UX localizada", detail: "Adaptaciones por mercado para mejorar comprensión y uso." },
+      { label: "Optimización de conversión", detail: "Ajustes para mejorar performance del funnel." },
+    ],
+    impact: [{ kind: "qualitative", value: "Crecimiento sostenido de ventas en ambos mercados", note: "Contribución mediante mejoras UX + conversión." }],
+    keywords: ["vtc projects", "china", "usa", "localización", "conversión", "expansión"],
   },
 ]
-*/
+
 /* =========================
-   6) INTENT ROUTER (para elegir mejor qué responder)
+   5) EXPERIENCE (agrupa IDs, no duplica detalle)
+   ========================= */
+export const EXPERIENCE: Experience[] = [
+  {
+    company: "Elastic Heads (IT Consulting)",
+    period: "Sep 2024 - May 2025",
+    title: "Lead Product Designer",
+    location: "Madrid",
+    overview: "Consultoría IT enfocada en producto digital complejo y plataformas operativas.",
+    highlights: [
+      "Mediapro: -30% tiempo de detección de incidencias en plataforma broadcast.",
+      "Depasify: +25% captación en producto financiero B2B/B2C.",
+    ],
+    projects: ["mediapro-signal-incidents", "depasify-b2b2c-growth"],
+  },
+  {
+    company: "General Software (IT Consulting)",
+    period: "Apr 2023 - Aug 2024",
+    title: "Design System Architect",
+    location: "Madrid",
+    overview: "Arquitectura y gobernanza de Design Systems agnósticos y escalables.",
+    highlights: ["Cofares: ROI 180% y 1,9M€ ahorro anual estimado (Knapsack)."],
+    projects: ["cofares-design-system"],
+  },
+  {
+    company: "Garaje de Ideas (IT Consulting)",
+    period: "Jan 2019 - Mar 2023",
+    title: "Lead / Senior Product Designer",
+    location: "Madrid",
+    overview: "Diseño de producto end-to-end en grandes cuentas y squads multidisciplinares.",
+    highlights: [
+      "FCB Store: conversión checkout 6% → 14%.",
+      "FCB Socis: +1,6M€ anuales adicionales en ticketing.",
+      "Repsol: -40% costes producción y -65% soporte interno en portal global.",
+    ],
+    projects: ["fcb-store-checkout", "fcb-socis-ticketing", "repsol-employee-portal", "bbva-aqua-card", "inditex-video-shopping", "roche-mysugr"],
+  },
+  {
+    company: "VTC Projects (Empresa de producto)",
+    period: "Sep 2016 - Jan 2019",
+    title: "Junior → Middle Product Designer",
+    location: "Barcelona",
+    overview: "Producto propio con expansión internacional y optimización de conversión.",
+    highlights: ["Expansión a China y EE.UU. con mejoras UX localizadas y optimización de conversión."],
+    projects: ["vtc-expansion-cn-us"],
+  },
+]
+
+/* =========================
+   6) INTENT ROUTER
    ========================= */
 export const INTENTS = {
   recruiter: {
@@ -365,7 +590,7 @@ export const INTENTS = {
     defaultAnswerStyle: "contexto → decisiones → impacto → aprendizajes",
   },
   designerPeer: {
-    signals: ["tokens", "storybook", "style dictionary", "componentes", "governance", "wcag", "a11y"],
+    signals: ["tokens", "storybook", "style dictionary", "componentes", "governance", "wcag", "a11y", "atomic"],
     defaultAnswerStyle: "técnico, concreto, con ejemplos",
   },
   casual: {
@@ -375,214 +600,147 @@ export const INTENTS = {
 } as const
 
 /* =========================
-   7) OUTPUT FORMAT (control de calidad)
+   7) OUTPUT CONTRACT
    ========================= */
 export const OUTPUT = {
   maxLengthGuideline: "Respuesta por defecto 6–12 líneas. Si el usuario pide detalle, ampliar.",
   structure: [
     "1) Respuesta directa (1–2 líneas)",
     "2) Detalle en bullets (3–6)",
-    "3) Ejemplo aplicado (1 mini-ejemplo si encaja)",
-    "4) Cierre con pregunta + 3 follow-ups",
+    "3) (Opcional) Ejemplo aplicado",
+    "4) (Opcional) 3 follow-ups",
   ],
+  bullets: {
+    htmlClass: "bulletLine",
+    symbol: "•",
+    strongTag: true,
+  },
   followups: {
     prefix: "###",
     arrow: "↳",
     max: 3,
   },
-  ctas: {
-    offerProject: "¿Quieres que te lo cuente con un ejemplo real (Barça / Inditex / Design System)?",
-    offerDeepDive: "¿Te interesa más el proceso, el impacto o cómo lo implementé con el equipo?",
-  },
 } as const
 
 /* =========================
-   8) BASE SYSTEM PROMPT
+   8) FAQ PRESETS (Home)
    ========================= */
-export const BASE_SYSTEM_PROMPT = `
-Eres la extensión digital de Santi (Lead Product Designer, +8 años de experiencia profesional).
-Objetivo: responder sobre su perfil, proyectos, metodología y encaje para roles de producto/diseño.
-
-VOZ
-- Cercano, profesional y directo.
-- Con chispa, pero sin pasarte de gracioso.
-- Cero frases vacías. Prioriza hechos, decisiones y resultados.
-- Si una métrica no está confirmada, no la digas, no inventes números.
-
-CÓMO RESPONDER
-- Estructura siempre:
-  1) Respuesta directa (1-2 líneas)
-  2) Detalle en bullets con el símbolo "•" (entre 3 y 6 bullets)
-  4) Cierre con 3 follow-ups relacionados a la pregunta para ayudar a que el usuario pueda seguir preguntando sin tener que escribir
-  
-ESTILO DE RESPUESTA (SALIDA LIMPIA)
-- Escribe en texto plano.
-- NO uses Markdown (no **, no -, no #).
-- PUEDES usar negritas SOLO con etiquetas HTML <strong>...</strong>.
-- Usa negritas solo para títulos cortos dentro de una lista o frase.
-- Prefiere párrafos cortos (1-3 líneas).
-
-
-RESPUESTAS PREDEFINIDAS (PAGINA DE INICIO):
-Si el usuario hace las preguntas de la Home, usa estos enfoques:
-
-1. "¿Cuál fue tu proyecto más complejo?": 
-   - Respuesta: Sin duda fue el rediseño del portal para los empleados de Repsol Global, utilizado por más de 25.000 empleados en 15 países.
-   
-   Creo que lo más complejo fue aterrizar el concepto de portal ideal con el que se sintieran identificados todos los empleados de Repsol según su país, cultura, rol y día a día dentro de la empresa. Conseguir diseñar una solución que se ajusta a cada situación gracias a una profunda fase de research donde pude comprender realmente las necesidades de los usuarios. Al final pude entregar una herramienta de trabajo centrada en la productividad y en la cultura de Repsol donde los usuarios puedan acceder a contenidos segmentados pensados y adaptados específicamente para cada uno de ellos.
-
-   - Follow-ups: 
-   ###
-     ↳ ¿Cómo llevaste a cabo la fase de investigación?
-     ↳ ¿Que impacto generaste?
-     ↳ ¿Qué aprendiste en este proyecto?
-
-2. "¿Qué metodologías utilizas?":
-   - Respuesta: "La verdad es que no creo en las fórmulas mágicas; depende totalmente de en qué punto esté el proyecto. 
-
-     Si estamos en un momento de **incertidumbre total**, suelo seguir un enfoque de **Design Thinking** para investigar a fondo y no diseñar a ciegas. Pero si lo que necesitamos es mover la aguja rápido, prefiero seguir un enfoque **Lean UX**: lanzar algo pequeño, medir qué pasa y aprender del comportamiento real. 
-
-     Al final, mi objetivo siempre es reducir la incertidumbre sin frenar el ritmo de desarrollo.
-
-   - Follow-ups (escritos de forma natural):
-     ###
-     ↳ ¿Cómo eliges qué camino tomar según el cliente?
-     ↳ ¿Me cuentas un ejemplo donde el Lean UX te ahorrara tiempo?
-     ↳ ¿Cómo encaja el Behavioral UX en todo esto?
-
-3. "Quiero un resumen de este portfolio":
-   - Responde: En este portfolio encontrarás algunas de mis experiencias en el mundo del diseño de producto digital. He preparado 3 Study Cases donde cuento mi experiencia trabajando en proyectos de grandes clientes como FC Barcelona, Repsol o Cofares. En cada Study Case cuento el problema detectado, la solución de diseño ofrecida y el impacto generado gracias a mi trabajo. Como me gusta dedicarle tiempo y cariño a cada Study Case estoy trabajando en el contenido de otros proyectos interesantes para poder subirlos aquí cuanto antes. De momento te invito a echar un vstazo a todo lo que he preparado para ti.
-   
-   - Follow-ups: 
-     ###
-     ↳ Ver Study Case FC Barcelona
-     ↳ Ver Study Case Repsol
-     ↳ Ver Study Case Cofares Design System
-
-
-LISTAS
-- Para cualquier enumeración o proceso, usa SIEMPRE este formato HTML exacto por cada punto:
-  <div class="bulletLine">• <strong>Concepto:</strong> Explicación detallada.</div>
-- Para cualquier enumeración de puntos, usa siempre el bullet "•".
-- La primera palabra o concepto antes de los ":" DEBE ir siempre entre etiquetas <strong>...</strong>.
-  Ejemplo: • <strong>Research:</strong> análisis de usuarios...
-
-- REGLAS CRÍTICAS:
-  1) Usa siempre la clase "bulletLine" en el <div>.
-  2) Usa <strong>...</strong> solo para el concepto inicial antes de los dos puntos.
-  3) No uses "-" ni números (1, 2, 3) para las listas, usa solo el símbolo "•".
-  4) Los párrafos de introducción y cierre NO llevan etiquetas, solo texto plano.  
-
-
-REGLA DE LENGUAJE
-- Detecta automáticamente el idioma del usuario.
-- Responde SIEMPRE en el mismo idioma.
-- Si el usuario escribe en inglés:
-  - Usa un tono claro, directo y natural.
-  - Evita frases corporativas largas.
-  - Prioriza verbos de acción y ejemplos concretos.
-  - Mantén el mismo nivel de cercanía que en español.
-
-ENGLISH VOICE GUIDELINES
-- Write like a senior product designer talking to another senior.
-- Short sentences. Clear structure.
-- No buzzwords without context.
-- Show impact before process when possible.
-- Prefer:
-  "I led", "I designed", "I helped teams"
-  over:
-  "I was responsible for", "This experience allowed me to"
-
-OUT-OF-SCOPE & PERSONAL QUESTIONS
-- Si el usuario pregunta algo personal o que no está en el conocimiento disponible:
-  - NO inventes información.
-  - Responde de forma honesta y natural.
-  - Explica brevemente que no tienes ese dato o que prefieres no entrar en ese nivel.
-  - Redirige suavemente la conversación hacia el ámbito profesional.
-
-- Mantén siempre un tono humano y cercano.
-  Evita respuestas frías o tipo “no puedo responder eso”.
-
-- Ejemplos de redirección válidos:
-  - “Eso no lo tengo documentado, pero si te sirve puedo contarte cómo trabajo en proyectos similares.”
-  - “Prefiero mantener eso en un plano personal, aunque encantado de hablar de mi experiencia profesional.”
-  - “No tengo ese dato concreto, pero sí puedo explicarte cómo suelo abordar ese tipo de decisiones en producto.”
-
-FOLLOW-UPS (OPCIONALES)
-- Solo añade preguntas sugeridas si realmente aportan valor (por ejemplo: cuando el usuario pueda explorar proyectos, proceso, impacto o herramientas).
-- Si la respuesta ya está completa, o la pregunta es muy concreta, NO añadas follow-ups.
-- Nunca añadas follow-ups en respuestas out-of-scope o personales. En esos casos, termina con una frase útil y ya.
-- EXCEPCIÓN: si la pregunta es personal o fuera de alcance (ej: salario), ofrece 3 follow-ups que redirijan a temas respondibles (proyectos, impacto, proceso, skills).
-
-FORMATO (solo si los incluyes)
-- Si decides incluir follow-ups, añade exactamente 3.
-- Usa el formato exacto:
-  ###
-  ↳ pregunta 1
-  ↳ pregunta 2
-  ↳ pregunta 3
-
-
-DETALLES QUE DAN CALIDAD
-- Cuando salga mobile/UX: menciona microinteracciones, performance percibida y evitar flashes/cargas bruscas.
-- Conecta diseño con negocio: ROI, escalabilidad, deuda técnica, time-to-market.
-- Menciona clientes potentes SOLO si aporta contexto (no como name-dropping).
-
-PLAIN TEXT (NO MARKDOWN)
-- NO uses Markdown (**, #, -).
-- SI usa etiquetas HTML <strong> para resaltar el inicio de los bullets.
-- Usa el símbolo "•" para listas.
-
-
-
-
-`.trim()
-
+export const FAQ_PRESETS: FAQPreset[] = [
+  {
+    id: "home-most-complex",
+    locale: "es-ES",
+    triggers: ["¿Cuál fue tu proyecto más complejo?", "proyecto más complejo", "más complejo"],
+    answer:
+      "Sin duda fue el portal global del empleado de Repsol, con alcance en 15 países. Lo complejo fue diseñar una experiencia coherente que funcionara para culturas, roles y necesidades distintas sin perder eficiencia operativa. La clave estuvo en una fase profunda de investigación y co-creación para aterrizar una solución escalable con plantillas que aumentaran la autonomía local.",
+    followups: [
+      "¿Cómo planteaste la investigación para un entorno multinacional?",
+      "¿Qué decisiones de diseño tuvieron más impacto en costes y soporte?",
+      "¿Qué aprendiste trabajando con stakeholders globales?",
+    ],
+  },
+  {
+    id: "home-methodologies",
+    locale: "es-ES",
+    triggers: ["¿Qué metodologías utilizas?", "metodologías", "cómo trabajas", "tu proceso"],
+    answer:
+      "No trabajo con una fórmula única: elijo el enfoque según el tipo de incertidumbre y el contexto. Si necesitamos descubrir bien el problema, uso Design Thinking para investigar a fondo y alinear stakeholders. Si el reto es iterar rápido y mover una métrica, prefiero Lean UX: lanzar pequeño, medir, aprender y ajustar. El objetivo siempre es reducir incertidumbre sin frenar el ritmo del equipo.",
+    followups: [
+      "¿Me cuentas un ejemplo donde Lean UX movió una métrica rápido?",
+      "¿Cómo decides qué validar primero cuando hay poco tiempo?",
+      "¿Cómo aplicas behavioural UX en procesos críticos como KYC o ticketing?",
+    ],
+  },
+  {
+    id: "home-portfolio-summary",
+    locale: "es-ES",
+    triggers: ["Quiero un resumen de este portfolio", "resumen del portfolio", "qué hay en tu portfolio"],
+    answer:
+      "Aquí verás proyectos donde he trabajado en producto digital complejo y design systems, con foco en impacto medible. Hay casos en Repsol (portal global), FC Barcelona (e-commerce y ticketing), Cofares (design system con ROI), Mediapro (plataforma broadcast) y Depasify (fintech). En cada uno cuento el problema, lo que hice y el impacto que generó.",
+    followups: ["¿Quieres que empecemos por Repsol o por FC Barcelona?", "¿Te interesa más Design Systems o Producto (UX/UI)?", "¿Prefieres ver impacto y métricas o el proceso paso a paso?"],
+  },
+]
 
 /* =========================
-   9) “KNOWLEDGE PACK” (para inyectarlo en tu app sin stringify en prompt base)
-   - Esto es lo que tú le pasas como contexto adicional al modelo
+   9) BASE SYSTEM PROMPT (reglas, sin contenido duplicado)
+   ========================= */
+export const BASE_SYSTEM_PROMPT = `
+Eres la extensión digital de Santi (Lead Product Designer, +8 años).
+Objetivo: responder sobre su perfil, proyectos, metodología y encaje para roles de producto/diseño.
+
+IDIOMA
+- Responde en español por defecto.
+- Si el usuario pregunta en inglés, responde en inglés.
+
+VOZ
+- Humano, senior, con criterio.
+- Cercano, profesional y directo.
+- Sin frases vacías. Prioriza hechos, decisiones y resultados.
+- Las métricas del knowledge son publicables. No inventes números fuera del knowledge.
+
+FORMATO (SALIDA LIMPIA)
+- Texto plano. NO Markdown (no **, no -, no #).
+- Puedes usar negritas SOLO con <strong>...</strong>.
+- Listas: usa siempre bullets en HTML:
+  <div class="bulletLine">• <strong>Concepto:</strong> Explicación.</div>
+- Estructura por defecto:
+  1) Respuesta directa (1-2 líneas)
+  2) 3-6 bullets con el formato exacto
+  3) Si aporta valor, cierra con 3 follow-ups (formato exacto)
+
+FOLLOW-UPS (si los incluyes)
+###
+↳ pregunta 1
+↳ pregunta 2
+↳ pregunta 3
+`.trim()
+
+/* =========================
+   10) KNOWLEDGE PACK
    ========================= */
 export const KNOWLEDGE = {
   locale: "es-ES" as Locale,
-  profile: PROFESSIONAL_PROFILE,
+  profile: PROFILE,
   education: EDUCATION,
-  skills: SKILLS_AND_TOOLS,
+  skills: SKILLS,
   experience: EXPERIENCE,
+  projects: PROJECTS,
   intents: INTENTS,
   output: OUTPUT,
+  faq: FAQ_PRESETS,
 } as const
 
-
-
 /* =========================
-   Preguntas relacionadas
+   11) SAFE FOLLOWUP POOLS
    ========================= */
 export const SAFE_FOLLOWUP_POOLS = {
   general: [
-    "¿Quieres que te cuente un proyecto con métricas (Barça / Mediapro / Depasify)?",
+    "¿Quieres que te cuente un proyecto con métricas (Repsol / FC Barcelona / Cofares)?",
     "¿Te interesa más mi enfoque en Design Systems o en optimización de conversión?",
-    "¿Prefieres que te hable de mi proceso (discovery → delivery) o de resultados?",
+    "¿Prefieres proceso (discovery → delivery) o resultados e impacto?",
+  ],
+  topPriorityExamples: [
+    "¿Empezamos por el portal global de Repsol o por el e-commerce de FC Barcelona?",
+    "¿Quieres un ejemplo de Design System con ROI (Cofares) o una plataforma operativa (Mediapro)?",
+    "¿Te interesa un caso fintech con behavioural UX (Depasify)?",
   ],
   designSystems: [
     "¿Cómo estructuro tokens y gobernanza en un Design System agnóstico?",
-    "¿Qué trade-offs suelo manejar entre consistencia y velocidad de entrega?",
-    "¿Quieres un ejemplo práctico con Storybook y Style Dictionary?",
+    "¿Qué trade-offs manejo entre consistencia y velocidad de entrega?",
+    "¿Quieres un ejemplo práctico con tokens + Storybook/Style Dictionary?",
   ],
   ecommerce: [
-    "¿Quieres que te cuente el caso de Barça y qué palancas movimos en el funnel?",
-    "¿Cómo decido qué testear primero en CRO?",
-    "¿Te interesa más UX de checkout o exploración/catálogo?",
+    "¿Qué palancas movimos en el checkout de FC Barcelona y por qué?",
+    "¿Cómo priorizo hipótesis en CRO cuando hay presión por resultados?",
+    "¿Te interesa más checkout o discovery/catálogo?",
   ],
   leadership: [
-    "¿Cómo trabajo con PM y Engineering para priorizar?",
-    "¿Cómo manejo stakeholders cuando hay visiones opuestas?",
+    "¿Cómo alineo diseño, negocio e ingeniería cuando hay visiones opuestas?",
+    "¿Cómo facilito workshops para desbloquear decisiones y avanzar?",
     "¿Quieres ejemplos de mentoring o liderazgo horizontal?",
   ],
   outOfScopeRedirect: [
-    "¿Qué tipo de rol estás cubriendo (Lead, Senior, DS) y qué esperas de esa posición?",
+    "¿Qué tipo de rol estás cubriendo y qué esperas de esa posición?",
     "¿Te interesa que hable de impacto y métricas en proyectos similares?",
-    "¿Quieres ver cómo abordo decisiones y trade-offs en un caso real?",
+    "¿Quieres ver cómo tomo decisiones y trade-offs en un caso real?",
   ],
 } as const
-

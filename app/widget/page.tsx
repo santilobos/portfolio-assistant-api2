@@ -166,22 +166,62 @@ function isCompensationQuestion(q: string) {
 }
 
 function sanitizeAssistantText(text: string) {
-  return text
-    // remove markdown emphasis/code
+  return (text ?? "")
+    // 1) elimina cualquier HTML que venga del modelo/backend
+    .replace(/<\/?[^>]+>/g, "")
+
+    // 2) remove markdown emphasis/code
     .replace(/\*\*/g, "")
     .replace(/\*/g, "")
     .replace(/`/g, "")
     .replace(/_/g, "")
 
-    // remove markdown headings ONLY at start of line (e.g., "### Title")
+    // 3) remove markdown headings
     .replace(/^\s*#{1,6}\s+/gm, "")
 
-    // remove dash bullets at line start
-    .replace(/^\s*-\s+/gm, "")
+    // 4) NO mates bullets: conviértelos a "• "
+    .replace(/^\s*-\s+/gm, "• ")
 
-    // tidy excessive blank lines
+    // 5) tidy excessive blank lines
     .replace(/\n{3,}/g, "\n\n")
-    .trim();
+    .trim()
+}
+
+
+
+function RenderAssistantText({ text }: { text: string }) {
+  if (!text) return null
+
+  // 1. Normalizamos bullets para que siempre empiecen en nueva línea
+  const normalized = text
+    .replace(/\s*(•|·|↳|-)\s+/g, "\n• ")
+    .trim()
+
+  // 2. Partimos por líneas
+  const lines = normalized
+    .split("\n")
+    .map(l => l.trim())
+    .filter(Boolean)
+
+  return (
+    <div className={styles.assistantText}>
+      {lines.map((line, idx) => {
+        const isBullet =
+          line.startsWith("• ") ||
+          /^\d+\.\s+/.test(line)
+
+        return isBullet ? (
+          <div key={idx} className={styles.bulletLine}>
+            {line.replace(/^•\s*/, "")}
+          </div>
+        ) : (
+          <p key={idx} className={styles.paragraphLine}>
+            {line}
+          </p>
+        )
+      })}
+    </div>
+  )
 }
 
 
@@ -193,8 +233,6 @@ export default function Widget() {
   const [introKey, setIntroKey] = React.useState(0);
   const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([]);
   const [lastUserQuestion, setLastUserQuestion] = React.useState("");
-
-
   const hasText = input.trim().length > 0;
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
@@ -207,9 +245,9 @@ export default function Widget() {
 
   // Preguntas sugeridas iniciales
   const quick = [
-    " → ¿Cuál fue tu proyecto más complejo?", 
-    " → ¿Qué metodologías utilizas?", 
-    " → Quiero un resumen de este portfolio"
+    " ¿Cuál fue tu proyecto más complejo?", 
+    " ¿Qué metodologías utilizas?", 
+    " Quiero un resumen de este portfolio"
   ];
 
   // Auto-scroll al final
@@ -360,10 +398,7 @@ typeText(mainContent, finalSuggestions);
                     {m.content === "" && loading && isLastAssistant ? (
                       <div className={styles.thinking}>Pensando</div>
                     ) : (
-                      <div
-                        className={styles.assistantText}
-                        dangerouslySetInnerHTML={{ __html: m.content }}
-                        />
+                      <RenderAssistantText text={m.content} />
                     )}
                     
                     {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (

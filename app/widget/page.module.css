@@ -39,12 +39,12 @@
 .assistantText {
   font-family: var(--font-aeonik);
   font-size: 0.9rem;
-  line-height: 1.7rem;
+  line-height: 1.2rem;
   font-weight: 500;
   color: #4d4d4d;
   max-width: 100%;
   white-space: pre-wrap;
-  padding-top: 8px;
+  padding: 8px;
 }
 
 .assistantText strong {
@@ -72,12 +72,25 @@
   font-size: 0.9rem;
 }
 
-.bulletLine {
-  display: block;
-  margin-left: 1.2rem;   /* Desplaza el bloque a la derecha */
-  text-indent: -1.2rem;  /* Mantiene el bullet en su sitio y alinea el texto que sigue */
-  margin-bottom: 8px;
+
+.paragraphLine {
+  margin: 0 0 12px 0;
+  line-height: 1.6;
 }
+
+.bulletLine {
+  margin: 10px 0;
+  padding-left: 18px;
+  position: relative;
+}
+
+.bulletLine::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  opacity: 0.6;
+}
+
 
 .assistantText strong {
   font-weight: 700;
