@@ -740,12 +740,12 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
     locale: "es-ES",
     question: "¿Dónde has estudiado?",
     match: [
-      "por que te mudaste a lima",
-      "por que te viniste a lima",
-      "por que estas en lima",
-      "que haces en lima",
-      "motivo de vivir en lima",
-      "por que vives en lima"
+      "que estudios tienes",
+      "en que universidad estudiaste",
+      "cual es tu carrera",
+      "que has estudiado",
+      "donde has estudiado",
+      "cual es tu titulo"
     ],
     answer:
       "He estudiado Diseño Multimedia en la Universidad de Málaga y posteriormente un Máster en Digital Product Design en La Gauss. Además, me he especializado en áreas como UX Writing, Design Systems y UI Development a través de formación continua en escuelas como Mr. Marcel School y General Software.",
@@ -770,12 +770,12 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
     locale: "es-ES",
     question: "¿Qué herramientas manejas?",
     match: [
-      "por que te mudaste a lima",
-      "por que te viniste a lima",
-      "por que estas en lima",
-      "que haces en lima",
-      "motivo de vivir en lima",
-      "por que vives en lima"
+      "que herramientas dominas",
+      "cual es tu nivel de figma",
+      "que herramientas de diseño manejas",
+      "que herramientas conoces",
+      "que usas para diseñar",
+      "cual es tu herramienta de diseño favorita"
     ],
     answer:
       "Trabajo principalmente con Figma y Framer, y en proyectos de Design Systems utilizo herramientas como Tokens Studio, Storybook, Style Dictionary y Zeroheight. Para research y análisis uso Google Analytics, Hotjar y Optimal Workshop, y para colaboración herramientas como Notion y Jira.",
