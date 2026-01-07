@@ -1,6 +1,8 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { BASE_SYSTEM_PROMPT, FAQ_PRESETS, FAQ_GRAPH } from "../../lib/constants";
+import { FAQ_ANTICIPATED } from "../../lib/constants";
+
 
 export const runtime = "edge";
 
@@ -22,6 +24,17 @@ function matchFAQPreset(question: string, locale: string = "es-ES") {
     (preset) =>
       preset.locale === locale &&
       preset.triggers.some((trigger) => q.includes(trigger.toLowerCase()))
+  );
+}
+
+    function matchFAQAnticipated(question: string, locale: string = "es-ES") {
+  const q = (question ?? "").toLowerCase().trim();
+  if (!q) return undefined;
+
+  return FAQ_ANTICIPATED.find(
+    (item) =>
+      item.locale === locale &&
+      item.question.toLowerCase().trim() === q
   );
 }
 
@@ -92,6 +105,19 @@ export async function POST(req: Request) {
         followups: preset.followups ?? [],
       });
     }
+    
+   /* ======================================================
+       3) FAQ_ANTICIPATED (preguntas esperables)
+       ====================================================== */
+
+    const anticipated = matchFAQAnticipated(lastUser, "es-ES");
+    if (anticipated) {
+      return NextResponse.json({
+        reply: anticipated.answer,
+        followups: [], // o algunos genéricos si quieres
+      });
+    }
+
 
     /* ======================================================
        3) LLM — solo si NO hay preset ni graph

@@ -723,6 +723,40 @@ export const FAQ_GRAPH: FAQNode[] = [
 
 ]
 
+export type FAQAnticipated = {
+  id: string
+  locale: Locale
+  question: string
+  answer: string
+}
+
+/* =========================
+   8.3) FAQ ANTICIPATED (Preguntas esperables)
+   ========================= */
+export const FAQ_ANTICIPATED: FAQAnticipated[] = [
+  {
+    id: "profile-education",
+    locale: "es-ES",
+    question: "¿Dónde has estudiado?",
+    answer:
+      "He estudiado Diseño Multimedia en la Universidad de Málaga y posteriormente un Máster en Digital Product Design en La Gauss. Además, me he especializado en áreas como UX Writing, Design Systems y UI Development a través de formación continua en escuelas como Mr. Marcel School y General Software.",
+  },
+  {
+    id: "profile-move-lima",
+    locale: "es-ES",
+    question: "¿Por qué te mudaste a Lima?",
+    answer:
+      "Me mudé a Lima por amor ❤️❤️❤️ En Madrid conocí a Carolina, con quien me casé hace unos meses y a quien decidí acompañar en su emprendimiento de postres saludables aquí en su Lima natal. Además a nivel profesional me siento cómodo ante nuevos retos que me permitan crecer como diseñador a la vez que descubro cómo se hace producto en otros lugares del mundo.",
+  },
+  {
+    id: "profile-tools",
+    locale: "es-ES",
+    question: "¿Qué herramientas manejas?",
+    answer:
+      "Trabajo principalmente con Figma y Framer, y en proyectos de Design Systems utilizo herramientas como Tokens Studio, Storybook, Style Dictionary y Zeroheight. Para research y análisis uso Google Analytics, Hotjar y Optimal Workshop, y para colaboración herramientas como Notion y Jira.",
+  },
+]
+
 
 
 
