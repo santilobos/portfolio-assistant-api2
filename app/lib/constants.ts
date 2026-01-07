@@ -745,10 +745,12 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
       "cual es tu carrera",
       "que has estudiado",
       "donde has estudiado",
-      "cual es tu titulo"
+      "cual es tu titulo",
+      "tienes alguna maestría",
+      "formación"
     ],
     answer:
-      "He estudiado Diseño Multimedia en la Universidad de Málaga y posteriormente un Máster en Digital Product Design en La Gauss. Además, me he especializado en áreas como UX Writing, Design Systems y UI Development a través de formación continua en escuelas como Mr. Marcel School y General Software.",
+      "Mi camino profesional empezó en la Universidad de Málaga, donde me gradué en Comunicación Audiovisual con la especialidad de Diseño Multimedia. Tras la carrera, sentí que necesitaba dar un paso más hacia la parte técnica y me decidí por el Máster de Digital Product Design en La Gauss, en Málaga. Soy de los que cree que este sector te obliga a estar en constante movimiento. Por eso, a lo largo de estos años he seguido completando mi perfil con formación en Design Systems, UX Writing y UI Development, aprendiendo de grandes profesionales en escuelas como Mr. Marcel o The Bridge, en Madrid. Mi objetivo siempre es el mismo: combinar el diseño y la tecnología para crear productos que conecten de verdad con las personas.",
   },
   {
     id: "profile-move-lima",
@@ -760,10 +762,11 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
       "por que estas en lima",
       "que haces en lima",
       "motivo de vivir en lima",
-      "por que vives en lima"
+      "por que vives en lima",
+      "peru"
     ],
     answer:
-      "Me mudé a Lima por amor ❤️❤️❤️. Durante mi etapa de trabajo en Madrid conocí a Carolina, con quien me casé y a quién decidí acompañar en su emprendimiento de postres saludables aquí en Lima, su ciudad Natal. Además, a nivel profesional me motivan los retos que me permitan crecer como diseñador y aprender cómo se construye producto en otros contextos.",
+      "Crucé el charco y me mudé a Lima por amor ❤️. En Madrid conocí a Carolina, mi esposa, y no dudé en acompañarla de vuelta a su ciudad natal para apoyarla en su emprendimiento de postres saludables. Esta etapa está siendo una oportunidad para entender el diseño y el negocio desde una perspectiva diferente, donde busco nuevos retos profesionales que me permitan seguir creciendo como diseñador y aportar mi experiencia en un contexto nuevo, con la misma ilusión con la que empecé",
   },
   {
     id: "profile-tools",
@@ -775,10 +778,12 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
       "que herramientas de diseño manejas",
       "que herramientas conoces",
       "que usas para diseñar",
-      "cual es tu herramienta de diseño favorita"
+      "cual es tu herramienta de diseño favorita",
+      "stack",
+      "tecnologias"
     ],
     answer:
-      "Trabajo principalmente con Figma y Framer, y en proyectos de Design Systems utilizo herramientas como Tokens Studio, Storybook, Style Dictionary y Zeroheight. Para research y análisis uso Google Analytics, Hotjar y Optimal Workshop, y para colaboración herramientas como Notion y Jira.",
+      "Mi proceso de trabajo nace y crece en **Figma**, donde centralizo todo: desde el research inicial y los workshops en **FigJam**, hasta prototipos avanzados y la colaboración real entre equipos. Cuando el proyecto necesita saltar a producción o requiere una presencia web rápida y sólida, confío en **Framer** y **Webflow** para la maquetación. Me apasiona el orden y la escalabilidad, por lo que gestiono Design Systems integrando herramientas como **Tokens Studio**, **Storybook**, **Style Dictionary** y **Zeroheight**. Además, no entiendo el diseño sin datos; por eso analizo comportamientos con **Google Analytics**, **Hotjar**, y **Helicone**, y profundizo en la experiencia del usuario mediante **Optimal Workshop** y **Lookback**. También me siento cómodo en el lado del desarrollo: manejo el stack técnico con **VS Code**, **Node.js** y **GitHub**, realizando despliegues en **Vercel** y gestionando contenidos con **Adobe Experience Manager** o **Storyblok**. Para que todo esto funcione en equipo, mantengo el orden y la comunicación apoyándome en **Notion**, **Jira**, **Linear** y el resto de herramientas de gestión que nos permiten remar en la misma dirección.",
   },
 ]
 

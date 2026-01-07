@@ -167,61 +167,60 @@ function isCompensationQuestion(q: string) {
 
 function sanitizeAssistantText(text: string) {
   return (text ?? "")
-    // elimina HTML si llegase por error
+    // 1. Elimina etiquetas HTML por seguridad
     .replace(/<\/?[^>]+>/g, "")
 
-    // remove markdown emphasis/code
-    .replace(/\*\*/g, "")
-    .replace(/\*/g, "")
+    // 2. Mantenemos las negritas (**) pero eliminamos otros símbolos de Markdown 
+    // que podrían ensuciar la UI (como bloques de código o guiones bajos)
     .replace(/`/g, "")
     .replace(/_/g, "")
 
-    // remove markdown headings ONLY at start of line
+    // 3. Limpiamos encabezados de Markdown (ej: ### Titulo) al inicio de línea
     .replace(/^\s*#{1,6}\s+/gm, "")
 
-    // convierte bullets tipo "-" a "• " (NO los mates)
+    // 4. Normalizamos los bullets: convierte guiones sueltos en puntos limpios
     .replace(/^\s*-\s+/gm, "• ")
 
-    // tidy excessive blank lines
+    // 5. Limpiamos saltos de línea excesivos (máximo 2 seguidos)
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
 
 
-
 function RenderAssistantText({ text }: { text: string }) {
   if (!text) return null
 
-  // 1. Normalizamos bullets para que siempre empiecen en nueva línea
-  const normalized = text
-    .replace(/\s*(•|·|↳|-)\s+/g, "\n• ")
-    .trim()
+  // Función para convertir **texto** en <strong>texto</strong>
+  const renderLineWithBold = (line: string) => {
+    const parts = line.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} style={{ fontWeight: 700, color: '#000' }}>{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+  };
 
-  // 2. Partimos por líneas
-  const lines = normalized
-    .split("\n")
-    .map(l => l.trim())
-    .filter(Boolean)
+  const normalized = text.replace(/\s*(•|·|↳|-)\s+/g, "\n• ").trim();
+  const lines = normalized.split("\n").map(l => l.trim()).filter(Boolean);
 
   return (
     <div className={styles.assistantText}>
       {lines.map((line, idx) => {
-        const isBullet =
-          line.startsWith("• ") ||
-          /^\d+\.\s+/.test(line)
+        const isBullet = line.startsWith("• ") || /^\d+\.\s+/.test(line);
 
         return isBullet ? (
           <div key={idx} className={styles.bulletLine}>
-            {line.replace(/^•\s*/, "")}
+            {renderLineWithBold(line.replace(/^•\s*/, ""))}
           </div>
         ) : (
           <p key={idx} className={styles.paragraphLine}>
-            {line}
+            {renderLineWithBold(line)}
           </p>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
 
 
@@ -237,11 +236,6 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Variantes para animaciones
-  const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 }
-  };
 
   // Preguntas sugeridas iniciales
   const quick = [
@@ -363,19 +357,34 @@ export default function Widget() {
       <div ref={listRef} className={styles.messages}>
         <AnimatePresence mode="popLayout">
           {messages.length === 0 ? (
-            <motion.div key={`intro-${introKey}`} className={styles.intro} initial="hidden" animate="visible">
-              <motion.div variants={itemVariants} className={styles.chatTitle}>
-                Pregúntame sobre mi trabajo
+              <motion.div
+                key={`intro-${introKey}`}
+                className={styles.intro}
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.div variants={itemVariants} className={styles.chatTitle}>
+                  Pregúntame sobre mi trabajo
+                </motion.div>
+
+                <motion.div variants={containerVariants} className={styles.quickGrid}>
+                  {quick.map((q) => (
+                    <motion.button
+                      key={q}
+                      variants={itemVariants}
+                      onClick={() => send(q)}
+                      className={styles.quickBtn}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {q}
+                    </motion.button>
+                  ))}
+                </motion.div>
               </motion.div>
-              <div className={styles.quickGrid}>
-                {quick.map(q => (
-                  <button key={q} onClick={() => send(q)} className={styles.quickBtn}>
-                    {q}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          ) : (
+            ) : (
+
+
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               {messages.map((m, i) => {
                 const isLastAssistant = m.role === "assistant" && i === messages.length - 1;
@@ -391,7 +400,15 @@ export default function Widget() {
                     {m.content === "" && loading && isLastAssistant ? (
                       <div className={styles.thinking}>Pensando</div>
                     ) : (
-                      <RenderAssistantText text={m.content} />
+                      <motion.div
+                        key={`a-${i}-${m.content.length > 0 ? "done" : "typing"}`}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <RenderAssistantText text={m.content} />
+                      </motion.div>
+
                     )}
                     
                     {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (
