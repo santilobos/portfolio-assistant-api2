@@ -763,7 +763,7 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
       "por que vives en lima"
     ],
     answer:
-      "Me mudé a Lima por amor. En Madrid conocí a Carolina y decidí acompañarla en su emprendimiento de postres saludables aquí en su Lima natal. Además, a nivel profesional me motivan los retos que me permitan crecer como diseñador y aprender cómo se construye producto en otros contextos.",
+      "Me mudé a Lima por amor ❤️❤️❤️. En Madrid conocí a Carolina y decidí acompañarla en su emprendimiento de postres saludables aquí en su Lima natal. Además, a nivel profesional me motivan los retos que me permitan crecer como diseñador y aprender cómo se construye producto en otros contextos.",
   },
   {
     id: "profile-tools",
