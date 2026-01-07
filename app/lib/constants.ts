@@ -727,6 +727,7 @@ export type FAQAnticipated = {
   id: string
   locale: Locale
   question: string
+  match: string[]    
   answer: string
 }
 
@@ -738,6 +739,14 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
     id: "profile-education",
     locale: "es-ES",
     question: "¿Dónde has estudiado?",
+    match: [
+      "por que te mudaste a lima",
+      "por que te viniste a lima",
+      "por que estas en lima",
+      "que haces en lima",
+      "motivo de vivir en lima",
+      "por que vives en lima"
+    ],
     answer:
       "He estudiado Diseño Multimedia en la Universidad de Málaga y posteriormente un Máster en Digital Product Design en La Gauss. Además, me he especializado en áreas como UX Writing, Design Systems y UI Development a través de formación continua en escuelas como Mr. Marcel School y General Software.",
   },
@@ -745,13 +754,29 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
     id: "profile-move-lima",
     locale: "es-ES",
     question: "¿Por qué te mudaste a Lima?",
+    match: [
+      "por que te mudaste a lima",
+      "por que te viniste a lima",
+      "por que estas en lima",
+      "que haces en lima",
+      "motivo de vivir en lima",
+      "por que vives en lima"
+    ],
     answer:
-      "Me mudé a Lima por amor ❤️❤️❤️ En Madrid conocí a Carolina, con quien me casé hace unos meses y a quien decidí acompañar en su emprendimiento de postres saludables aquí en su Lima natal. Además a nivel profesional me siento cómodo ante nuevos retos que me permitan crecer como diseñador a la vez que descubro cómo se hace producto en otros lugares del mundo.",
+      "Me mudé a Lima por amor. En Madrid conocí a Carolina y decidí acompañarla en su emprendimiento de postres saludables aquí en su Lima natal. Además, a nivel profesional me motivan los retos que me permitan crecer como diseñador y aprender cómo se construye producto en otros contextos.",
   },
   {
     id: "profile-tools",
     locale: "es-ES",
     question: "¿Qué herramientas manejas?",
+    match: [
+      "por que te mudaste a lima",
+      "por que te viniste a lima",
+      "por que estas en lima",
+      "que haces en lima",
+      "motivo de vivir en lima",
+      "por que vives en lima"
+    ],
     answer:
       "Trabajo principalmente con Figma y Framer, y en proyectos de Design Systems utilizo herramientas como Tokens Studio, Storybook, Style Dictionary y Zeroheight. Para research y análisis uso Google Analytics, Hotjar y Optimal Workshop, y para colaboración herramientas como Notion y Jira.",
   },

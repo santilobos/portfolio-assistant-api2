@@ -1,8 +1,6 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
-import { BASE_SYSTEM_PROMPT, FAQ_PRESETS, FAQ_GRAPH } from "../../lib/constants";
-import { FAQ_ANTICIPATED } from "../../lib/constants";
-
+import { BASE_SYSTEM_PROMPT, FAQ_PRESETS, FAQ_GRAPH, FAQ_ANTICIPATED } from "../../lib/constants";
 
 export const runtime = "edge";
 
@@ -16,6 +14,22 @@ const client = new OpenAI({
 
 type IncomingMsg = { role: "user" | "assistant"; content: string };
 
+/* =========================
+   Normalizer
+   ========================= */
+function normalizeText(text: string) {
+  return (text ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // quita tildes
+    .replace(/[¿?]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* =========================
+   Matchers
+   ========================= */
 function matchFAQPreset(question: string, locale: string = "es-ES") {
   const q = (question ?? "").toLowerCase().trim();
   if (!q) return undefined;
@@ -27,20 +41,21 @@ function matchFAQPreset(question: string, locale: string = "es-ES") {
   );
 }
 
-    function matchFAQAnticipated(question: string, locale: string = "es-ES") {
-  const q = (question ?? "").toLowerCase().trim();
+/**
+ * FAQ_ANTICIPATED: match por keywords/frases (match[])
+ */
+function matchFAQAnticipated(question: string, locale: string = "es-ES") {
+  const q = normalizeText(question);
   if (!q) return undefined;
 
-  return FAQ_ANTICIPATED.find(
-    (item) =>
-      item.locale === locale &&
-      item.question.toLowerCase().trim() === q
-  );
+  return FAQ_ANTICIPATED.find((item) => {
+    if (item.locale !== locale) return false;
+    return item.match.some((k) => q.includes(normalizeText(k)));
+  });
 }
 
 /**
- * Para conversación guiada:
- * match exacto por "question" (porque viene de tus botones).
+ * FAQ_GRAPH: match EXACTO por question (viene de botones)
  */
 function matchFAQGraph(question: string, locale: string = "es-ES") {
   const q = (question ?? "").toLowerCase().trim();
@@ -60,6 +75,9 @@ function resolveGraphFollowups(node: (typeof FAQ_GRAPH)[number]) {
     .map((n) => n!.question);
 }
 
+/* =========================
+   Helpers
+   ========================= */
 function safeJSONParse(text: string): any | null {
   try {
     return JSON.parse(text);
@@ -76,6 +94,9 @@ function normalizeFollowups(value: any): string[] {
     .slice(0, 3);
 }
 
+/* =========================
+   POST
+   ========================= */
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -105,22 +126,24 @@ export async function POST(req: Request) {
         followups: preset.followups ?? [],
       });
     }
-    
-   /* ======================================================
-       3) FAQ_ANTICIPATED (preguntas esperables)
-       ====================================================== */
 
+    /* ======================================================
+       3) FAQ_ANTICIPATED — preguntas esperables (keywords)
+       ====================================================== */
     const anticipated = matchFAQAnticipated(lastUser, "es-ES");
     if (anticipated) {
       return NextResponse.json({
         reply: anticipated.answer,
-        followups: [], // o algunos genéricos si quieres
+        followups: [
+          "¿Qué tipo de rol estás buscando ahora?",
+          "¿Prefieres que te cuente un proyecto con impacto medible?",
+          "¿Quieres que te resuma mi experiencia en 30 segundos?",
+        ],
       });
     }
 
-
     /* ======================================================
-       3) LLM — solo si NO hay preset ni graph
+       4) LLM — fallback
        ====================================================== */
     const completion = await client.chat.completions.create(
       {
