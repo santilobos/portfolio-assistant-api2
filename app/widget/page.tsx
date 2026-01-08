@@ -231,17 +231,16 @@ export default function Widget() {
   const [loading, setLoading] = React.useState(false);
   const [introKey, setIntroKey] = React.useState(0);
   const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([]);
-  const [lastUserQuestion, setLastUserQuestion] = React.useState("");
+  const [askedQuestions, setAskedQuestions] = React.useState<string[]>([]); // MEMORIA DE PREGUNTAS
   const hasText = input.trim().length > 0;
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
-
   // Preguntas sugeridas iniciales
   const quick = [
-    " ¿Cuál fue tu proyecto más complejo?", 
-    " ¿Qué metodologías utilizas?", 
-    " Quiero un resumen de este portfolio"
+    "¿Cuál fue tu proyecto más complejo?", 
+    "¿Qué metodologías utilizas?", 
+    "¿Cómo enfocas el liderazgo en diseño de producto?"
   ];
 
   // Auto-scroll al final
@@ -251,19 +250,18 @@ export default function Widget() {
     }
   }, [messages, loading, dynamicFollowUps]);
 
-// Enviar posición del mouse a Framer para el Trailing Dot
-    React.useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            window.parent.postMessage({
-                type: "widget-mouse-move",
-                x: e.clientX,
-                y: e.clientY
-            }, "*");
-        };
-
-        window.addEventListener("mousemove", handleMouseMove);
-        return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, []);
+  // Enviar posición del mouse a Framer
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      window.parent.postMessage({
+        type: "widget-mouse-move",
+        x: e.clientX,
+        y: e.clientY
+      }, "*");
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.stopPropagation();
@@ -273,7 +271,7 @@ export default function Widget() {
     }, 100);
   };
 
-  const typeText = (fullText: string, suggestions?: string[]) => {
+ const typeText = (fullText: string, suggestions?: string[]) => {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     let i = 0;
     typingIntervalRef.current = setInterval(() => {
@@ -285,10 +283,39 @@ export default function Widget() {
         if (last && last.role === "assistant") last.content = chunk;
         return next;
       });
+
       if (i >= fullText.length) {
         if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
         setLoading(false);
-        if (suggestions && suggestions.length > 0) setDynamicFollowUps(suggestions.slice(0, 3));
+
+        if (suggestions && suggestions.length > 0) {
+          // 1. Filtrar preguntas que el usuario YA ha hecho (Memoria)
+          const notAskedYet = suggestions.filter(
+            s => !askedQuestions.includes(s.toLowerCase().trim())
+          );
+
+          // 2. Identificar cuáles son "saltos" a otros proyectos
+          const PROJECT_KEYWORDS = [
+            "repsol", "fc barcelona", "fcb", "cofares", "mediapro", "depasify", "bbva", "inditex", "roche", "mysugr",
+            "portal del empleado", "design system", "plataforma broadcast", "app de socios", "gestion de partidos", "checkout", "ecommerce", "fintech"
+          ];
+          
+          // 3. Lógica de Ordenación (No exclusión):
+          // En lugar de elegir un grupo u otro, los combinamos todos.
+          // Ponemos las "internas" primero y los "saltos" después.
+          const sortedSuggestions = [...notAskedYet].sort((a, b) => {
+            const aIsJump = PROJECT_KEYWORDS.some(key => a.toLowerCase().includes(key));
+            const bIsJump = PROJECT_KEYWORDS.some(key => b.toLowerCase().includes(key));
+            
+            // Si A es salto y B es interna, B va primero (-1)
+            if (aIsJump && !bIsJump) return 1;
+            if (!aIsJump && bIsJump) return -1;
+            return 0;
+          });
+
+          // Mostramos las 3 mejores sugerencias resultantes de la mezcla
+          setDynamicFollowUps(sortedSuggestions.slice(0, 3));
+        }
       }
     }, 15);
   };
@@ -299,12 +326,16 @@ export default function Widget() {
     setInput("");
     setLoading(false);
     setDynamicFollowUps([]);
+    setAskedQuestions([]); // LIMPIAMOS LA MEMORIA AL RESETEAR
     setIntroKey(prev => prev + 1);
   };
 
   async function send(text?: string) {
     const q = (text ?? input).trim();
     if (!q || loading) return;
+    
+    // GUARDAMOS LA PREGUNTA EN EL HISTORIAL
+    setAskedQuestions(prev => [...prev, q.toLowerCase().trim()]);
     
     setInput("");
     setLoading(true);
@@ -319,22 +350,19 @@ export default function Widget() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: newMessages }), 
       });
-            const data = await res.json();
+      const data = await res.json();
 
       const mainContent = sanitizeAssistantText(data?.reply ?? "");
-
       const apiFollowups = Array.isArray(data?.followups) ? data.followups : [];
 
-      // si el modelo no devuelve nada, aplicamos tu fallback para salario
       const finalSuggestions =
         apiFollowups.length > 0
-          ? apiFollowups.slice(0, 3)
+          ? apiFollowups
           : isCompensationQuestion(q)
             ? [...OUT_OF_SCOPE_FOLLOWUPS]
             : [];
 
       typeText(mainContent, finalSuggestions);
-
 
     } catch (e) {
       setLoading(false);
@@ -357,19 +385,21 @@ export default function Widget() {
       <div ref={listRef} className={styles.messages}>
         <AnimatePresence mode="popLayout">
           {messages.length === 0 ? (
-              <motion.div
-                key={`intro-${introKey}`}
-                className={styles.intro}
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                <motion.div variants={itemVariants} className={styles.chatTitle}>
-                  Pregúntame sobre mi trabajo
-                </motion.div>
+            <motion.div
+              key={`intro-${introKey}`}
+              className={styles.intro}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div variants={itemVariants} className={styles.chatTitle}>
+                Pregúntame sobre mi trabajo
+              </motion.div>
 
-                <motion.div variants={containerVariants} className={styles.quickGrid}>
-                  {quick.map((q) => (
+              <motion.div variants={containerVariants} className={styles.quickGrid}>
+                {quick
+                  .filter(q => !askedQuestions.includes(q.toLowerCase().trim())) // FILTRO EN LA HOME
+                  .map((q) => (
                     <motion.button
                       key={q}
                       variants={itemVariants}
@@ -380,11 +410,9 @@ export default function Widget() {
                       {q}
                     </motion.button>
                   ))}
-                </motion.div>
               </motion.div>
-            ) : (
-
-
+            </motion.div>
+          ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               {messages.map((m, i) => {
                 const isLastAssistant = m.role === "assistant" && i === messages.length - 1;
@@ -408,7 +436,6 @@ export default function Widget() {
                       >
                         <RenderAssistantText text={m.content} />
                       </motion.div>
-
                     )}
                     
                     {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (
@@ -417,10 +444,7 @@ export default function Widget() {
                         animate={{ opacity: 1, y: 0 }} 
                         className={styles.followUpsContainer}
                       >
-
-                          {/* EL DIVISOR */}
-                      <div className={styles.divider} />
-
+                        <div className={styles.divider} />
                         <div className={styles.followUps}>
                           {dynamicFollowUps.map(q => (
                             <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>

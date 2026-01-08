@@ -255,7 +255,7 @@ export const PROJECTS: Project[] = [
     company: "Garaje de Ideas",
     priority: 1,
     oneLiner:
-      "Rediseño de experiencia del empleado a escala global para reducir costes, soporte interno y aumentar autonomía de equipos locales.",
+      "liderar el rediseño integral del portal global para 25.000 empleados en 15 países, creando una experiencia personalizada y segmentada por país, sede y rol que transformó una plataforma compleja en una herramienta de alta productividad",
     context: {
       productType: "platform",
       stage: "end-to-end",
@@ -672,28 +672,28 @@ export const FAQ_PRESETS: FAQPreset[] = [
     ],
   },
   {
-    id: "home-portfolio-summary",
+    id: "liderazgo-preset",
     locale: "es-ES",
     triggers: [
-      "quiero un resumen de este portfolio",
-      "hazme un resumen de tu portfolio",
-      "resume este portfolio",
-      "resumen del portfolio",
-      "qué proyectos tienes",
-      "ver tus trabajos",
-      "experiencia",
-      "proyectos destacados",
-      "casos de estudio",
-      "¿qué has hecho?",
-      "cuéntame de tu experiencia",
-      "qué puedo encontrar en este portfolio"
+    "¿Cómo enfocas el liderazgo en diseño de producto?",
+    "liderazgo",
+    "gestión de equipos",
+    "gestión de personas",
+    "cómo lideras",
+    "experiencia liderando",
+    "lead",
+    "liderar",
+    "mentoring",
+    "stakeholders",
+    "gestión de proyectos",
+    "cómo es tu forma de liderar"
     ],
     answer:
-      "Mi portfolio se centra en productos digitales de alta complejidad y sistemas de diseño escalables, uniendo estrategia de UX con viabilidad técnica. Para contarte sobre mi experinecia he seleccionado tres casos de estudio clave que muestran diferentes procesos, metodologías y aprendizajes:\n\n**1. Repsol**: Te cuento cómo lideré este proyecto estratégico de diseño e investigación UX para redefinir el Portal del Empleado de Repsol con el objetivo de mejorar el día a día de los más de 25 mil empleados repartidos a lo largo de 15 países.\n **2. FC Barcelona**: En este case te cuento cómo una mejora en la experiencia de gestión de los partidos de los socios generó un beneficio de 1,6M€ al final de la temporada.\n **3. Cofares**: Aquí cuento los detalles de cómo un sistema de diseño bien estructurado ayudó a la empresa líder en logística farmacéutica de España a conseguir un 180% de ROI\n\nEn cada uno detallo el proceso de investigación, las decisiones de arquitectura y los resultados obtenidos.",
+      "Entiendo el **liderazgo en diseño de producto** no solo como la gestión de equipos, sino también como la capacidad de influir en la estrategia de negocio a través del diseño. Mi enfoque se centra en tres ejes: \n\n• **Cultura de diseño:** Crear entornos donde el feedback constructivo y la excelencia técnica sean la norma.\n• **Escalabilidad:** Implementar dinámicas que permitan al equipo ser autónomo y eficiente.\n• **Evangelización de diseño:** Transmitir al resto de áreas la importancia de colocar al diseño en el centro de las decisiones en beneficio del crecimiento de la empresa.",
     followups: [
-      "Quiero más detalles sobre el study case del FC Barcelona",
-      "Quiero más detalles sobre el study case de Repsol",
-      "Quiero más detalles sobre el study case de Cofares",
+      "Cuéntame tu experiencia de liderazgo en Repsol.",
+      "Quiero saber acerca de tu liderazgo en FC Barcelona",
+      "Cuéntame sobre tu liderazgo en el sistema de diseño de Cofares",
     ],
   },
 ]
@@ -728,9 +728,15 @@ export const FAQ_GRAPH: FAQNode[] = [
     answer:
     "El proceso de investigación fue la clave para transformar un portal genérico en una herramienta de alta productividad. Realicé una fase de descubrimiento profundo dividida en tres pilares:\n\n1. **Inmersión Cualitativa**: Realicé entrevistas en profundidad a **37 empleados y 10 stakeholders**. Esto me permitió identificar que la navegación era la principal barrera ('demasiadas puertas de entrada poco usables') y que el 70% de los usuarios no pasaba de la Home.\n\n2. **Síntesis con Affinity Diagram**: Agrupé los hallazgos para detectar patrones. El insight principal fue que el portal no debía ser solo un canal de noticias, sino un **hub de servicios** que priorizara el ahorro de tiempo en trámites administrativos.\n\n3. **Definición de Ideales**: Los empleados demandaban una experiencia similar a sus productos digitales personales. De aquí nacieron conceptos como la **'Navegación centrada en la productividad'** y un diseño visual amigable inspirado en redes sociales (stories y buscadores inteligentes).\n\nEl resultado fue una hoja de ruta basada en datos reales, pasando de un modelo estático a uno centrado 100% en el usuario.",
     followupIds: [
+      
+      //1. Preguntas relacionadas con Repsol
       "repsol-key-features",
       "repsol-personalizacion",
       "repsol-impacto-negocio",
+
+      //2. Preguntas de otros cases
+      "cofares-intro",
+      "fcb-intro",
     ],
   },
 
@@ -741,8 +747,15 @@ export const FAQ_GRAPH: FAQNode[] = [
     answer:
       "El foco principal fue crear una **navegación flexible** orientada a la multitarea. Introduje tres innovaciones principales:\n\n1. **Ventanas Flotantes**: Permiten realizar gestiones (como reservar el comedor o consultar la agenda) sin perder el contexto de la tarea actual.\n2. **Modo Lectura**: Una interfaz limpia para documentos legales y burocráticos, mejorando la comprensión y reduciendo el estrés cognitivo.\n3. **Centralización de Herramientas**: Eliminamos la dispersión de enlaces externos, integrando todo en un único punto de acceso. Esto redujo drásticamente el coste de gestión de cuentas y mejoró la seguridad operativa.",
     followupIds: [
+
+      //1. Preguntas relacionadas con Repsol
+      "repsol-research",
       "repsol-personalizacion",
       "repsol-impacto-negocio",
+
+      //2. Preguntas de otros cases
+      "cofares-intro",
+      "fcb-intro",
     ],
   },
 
@@ -754,7 +767,15 @@ export const FAQ_GRAPH: FAQNode[] = [
       "Utilicé una estrategia de **Generación de Audiencias** mediante **Adobe Experience Manager**. \n\nDiseñé una estructura de contenidos modular que permitía segmentar la información según el rol, el país (15 países), el momento profesional y los intereses del empleado. Así, conseguimos que el portal dejara de ser una 'caja de herramientas' genérica para convertirse en una plataforma que entrega el contenido adecuado a la persona adecuada en el momento justo.",
 
     followupIds: [
+
+      //1. Preguntas relacionadas con Repsol
+      "repsol-research",
+      "repsol-key-features",
       "repsol-impacto-negocio",
+
+      //2. Preguntas de otros cases
+      "cofares-intro",
+      "fcb-intro",
     ],
   },
 
@@ -766,10 +787,36 @@ export const FAQ_GRAPH: FAQNode[] = [
    "El éxito del proyecto se validó tras 18 meses de investigación y diseño, transformando por completo la operatividad interna de Repsol. Los resultados clave fueron:\n\n1. **Aceleración de procesos clave (x5 más rápido)**: Logré que trámites críticos, como la gestión de documentación personal o la solicitud de permisos, se completen cinco veces más rápido (algunas tareas en menos de 1 minuto) eliminando la fricción administrativa.\n2. **Reducción de costos de desarrollo**: Gracias a la nueva arquitectura modular y al sistema de plantillas que diseñé, **logré reducir los costes de producción en un 40%**, optimizando el mantenimiento global y permitiendo realizar iteraciones de manera mas rápida e intuitiva.\n3. **Reducción de soporte técnico**: La mejora en la arquitectura de información logró reducir un **65% las peticiones a soporte** y a las mesas de ayuda durante el primer trimestre respecto al portal anterior.\n4. **Satisfacción y Consistencia**: Alcanzamos un **75% de satisfacción** de los empleados según índice de satisfacción interno, unificando la marca en **15 países** bajo un ecosistema digital coherente que respeta las audiencias locales.",
 
    followupIds: [
+
+    //1. Preguntas relacionadas con Repsol
+    "repsol-research",    
+    "repsol-key-features",    
+    "repsol-personalizacion",  
+
+    //2. Preguntas de otros cases
+    "cofares-intro",
+    "fcb-intro",
+    ],
+},
+
+ {
+    id: "design-thinking-project",
+    locale: "es-ES",
+    question: "Cuéntame sobre algún proyecto utilizando Design Thinking",
+    answer:
+    "El proyecto donde apliqué Design Thinking con mayor impacto fue el rediseño del Portal Global de Repsol. El desafío consistió en transformar un ecosistema digital genérico y fragmentado en una herramienta personalizada de alto impacto, optimizando la experiencia para 25.000 empleados en 15 países.",
+    followupIds: [
+      
+      //1. Preguntas relacionadas con Repsol
+      "repsol-key-features",
+      "repsol-personalizacion",
+      "repsol-impacto-negocio",
+
+      //2. Preguntas de otros cases
       "cofares-intro",
       "fcb-intro",
     ],
-},
+  },
 
 /* =========================
   FCB, REDISEÑO APP SOCIOS
@@ -833,9 +880,9 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
     answer:
       "Mi historia es un viaje de ida y vuelta. Nací en Argentina, en la ciudad de Córdoba, pero con solo 8 años crucé el charco con mi familia hacia la tierra de mis abuelos: España.\n\nMe crié en Málaga, frente al mar. Es la ciudad donde crecí, donde me formé y el lugar que, sin importar dónde esté, siempre llamo casa.\n\nCuando terminé la carrera, mis ganas de aprender de los mejores me llevó a .Ese impulso me llevó a moverme a Barcelona donde trabajé dos años en producto. Finalmente la vida me presentó una gran oportunidad laboral y me mudé a Madrid, una ciudad que me atrapó por completo. He pasado los últimos 7 años allí, trabajando en consultoría IT y disfrutando de cada rincón de la capital. Madrid ha sido mi escenario profesional y personal más intenso, y es una ciudad de la que sigo profundamente enamorado.",
       followups:[
-        "Qué proyecto destacarías en Garaje de Ideas?",
-        "Cuéntame sobre tu proyecto en Cofares",
-        "Cuál fue tu rol como diseñador en el FC Barcelona?",
+        "¿Dónde has estudiado?",
+        "¿Cuál es tu trayectoria profesional?",
+        "¿Qué te hace destacar como diseñador?",
       ]
   },
 
@@ -852,16 +899,24 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
       "donde has estudiado",
       "cual es tu titulo",
       "tienes alguna maestría",
-      "formación"
+      "cuál es tu formación",
+      "que formacion tienes",
+      "formación",
+      "donde estudiaste"
     ],
     answer:
       "Mi camino profesional empezó en la Universidad de Málaga, donde me gradué en Comunicación Audiovisual con la **especialidad de Diseño Multimedia**. Tras la carrera, sentí que necesitaba dar un paso más hacia la parte técnica y me decidí por el **Máster de Digital Product Design** en La Gauss, en Málaga. Soy de los que cree que este sector te obliga a estar en constante movimiento. Por eso, a lo largo de estos años he seguido completando mi perfil con formación en **Design Systems**, UX Writing y UI Development, aprendiendo de grandes profesionales en escuelas como Mr. Marcel o The Bridge, en Madrid. Mi objetivo siempre es el mismo: combinar el diseño y la tecnología para crear productos que conecten de verdad con las personas.",
+
+    followups:[
+      "¿Cuál es tu trayectoria profesional?",
+      "¿Cómo gestionas el liderazgo en tus proyectos?",
+      ] 
   },
 
     {
     id: "profile-trajectory-full",
     locale: "es-ES",
-    question: "¿Cuál es tu trayectoria?",
+    question: "¿Cuál es tu trayectoria profesional?",
     match: [
       "cuentame tu trayectoria",
       "resumen de tu carrera",
@@ -871,14 +926,16 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
       "cuentame de ti",
       "trayectoria",
       "en qué empresas has estado",
-      "en qué empresas has trabajado"
+      "en qué empresas has trabajado",
+      "¿Cuál es tu trayectoria profesional?"
     ],
     answer:
       "Mi camino en el diseño de producto empezó en **Barcelona**, trabajando para **VTC Projects**. Fue una etapa fascinante porque, al ser una empresa con gran presencia en China y Estados Unidos, me dio desde el primer día una visión global sobre cómo mantener ecommerces y productos digitales a gran escala.\n\nCon esa base, decidí dar el salto a **Madrid** para sumergirme en el mundo de la consultoría IT de la mano de **Garaje de Ideas (EDG Group)** una de las mejores consultoras en España. Allí pasé cuatro años intensos donde mi perfil dio un salto de gigante; tuve la suerte de trabajar para clientes como Inditex, BBVA, Repsol o Telefónica, aprendiendo a adaptar el diseño a industrias y necesidades totalmente distintas.\n\nEsa experiencia me preparó para uno de los retos más apasionantes de mi carrera en **General Software**: construir desde cero el sistema de diseño para Cofares. Ese proyecto marcó un antes y un después, ya que me permitió especializarme como Design System Architect y reforzar mi perfil híbrido como UX Engineer. Fue ahí donde descubrí cuánto me apasionaba no solo el diseño técnico, sino también la gestión de equipos y stakeholders.\n\nFinalmente, ese interés por la cultura de diseño me llevó a **Elastic Heads**, donde ejercí como **Design Lead**. Mi misión allí fue ayudar a crecer la estructura de la compañía y mentorizar a perfiles junior, asegurando que la calidad y la metodología fueran de la mano.\n\nHoy, la vida me ha traído a **Lima**. Me he mudado a la ciudad natal de mi esposa para acompañarla en su nuevo emprendimiento laboral, y me hace mucha ilusión afrontar esta etapa buscando nuevos retos donde pueda aportar toda esta experiencia acumulada en liderazgo y estrategia de diseño.",
+
       followups:[
         "Qué proyecto destacarías en Garaje de Ideas?",
         "Cuéntame sobre tu proyecto en Cofares",
-        "Cuál fue tu rol como diseñador en el FC Barcelona?",
+        "Cuál fue tu rol como diseñador en Repsol?",
       ]
   },
 
@@ -940,6 +997,60 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
     answer:
       "Mi dominio de **Figma es a nivel experto** y está totalmente orientado a la creación de productos profesionales escalables. No me limito a diseñar pantallas; construyo **Sistemas de Diseño** robustos utilizando Variables para gestionar colores, espaciados y radios, aprovechando los Modos para implementar temas (como el Light/Dark mode) o diferentes densidades de espaciados de forma automática.\n\nEn cuanto a la arquitectura de componentes, domino el uso de **Auto Layout 5.0**, las propiedades de componentes (Boolean, Instance swap, Text) y el uso de Variants, Instances y Slot components para mantener librerías que sean flexibles pero controladas.\n\nTengo la capacidad de crear, gestionar y escalar liberías de componentes que dan soporte a distintos productos y equipos.\n\nAdemás mi proceso de prototipado incluye **lógica avanzada** con variables y expresiones condicionales, lo que me permite realizar tests de usuario realistas con flujos que reaccionan a las acciones del usuario sin salir de la herramienta.\n\nFinalmente, priorizo un **handoff impecable**: organizo los archivos para que el equipo de desarrollo encuentre especificaciones claras, nombres de capas semánticos y una estructura de tokens que coincida con el código (apoyándome en plugins como Tokens Studio). Además, utilizo FigJam en las fases estratégicas para facilitar workshops de ideación y definir flujos de usuario de manera colaborativa.",
   },
+
+{
+    id: "home-portfolio-summary",
+    locale: "es-ES",
+    question: "¿Puedes hacerme un resumen de este portfolio?",
+    match: [
+      "quiero un resumen de este portfolio",
+      "hazme un resumen de tu portfolio",
+      "resumeme tu portfolio",
+      "resume este portfolio",
+      "resumen del portfolio",
+      "qué proyectos tienes",
+      "ver tus trabajos",
+      "experiencia",
+      "proyectos destacados",
+      "casos de estudio",
+      "¿qué has hecho?",
+      "cuéntame de tu experiencia",
+      "qué puedo encontrar en este portfolio"
+    ],
+    answer:
+      "Mi portfolio se centra en productos digitales de alta complejidad y sistemas de diseño escalables, uniendo estrategia de UX con viabilidad técnica. Para contarte sobre mi experinecia he seleccionado tres casos de estudio clave que muestran diferentes procesos, metodologías y aprendizajes:\n\n**1. Repsol**: Te cuento cómo lideré este proyecto estratégico de diseño e investigación UX para redefinir el Portal del Empleado de Repsol con el objetivo de mejorar el día a día de los más de 25 mil empleados repartidos a lo largo de 15 países.\n **2. FC Barcelona**: En este case te cuento cómo una mejora en la experiencia de gestión de los partidos de los socios generó un beneficio de 1,6M€ al final de la temporada.\n **3. Cofares**: Aquí cuento los detalles de cómo un sistema de diseño bien estructurado ayudó a la empresa líder en logística farmacéutica de España a conseguir un 180% de ROI\n\nEn cada uno detallo el proceso de investigación, las decisiones de arquitectura y los resultados obtenidos.",
+    followups: [
+      "Quiero más detalles sobre el study case del FC Barcelona",
+      "Quiero más detalles sobre el study case de Repsol",
+      "Quiero más detalles sobre el study case de Cofares",
+    ],
+  },
+
+  {
+    id: "design-thinking-project",
+    locale: "es-ES",
+    question: "Cuéntame sobre algún proyecto utilizando Design Thinking",
+    match: [
+      "en qué proyectos has utilizado design thinking",
+      "Cuéntame sobre algún proyecto donde hayas utilizado Design Thinking",
+      "Cuéntame sobre algún proyecto donde hayas aplicado Design Thinking",
+      "en que proyecto has aplicado design thinking",
+      "siguiendo la metodologia design thinking",
+      "a través de design thinking",
+      "mediante Design Thinking",
+      "usando Design Thinking",
+      "con design thinking",
+      "donde has usado design thinking"
+    ],
+    answer:
+    "El proyecto donde apliqué Design Thinking con mayor impacto fue el rediseño del Portal Global de Repsol. El desafío consistió en transformar un ecosistema digital genérico y fragmentado en una herramienta personalizada de alto impacto, optimizando la experiencia para 25.000 empleados en 15 países.",
+    followups: [
+      "¿Cómo llevaste a cabo el proceso de investigación?",
+      "¿Qué funcionalidades clave diseñaste para mejorar la productividad?",
+      "¿Cómo lograste personalizar la experiencia para 25,000 empleados?",
+    ],
+  },
+
 ]
 
 
@@ -950,33 +1061,37 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
 // ===============================
 
 export const BASE_SYSTEM_PROMPT = `
-Eres SANTI.GPT, un asistente que representa el portfolio de un Senior Product Designer.
+Eres SANTI.GPT, el representante exclusivo del portfolio de Santiago Lobos (Santi), Senior Product Designer.
 
-Idioma y tono:
-- Responde siempre en español neutro (salvo que el usuario escriba en inglés).
-- Tono profesional, claro y directo.
-- Respuestas fáciles de escanear.
-- Evita emojis y markdown complejo.
+IDENTIDAD Y REGLAS DE ORO:
+1. FOCO TOTAL: Solo puedes hablar de la trayectoria de Santi, sus proyectos, educación y habilidades técnicas contenidas en su CV.
+2. NO INVENTES: Si te preguntan algo que no está en el perfil (ej. datos históricos del FC Barcelona, clima, política, o vida personal no profesional), responde: "Mi conocimiento se limita a la trayectoria profesional de Santi. Puedo contarte sobre el proyecto de [Proyecto Relacionado] que él realizó, pero no tengo información sobre otros temas."
+3. PRIMERA PERSONA: Habla siempre como si fueras Santi (ej: "Yo diseñé...", "En mi experiencia...").
+4. FILTRO DE CONTEXTO: Si el usuario menciona una institución (ej. "FC Barcelona"), redirige la respuesta inmediatamente a los aportes de Santi para ese cliente (Checkout y App de Socios). Nunca hables del club como institución deportiva.
 
-Contenido:
-- Responde como si el diseñador hablara en primera persona.
-- Prioriza impacto, métricas, decisiones y trade-offs.
-- Si la pregunta es sobre salario/compensación, responde de forma neutral y redirige a temas de valor (proyectos, proceso, impacto).
+TONO Y ESTILO:
+- Español neutro, profesional y directo.
+- Respuestas escaneables con frases cortas.
+- Cero emojis y cero markdown complejo.
 
-FORMATO OBLIGATORIO:
-Devuelve SIEMPRE un JSON válido con esta forma exacta:
-
+FORMATO OBLIGATORIO (JSON):
+Devuelve SIEMPRE un JSON válido:
 {
-  "reply": "texto de la respuesta",
-  "followups": ["pregunta 1", "pregunta 2"]
+  "reply": "Tu respuesta aquí. Si el usuario pregunta '¿donde estudiaste?', responde basándote exclusivamente en su educación: Bachiller en Diseño Multimedia (U. de Málaga) y Másteres en Digital Product Design y Design Systems.",
+  "followups": ["pregunta corta 1", "pregunta corta 2"]
 }
 
-Reglas:
-- "reply": texto plano, sin HTML.
-- "followups": un array de 1 a 3 strings.
-- Cada followup: pregunta corta (6–90 caracteres), relacionada con lo que acabas de responder.
-- No repitas la pregunta del usuario.
-- No uses comillas, markdown ni emojis en followups.
+Reglas de campos:
+- "reply": Texto plano.
+- "followups": Array de 1 a 3 strings (6-90 caracteres). Deben invitar a seguir explorando los proyectos de Santi.
+// ... dentro de tu BASE_SYSTEM_PROMPT ...
+
+REGLA DE REDIRECCIÓN (FOLLOWUPS):
+- Si el usuario pregunta por un tema general (ej. Historia del FC Barcelona, ubicación de una oficina, etc.) y no puedes responder directamente:
+- Los followups DEBEN ser invitaciones directas a tus proyectos relacionados.
+- Ejemplo: Si preguntan por el Barça, los followups deben ser: ["Cuéntame sobre el rediseño del FCB Store", "Cómo rediseñaste la app de socios del FC Barcelona"]. Si preguntan por Repsol, los followups deben ser: ["Cuéntame sobre el rediseño del portal del empleado de Repsol"] 
+- Si preguntan por estudios generales, los followups deben ser: ["¿Cuál es tu formación?", "¿Qué herramientas de diseño dominas?"]
+
 `.trim();
 
 

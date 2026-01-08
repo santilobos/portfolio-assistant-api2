@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
-import { BASE_SYSTEM_PROMPT, FAQ_PRESETS, FAQ_GRAPH, FAQ_ANTICIPATED } from "../../lib/constants";
+// Importamos 'type Project' para que el casting del punto 4 funcione
+import { BASE_SYSTEM_PROMPT, FAQ_PRESETS, FAQ_GRAPH, FAQ_ANTICIPATED, PROJECTS, type Project } from "../../lib/constants";
 
 export const runtime = "edge";
 
@@ -21,10 +22,10 @@ function normalizeText(text: string) {
   return (text ?? "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Quita tildes y diacríticos
-    .replace(/[¿?¡!.,;:]/g, "")      // Añadimos más signos de puntuación comunes
-    .replace(/[^\w\s]/gi, "")       // Opcional: elimina cualquier símbolo especial restante
-    .replace(/\s+/g, " ")           // Colapsa múltiples espacios en uno solo
+    .replace(/[\u0300-\u036f]/g, "") 
+    .replace(/[¿?¡!.,;:]/g, "")      
+    .replace(/[^\w\s]/gi, "")       
+    .replace(/\s+/g, " ")           
     .trim();
 }
 
@@ -42,9 +43,6 @@ function matchFAQPreset(question: string, locale: string = "es-ES") {
   );
 }
 
-/**
- * FAQ_ANTICIPATED: match por keywords/frases (match[])
- */
 function matchFAQAnticipated(question: string, locale: string = "es-ES") {
   const q = normalizeText(question);
   if (!q) return undefined;
@@ -55,9 +53,6 @@ function matchFAQAnticipated(question: string, locale: string = "es-ES") {
   });
 }
 
-/**
- * FAQ_GRAPH: match EXACTO por question (viene de botones)
- */
 function matchFAQGraph(question: string, locale: string = "es-ES") {
   const q = (question ?? "").toLowerCase().trim();
   if (!q) return undefined;
@@ -68,7 +63,7 @@ function matchFAQGraph(question: string, locale: string = "es-ES") {
 }
 
 function resolveGraphFollowups(node: (typeof FAQ_GRAPH)[number]) {
-  const ids = (node.followupIds ?? []).slice(0, 3);
+  const ids = (node.followupIds ?? []).slice(0, 5);
 
   return ids
     .map((id) => FAQ_GRAPH.find((n) => n.id === id))
@@ -107,7 +102,7 @@ export async function POST(req: Request) {
       [...incoming].reverse().find((m) => m.role === "user")?.content ?? "";
 
     /* ======================================================
-       1) FAQ GRAPH — conversación guiada (prioridad alta)
+       1) FAQ GRAPH — conversación guiada
        ====================================================== */
     const graphNode = matchFAQGraph(lastUser, "es-ES");
     if (graphNode) {
@@ -118,7 +113,7 @@ export async function POST(req: Request) {
     }
 
     /* ======================================================
-       2) FAQ PRESETS — respuestas deterministas (home)
+       2) FAQ PRESETS — respuestas deterministas
        ====================================================== */
     const preset = matchFAQPreset(lastUser, "es-ES");
     if (preset) {
@@ -129,59 +124,80 @@ export async function POST(req: Request) {
     }
 
     /* ======================================================
-       3) FAQ_ANTICIPATED — preguntas esperables (keywords)
+       3) FAQ_ANTICIPATED — preguntas esperables
        ====================================================== */
-    /* ======================================================
-   3) FAQ_ANTICIPATED — preguntas esperables (keywords)
-   ====================================================== */
-const anticipated = matchFAQAnticipated(lastUser, "es-ES");
-
-if (anticipated) {
-  return NextResponse.json({
-    reply: anticipated.answer,
-    // Ahora solo envía los followups si existen en el objeto de la constante
-    followups: anticipated.followups ?? [], 
-  });
-}
+    const anticipated = matchFAQAnticipated(lastUser, "es-ES");
+    if (anticipated) {
+      return NextResponse.json({
+        reply: anticipated.answer,
+        followups: anticipated.followups ?? [], 
+      });
+    }
 
     /* ======================================================
-       4) LLM — fallback
+       4) LLM — fallback inteligente
        ====================================================== */
-    const completion = await client.chat.completions.create(
-      {
-        model: "gpt-4o-mini",
-        temperature: 0.7,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: BASE_SYSTEM_PROMPT },
-          ...incoming.map((m) => ({ role: m.role, content: m.content })),
-        ],
-      },
-      {
-        headers: {
-          "Helicone-Property-User-Question": lastUser,
-        },
-      } as any
-    );
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0, 
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: BASE_SYSTEM_PROMPT },
+        ...incoming.map((m) => ({ role: m.role, content: m.content })),
+      ],
+    });
 
     const raw = completion.choices[0]?.message?.content?.trim() ?? "";
     const parsed = safeJSONParse(raw);
-
-    const reply =
-      (parsed && typeof parsed.reply === "string" ? parsed.reply : raw).trim();
-
+    
+    let reply = (parsed && typeof parsed.reply === "string" ? parsed.reply : raw).trim();
     let followups = normalizeFollowups(parsed?.followups);
 
-    if (followups.length < 1) {
-      followups = [
-        "¿Quieres que te lo explique con un caso real?",
-        "¿Qué métricas usarías para validarlo?",
-      ];
+    // Casting seguro a Project[]
+    const safeProjects = (Array.isArray(PROJECTS) ? PROJECTS : []) as Project[];
+    const userInput = lastUser.toLowerCase();
+
+    const projectFound = safeProjects.find(p => {
+      const clientName = p.client?.toLowerCase() || "";
+      const projectId = p.id?.toLowerCase() || "";
+      return (clientName && userInput.includes(clientName)) || 
+             (projectId && userInput.includes(projectId.split('-')[0]));
+    });
+
+    if (projectFound) {
+      const projectKey = projectFound.id.split('-')[0].toLowerCase();
+      const mainNode = FAQ_GRAPH.find(node => node.id.toLowerCase().startsWith(projectKey));
+      
+      if (mainNode) {
+        const clientName = projectFound.client;
+        const summary = projectFound.oneLiner || "mejorar la experiencia digital";
+        const cleanSummary = summary.charAt(0).toLowerCase() + summary.slice(1);
+        
+        reply = `Mi trabajo en **${clientName}** consistió en ${cleanSummary}. \n\n¿Qué te gustaría profundizar sobre este proyecto?`;
+        
+        if (mainNode.followupIds) {
+          const realQuestions = mainNode.followupIds
+            .map(id => FAQ_GRAPH.find(n => n.id === id)?.question)
+            .filter(Boolean) as string[];
+            
+          if (realQuestions.length > 0) {
+            followups = realQuestions.slice(0, 3);
+          }
+        }
+      }
+    }
+
+    if (followups.length === 0) {
+      followups = ["Ver mis proyectos", "¿Qué metodologías utilizas?", "Hablemos de mi formación"];
     }
 
     return NextResponse.json({ reply, followups });
+
   } catch (error) {
-    console.error("Error en /api/chat:", error);
-    return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
+    console.error("Error en POST:", error);
+    return NextResponse.json(
+      { reply: "Lo siento, he tenido un error técnico. ¿Podemos intentarlo de nuevo?", followups: [] },
+      { status: 500 }
+    );
   }
 }
