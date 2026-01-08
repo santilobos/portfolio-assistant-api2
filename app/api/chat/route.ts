@@ -21,9 +21,10 @@ function normalizeText(text: string) {
   return (text ?? "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // quita tildes
-    .replace(/[¿?]/g, "")
-    .replace(/\s+/g, " ")
+    .replace(/[\u0300-\u036f]/g, "") // Quita tildes y diacríticos
+    .replace(/[¿?¡!.,;:]/g, "")      // Añadimos más signos de puntuación comunes
+    .replace(/[^\w\s]/gi, "")       // Opcional: elimina cualquier símbolo especial restante
+    .replace(/\s+/g, " ")           // Colapsa múltiples espacios en uno solo
     .trim();
 }
 
@@ -130,17 +131,18 @@ export async function POST(req: Request) {
     /* ======================================================
        3) FAQ_ANTICIPATED — preguntas esperables (keywords)
        ====================================================== */
-    const anticipated = matchFAQAnticipated(lastUser, "es-ES");
-    if (anticipated) {
-      return NextResponse.json({
-        reply: anticipated.answer,
-        followups: [
-          "¿Qué tipo de rol estás buscando ahora?",
-          "¿Prefieres que te cuente un proyecto con impacto medible?",
-          "¿Quieres que te resuma mi experiencia en 30 segundos?",
-        ],
-      });
-    }
+    /* ======================================================
+   3) FAQ_ANTICIPATED — preguntas esperables (keywords)
+   ====================================================== */
+const anticipated = matchFAQAnticipated(lastUser, "es-ES");
+
+if (anticipated) {
+  return NextResponse.json({
+    reply: anticipated.answer,
+    // Ahora solo envía los followups si existen en el objeto de la constante
+    followups: anticipated.followups ?? [], 
+  });
+}
 
     /* ======================================================
        4) LLM — fallback

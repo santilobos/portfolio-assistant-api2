@@ -632,34 +632,69 @@ export const FAQ_PRESETS: FAQPreset[] = [
   {
     id: "home-mayor-complejidad",
     locale: "es-ES",
-    triggers: ["¿Cuál fue tu proyecto más complejo?", "¿Cuál fue tu proyecto más difícil?", "¿Qué proyecto destacarías más?"],
+    triggers: [
+      "¿Cuál fue tu proyecto más complejo?",
+      "¿Cuál fue tu proyecto más difícil?",
+      "¿Cuál es tu proyecto más destacado?",
+      "¿Qué proyecto destacarías más?",
+      "hazme un resumen del proyecto de repsol",
+      "hazme un resumen del proyecto del portal del empleado",
+      "employee experience platform"
+    ],
     answer:
-      "Sin duda fue el portal global del empleado de Repsol, con alcance en 15 países. Destacaría este proyecto por su complejidad y su alcance. Lo más complicado fue diseñar una experiencia coherente que funcionara igual de bien para todos los empleados de Repsol, con sus correspondientes culturas, roles y necesidades sin perder eficiencia operativa. La clave estuvo en una fase profunda de investigación, donde pude empatizar con los usuarios y entender sus necesidades reales para poder centrar todo el diseño en una experiencia personalizada y segmentada por país, sede y rol profeisonal.",
+      "Sin duda, el reto más complejo de mi carrera fue el rediseño del **Portal Global del Empleado para Repsol**, un ecosistema digital con alcance en 15 países. Lo más complejo fue diseñar una experiencia coherente que funcionara para miles de personas **(más de 25 mil empleados)** con culturas, roles y necesidades técnicas totalmente distintas, todo sin perder la eficiencia operativa de la compañía.\n\nLa clave del éxito fue una fase profunda de investigación **(Design Research)** donde pude empatizar con los usuarios reales. Esto me permitió segmentar la experiencia por país, sede y rol profesional, transformando un portal genérico en una **herramienta personalizada** y de **alto impacto**.",
+   
     followups: [
-      "¿Cómo se plantea una investigación de esta magnitud?",
-      "¿Cómo priorizaste la toma de decisiones?",
-      "¿Qué aprendiste trabajando con stakeholders globales?",
+      "¿Cómo llevaste a cabo el proceso de investigación?",
+      "¿Qué funcionalidades clave diseñaste para mejorar la productividad?",
+      "¿Cómo lograste personalizar la experiencia para 25,000 empleados?",
     ],
   },
   {
     id: "home-methodologies",
     locale: "es-ES",
-    triggers: ["¿Qué metodologías utilizas?", "metodologías", "cómo trabajas", "tu proceso"],
+    triggers: [
+      "¿Qué metodologías utilizas?",
+      "¿Qué metodologías conoces?",
+      "¿Qué metodologías aplicas en tus proyectos?",
+      "¿Cuál es tu proceso de trabajo?",
+      "¿Cómo sueles abordar un proyecto?",
+      "metodologías",
+      "cómo trabajas",
+      "tu proceso"
+    ],
     answer:
-      "No trabajo con una fórmula única: elijo el enfoque según el tipo de incertidumbre y el contexto. Si necesitamos descubrir bien el problema, uso Design Thinking para investigar a fondo y alinear stakeholders. Si el reto es iterar rápido y mover una métrica, prefiero Lean UX: lanzar pequeño, medir, aprender y ajustar. El objetivo siempre es reducir incertidumbre sin frenar el ritmo del equipo.",
+      "Mi enfoque no es dogmático: **adapto la metodología** según la madurez del producto y los objetivos de negocio. No uso una fórmula única, sino un **'toolkit' estratégico**.\n\nSi el reto es definir una visión desde cero o desbloquear problemas complejos, aplico **Design Thinking** para alinear stakeholders y empatizar con el usuario real.\n\nEn cambio, si el foco es la velocidad y la optimización de métricas, prefiero **Lean UX**: ciclos rápidos de construcción, medición y aprendizaje (Build-Measure-Learn) para reducir el riesgo sin frenar el desarrollo.\n\nEn casos donde el reto es estructural, utilizo **Atomic Design** para construir soluciones escalables que me ayudan a establecer un lenguaje común entre diseño y desarrollo.\n\nEn definitiva, mi prioridad es equilibrar el rigor del diseño con la agilidad técnica, asegurando que cada iteración aporte valor real tanto al usuario como a la compañía.",
     followups: [
-      "¿Me cuentas un ejemplo donde Lean UX movió una métrica rápido?",
-      "¿Cómo decides qué validar primero cuando hay poco tiempo?",
-      "¿Cómo aplicas behavioural UX en procesos críticos como KYC o ticketing?",
+      "Cuéntame sobre algún proyecto utilizando Design Thinking",
+      "Cuéntame sobre algún proyecto utilizando Lean UX",
+      "Cuéntame sobre algún proyecto utilizando Atomic Design",
     ],
   },
   {
     id: "home-portfolio-summary",
     locale: "es-ES",
-    triggers: ["Quiero un resumen de este portfolio", "resumen del portfolio", "qué hay en tu portfolio"],
+    triggers: [
+      "quiero un resumen de este portfolio",
+      "hazme un resumen de tu portfolio",
+      "resume este portfolio",
+      "resumen del portfolio",
+      "qué proyectos tienes",
+      "ver tus trabajos",
+      "experiencia",
+      "proyectos destacados",
+      "casos de estudio",
+      "¿qué has hecho?",
+      "cuéntame de tu experiencia",
+      "qué puedo encontrar en este portfolio"
+    ],
     answer:
-      "Aquí verás proyectos donde he trabajado en producto digital complejo y design systems, con foco en impacto medible. Hay casos en Repsol (portal global), FC Barcelona (e-commerce y ticketing), Cofares (design system con ROI), Mediapro (plataforma broadcast) y Depasify (fintech). En cada uno cuento el problema, lo que hice y el impacto que generó.",
-    followups: ["¿Quieres que empecemos por Repsol o por FC Barcelona?", "¿Te interesa más Design Systems o Producto (UX/UI)?", "¿Prefieres ver impacto y métricas o el proceso paso a paso?"],
+      "Mi portfolio se centra en productos digitales de alta complejidad y sistemas de diseño escalables, uniendo estrategia de UX con viabilidad técnica. Para contarte sobre mi experinecia he seleccionado tres casos de estudio clave que muestran diferentes procesos, metodologías y aprendizajes:\n\n**1. Repsol**: Te cuento cómo lideré este proyecto estratégico de diseño e investigación UX para redefinir el Portal del Empleado de Repsol con el objetivo de mejorar el día a día de los más de 25 mil empleados repartidos a lo largo de 15 países.\n **2. FC Barcelona**: En este case te cuento cómo una mejora en la experiencia de gestión de los partidos de los socios generó un beneficio de 1,6M€ al final de la temporada.\n **3. Cofares**: Aquí cuento los detalles de cómo un sistema de diseño bien estructurado ayudó a la empresa líder en logística farmacéutica de España a conseguir un 180% de ROI\n\nEn cada uno detallo el proceso de investigación, las decisiones de arquitectura y los resultados obtenidos.",
+    followups: [
+      "Quiero más detalles sobre el study case del FC Barcelona",
+      "Quiero más detalles sobre el study case de Repsol",
+      "Quiero más detalles sobre el study case de Cofares",
+    ],
   },
 ]
 
@@ -681,45 +716,85 @@ export type FAQNode = {
    8.2) FAQ GRAPH (Guided conversation)
    ========================= */
 export const FAQ_GRAPH: FAQNode[] = [
+
+/* =========================
+  REPSOL, PORTAL DEL EMPLEADO
+   ========================= */
+
   {
     id: "repsol-research",
     locale: "es-ES",
-    question: "¿Cómo se plantea una investigación de esta magnitud?",
+    question: "¿Cómo llevaste a cabo el proceso de investigación?",
     answer:
-      "Lo primero que hice fue definir la metodología que quería seguir para esta fase. Mediante Design Thinking fui capaz de obtener información muy valiosa de los propios empleados de la compañía. Seleccioné una muestra de más de 50 perfiles clave para entender sus problemas diarios y poder diseñar una solución capaz de satisfacer sus necesidades. Con todos los insights obtenidos pude formular las hipótesis que más tarde tendría que validar. Realicé un benchmark para ver buenas prácticas de otras empresas en sus intranets. Mediante un workshop de alineamiento pude elaborar un concepto de portal ideal, planteando una propuesta de valor junto a los distintos departamentos de la compañía.",
+    "El proceso de investigación fue la clave para transformar un portal genérico en una herramienta de alta productividad. Realicé una fase de descubrimiento profundo dividida en tres pilares:\n\n1. **Inmersión Cualitativa**: Realicé entrevistas en profundidad a **37 empleados y 10 stakeholders**. Esto me permitió identificar que la navegación era la principal barrera ('demasiadas puertas de entrada poco usables') y que el 70% de los usuarios no pasaba de la Home.\n\n2. **Síntesis con Affinity Diagram**: Agrupé los hallazgos para detectar patrones. El insight principal fue que el portal no debía ser solo un canal de noticias, sino un **hub de servicios** que priorizara el ahorro de tiempo en trámites administrativos.\n\n3. **Definición de Ideales**: Los empleados demandaban una experiencia similar a sus productos digitales personales. De aquí nacieron conceptos como la **'Navegación centrada en la productividad'** y un diseño visual amigable inspirado en redes sociales (stories y buscadores inteligentes).\n\nEl resultado fue una hoja de ruta basada en datos reales, pasando de un modelo estático a uno centrado 100% en el usuario.",
     followupIds: [
-      "repsol-decisions",
-      "repsol-impact",
+      "repsol-key-features",
+      "repsol-personalizacion",
+      "repsol-impacto-negocio",
     ],
   },
 
   {
-    id: "repsol-decisions",
+    id: "repsol-key-features",
     locale: "es-ES",
-    question: "¿Qué decisiones de diseño tuvieron más impacto en costes y soporte?",
+    question: "¿Qué funcionalidades clave diseñaste para mejorar la productividad?",
     answer:
-      "Las decisiones con mayor impacto fueron la creación de plantillas reutilizables y una arquitectura de información clara...",
+      "El foco principal fue crear una **navegación flexible** orientada a la multitarea. Introduje tres innovaciones principales:\n\n1. **Ventanas Flotantes**: Permiten realizar gestiones (como reservar el comedor o consultar la agenda) sin perder el contexto de la tarea actual.\n2. **Modo Lectura**: Una interfaz limpia para documentos legales y burocráticos, mejorando la comprensión y reduciendo el estrés cognitivo.\n3. **Centralización de Herramientas**: Eliminamos la dispersión de enlaces externos, integrando todo en un único punto de acceso. Esto redujo drásticamente el coste de gestión de cuentas y mejoró la seguridad operativa.",
     followupIds: [
-      "repsol-impact",
-      "repsol-learnings",
+      "repsol-personalizacion",
+      "repsol-impacto-negocio",
     ],
   },
 
   {
-    id: "repsol-impact",
+    id: "repsol-personalizacion",
     locale: "es-ES",
-    question: "¿Qué impacto tuvo el proyecto en negocio?",
+    question: "¿Cómo lograste personalizar la experiencia para 25,000 empleados?",
     answer:
-      "El impacto fue una reducción del 40% en costes y del 65% en soporte interno...",
+      "Utilicé una estrategia de **Generación de Audiencias** mediante **Adobe Experience Manager**. \n\nDiseñé una estructura de contenidos modular que permitía segmentar la información según el rol, el país (15 países), el momento profesional y los intereses del empleado. Así, conseguimos que el portal dejara de ser una 'caja de herramientas' genérica para convertirse en una plataforma que entrega el contenido adecuado a la persona adecuada en el momento justo.",
+
+    followupIds: [
+      "repsol-impacto-negocio",
+    ],
   },
 
   {
-  id: "repsol-learnings",
+  id: "repsol-impacto-negocio",
   locale: "es-ES",
-  question: "¿Qué aprendiste trabajando con stakeholders globales?",
+  question: "¿Cuál fue el impacto real del nuevo portal?",
   answer:
-    "Aprendí a alinear expectativas con claridad, a convertir desacuerdos en decisiones y a diseñar un marco común que permita autonomía local sin romper consistencia global. La clave fue documentar acuerdos, priorizar por impacto y mantener ciclos cortos de validación con referentes de cada país.",
+   "El éxito del proyecto se validó tras 18 meses de investigación y diseño, transformando por completo la operatividad interna de Repsol. Los resultados clave fueron:\n\n1. **Aceleración de procesos clave (x5 más rápido)**: Logré que trámites críticos, como la gestión de documentación personal o la solicitud de permisos, se completen cinco veces más rápido (algunas tareas en menos de 1 minuto) eliminando la fricción administrativa.\n2. **Reducción de costos de desarrollo**: Gracias a la nueva arquitectura modular y al sistema de plantillas que diseñé, **logré reducir los costes de producción en un 40%**, optimizando el mantenimiento global y permitiendo realizar iteraciones de manera mas rápida e intuitiva.\n3. **Reducción de soporte técnico**: La mejora en la arquitectura de información logró reducir un **65% las peticiones a soporte** y a las mesas de ayuda durante el primer trimestre respecto al portal anterior.\n4. **Satisfacción y Consistencia**: Alcanzamos un **75% de satisfacción** de los empleados según índice de satisfacción interno, unificando la marca en **15 países** bajo un ecosistema digital coherente que respeta las audiencias locales.",
+
+   followupIds: [
+      "cofares-intro",
+      "fcb-intro",
+    ],
 },
+
+/* =========================
+  FCB, REDISEÑO APP SOCIOS
+   ========================= */
+
+{
+  id: "fcb-intro",
+  locale: "es-ES",
+  question: "Cuéntame sobre el proyecto del FC Barcelona",
+  answer: "En el FC Barcelona, rediseñé la experiencia de gestión de partidos para socios. El reto era optimizar el sistema de 'Seient Lliure' y ticketing. Al final de la temporada, la mejora en el flujo generó un beneficio de **1,6M€**.",
+  followupIds: ["cofares-intro", "home-portfolio-summary"]
+},   
+
+  /* =========================
+  COFARES, DESIGN SYSTEM
+   ========================= */
+
+
+{
+  id: "cofares-intro",
+  locale: "es-ES",
+  question: "Cuéntame sobre el proyecto de Cofares",
+  answer: "Para Cofares, el reto fue crear un sistema de diseño desde cero que unificara sus herramientas logísticas. No solo mejoramos la consistencia, sino que logramos un **180% de ROI** al reducir tiempos de diseño y desarrollo.",
+  followupIds: ["fcb-intro", "home-portfolio-summary"]
+}
 
 ]
 
@@ -729,6 +804,7 @@ export type FAQAnticipated = {
   question: string
   match: string[]    
   answer: string
+  followups?: string[]; 
 }
 
 /* =========================
@@ -736,10 +812,39 @@ export type FAQAnticipated = {
    ========================= */
 export const FAQ_ANTICIPATED: FAQAnticipated[] = [
   {
+    id: "profile-origin",
+    locale: "es-ES",
+    question: "¿De dónde eres?",
+    match: [
+      "¿de donde eres?",
+      "¿Dónde naciste?",
+      "cuentame de ti",
+      "cuentame sobre ti",
+      "hablame de ti",
+      "nacimiento",
+      "eres español?",
+      "eres peruano?",
+      "eres argentino?",
+      "donde te has criado?",
+      "cual es tu origen",
+      "origen",
+      "vida personal"
+    ],
+    answer:
+      "Mi historia es un viaje de ida y vuelta. Nací en Argentina, en la ciudad de Córdoba, pero con solo 8 años crucé el charco con mi familia hacia la tierra de mis abuelos: España.\n\nMe crié en Málaga, frente al mar. Es la ciudad donde crecí, donde me formé y el lugar que, sin importar dónde esté, siempre llamo casa.\n\nCuando terminé la carrera, mis ganas de aprender de los mejores me llevó a .Ese impulso me llevó a moverme a Barcelona donde trabajé dos años en producto. Finalmente la vida me presentó una gran oportunidad laboral y me mudé a Madrid, una ciudad que me atrapó por completo. He pasado los últimos 7 años allí, trabajando en consultoría IT y disfrutando de cada rincón de la capital. Madrid ha sido mi escenario profesional y personal más intenso, y es una ciudad de la que sigo profundamente enamorado.",
+      followups:[
+        "Qué proyecto destacarías en Garaje de Ideas?",
+        "Cuéntame sobre tu proyecto en Cofares",
+        "Cuál fue tu rol como diseñador en el FC Barcelona?",
+      ]
+  },
+
+  {
     id: "profile-education",
     locale: "es-ES",
     question: "¿Dónde has estudiado?",
     match: [
+      "¿Dónde has estudiado?",
       "que estudios tienes",
       "en que universidad estudiaste",
       "cual es tu carrera",
@@ -750,8 +855,33 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
       "formación"
     ],
     answer:
-      "Mi camino profesional empezó en la Universidad de Málaga, donde me gradué en Comunicación Audiovisual con la especialidad de Diseño Multimedia. Tras la carrera, sentí que necesitaba dar un paso más hacia la parte técnica y me decidí por el Máster de Digital Product Design en La Gauss, en Málaga. Soy de los que cree que este sector te obliga a estar en constante movimiento. Por eso, a lo largo de estos años he seguido completando mi perfil con formación en Design Systems, UX Writing y UI Development, aprendiendo de grandes profesionales en escuelas como Mr. Marcel o The Bridge, en Madrid. Mi objetivo siempre es el mismo: combinar el diseño y la tecnología para crear productos que conecten de verdad con las personas.",
+      "Mi camino profesional empezó en la Universidad de Málaga, donde me gradué en Comunicación Audiovisual con la **especialidad de Diseño Multimedia**. Tras la carrera, sentí que necesitaba dar un paso más hacia la parte técnica y me decidí por el **Máster de Digital Product Design** en La Gauss, en Málaga. Soy de los que cree que este sector te obliga a estar en constante movimiento. Por eso, a lo largo de estos años he seguido completando mi perfil con formación en **Design Systems**, UX Writing y UI Development, aprendiendo de grandes profesionales en escuelas como Mr. Marcel o The Bridge, en Madrid. Mi objetivo siempre es el mismo: combinar el diseño y la tecnología para crear productos que conecten de verdad con las personas.",
   },
+
+    {
+    id: "profile-trajectory-full",
+    locale: "es-ES",
+    question: "¿Cuál es tu trayectoria?",
+    match: [
+      "cuentame tu trayectoria",
+      "resumen de tu carrera",
+      "donde has trabajado",
+      "cual es tu historia profesional",
+      "que has hecho hasta ahora",
+      "cuentame de ti",
+      "trayectoria",
+      "en qué empresas has estado",
+      "en qué empresas has trabajado"
+    ],
+    answer:
+      "Mi camino en el diseño de producto empezó en **Barcelona**, trabajando para **VTC Projects**. Fue una etapa fascinante porque, al ser una empresa con gran presencia en China y Estados Unidos, me dio desde el primer día una visión global sobre cómo mantener ecommerces y productos digitales a gran escala.\n\nCon esa base, decidí dar el salto a **Madrid** para sumergirme en el mundo de la consultoría IT de la mano de **Garaje de Ideas (EDG Group)** una de las mejores consultoras en España. Allí pasé cuatro años intensos donde mi perfil dio un salto de gigante; tuve la suerte de trabajar para clientes como Inditex, BBVA, Repsol o Telefónica, aprendiendo a adaptar el diseño a industrias y necesidades totalmente distintas.\n\nEsa experiencia me preparó para uno de los retos más apasionantes de mi carrera en **General Software**: construir desde cero el sistema de diseño para Cofares. Ese proyecto marcó un antes y un después, ya que me permitió especializarme como Design System Architect y reforzar mi perfil híbrido como UX Engineer. Fue ahí donde descubrí cuánto me apasionaba no solo el diseño técnico, sino también la gestión de equipos y stakeholders.\n\nFinalmente, ese interés por la cultura de diseño me llevó a **Elastic Heads**, donde ejercí como **Design Lead**. Mi misión allí fue ayudar a crecer la estructura de la compañía y mentorizar a perfiles junior, asegurando que la calidad y la metodología fueran de la mano.\n\nHoy, la vida me ha traído a **Lima**. Me he mudado a la ciudad natal de mi esposa para acompañarla en su nuevo emprendimiento laboral, y me hace mucha ilusión afrontar esta etapa buscando nuevos retos donde pueda aportar toda esta experiencia acumulada en liderazgo y estrategia de diseño.",
+      followups:[
+        "Qué proyecto destacarías en Garaje de Ideas?",
+        "Cuéntame sobre tu proyecto en Cofares",
+        "Cuál fue tu rol como diseñador en el FC Barcelona?",
+      ]
+  },
+
   {
     id: "profile-move-lima",
     locale: "es-ES",
@@ -766,24 +896,49 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
       "peru"
     ],
     answer:
-      "Crucé el charco y me mudé a Lima por amor ❤️. En Madrid conocí a Carolina, mi esposa, y no dudé en acompañarla de vuelta a su ciudad natal para apoyarla en su emprendimiento de postres saludables. Esta etapa está siendo una oportunidad para entender el diseño y el negocio desde una perspectiva diferente, donde busco nuevos retos profesionales que me permitan seguir creciendo como diseñador y aportar mi experiencia en un contexto nuevo, con la misma ilusión con la que empecé",
+      "Crucé el charco y me mudé a Lima por amor ❤️. En Madrid conocí a Carolina, mi esposa, y no dudé en acompañarla de vuelta a su ciudad natal para apoyarla en su emprendimiento de postres saludables. Esta etapa está siendo una **oportunidad para entender el diseño y el negocio en un contexto nuevo y diferente para mí**, donde busco nuevos retos profesionales que me permitan seguir creciendo como diseñador y aportar la experiencia que tengo acumulada en estos años trabajando con clientes de alto nivel en europa, con la misma ilusión con la que empecé.",
   },
   {
     id: "profile-tools",
     locale: "es-ES",
     question: "¿Qué herramientas manejas?",
     match: [
+      "¿Qué herramientas manejas?",
       "que herramientas dominas",
-      "cual es tu nivel de figma",
-      "que herramientas de diseño manejas",
+      "que herramientas de diseño utilizas",
       "que herramientas conoces",
       "que usas para diseñar",
       "cual es tu herramienta de diseño favorita",
       "stack",
-      "tecnologias"
+      "tecnologias",
+      "gestion de trabajo",
+      "proceso de trabajo"
     ],
     answer:
       "Mi proceso de trabajo nace y crece en **Figma**, donde centralizo todo: desde el research inicial y los workshops en **FigJam**, hasta prototipos avanzados y la colaboración real entre equipos. Cuando el proyecto necesita saltar a producción o requiere una presencia web rápida y sólida, confío en **Framer** y **Webflow** para la maquetación. Me apasiona el orden y la escalabilidad, por lo que gestiono Design Systems integrando herramientas como **Tokens Studio**, **Storybook**, **Style Dictionary** y **Zeroheight**. Además, no entiendo el diseño sin datos; por eso analizo comportamientos con **Google Analytics**, **Hotjar**, y **Helicone**, y profundizo en la experiencia del usuario mediante **Optimal Workshop** y **Lookback**. También me siento cómodo en el lado del desarrollo: manejo el stack técnico con **VS Code**, **Node.js** y **GitHub**, realizando despliegues en **Vercel** y gestionando contenidos con **Adobe Experience Manager** o **Storyblok**. Para que todo esto funcione en equipo, mantengo el orden y la comunicación apoyándome en **Notion**, **Jira**, **Linear** y el resto de herramientas de gestión que nos permiten remar en la misma dirección.",
+  },
+
+  {
+    id: "figma-level",
+    locale: "es-ES",
+    question: "¿Cuál es tu nivel de figma?",
+    match: [
+      "cual es tu nivel en figma",
+      "que sabes hacer en figma",
+      "dominio de figma",
+      "figma experto",
+      "sabes usar figma",
+      "prototipado en figma",
+      "figma componentes",
+      "figma skill",
+      "usas figma",
+      "nivel de figma",
+      "variables en figma",
+      "librerias figma",
+      "themes figma",
+    ],
+    answer:
+      "Mi dominio de **Figma es a nivel experto** y está totalmente orientado a la creación de productos profesionales escalables. No me limito a diseñar pantallas; construyo **Sistemas de Diseño** robustos utilizando Variables para gestionar colores, espaciados y radios, aprovechando los Modos para implementar temas (como el Light/Dark mode) o diferentes densidades de espaciados de forma automática.\n\nEn cuanto a la arquitectura de componentes, domino el uso de **Auto Layout 5.0**, las propiedades de componentes (Boolean, Instance swap, Text) y el uso de Variants, Instances y Slot components para mantener librerías que sean flexibles pero controladas.\n\nTengo la capacidad de crear, gestionar y escalar liberías de componentes que dan soporte a distintos productos y equipos.\n\nAdemás mi proceso de prototipado incluye **lógica avanzada** con variables y expresiones condicionales, lo que me permite realizar tests de usuario realistas con flujos que reaccionan a las acciones del usuario sin salir de la herramienta.\n\nFinalmente, priorizo un **handoff impecable**: organizo los archivos para que el equipo de desarrollo encuentre especificaciones claras, nombres de capas semánticos y una estructura de tokens que coincida con el código (apoyándome en plugins como Tokens Studio). Además, utilizo FigJam en las fases estratégicas para facilitar workshops de ideación y definir flujos de usuario de manera colaborativa.",
   },
 ]
 
