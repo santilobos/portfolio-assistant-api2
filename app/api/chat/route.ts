@@ -180,6 +180,120 @@ function resolveFollowupStringsToKnownQuestions(
 }
 
 /* ===============================
+   INTENT OVERRIDES (topic switch)
+   =============================== */
+
+function hasAny(t: string, arr: string[]) {
+  return arr.some((k) => t.includes(normalize(k)))
+}
+
+/**
+ * (1) Asegura que “proyecto más complejo” dispare PRESET.
+ * Motivo: suele parecerse semánticamente a nodos de casos y los embeddings lo “secuestran”.
+ */
+function isMostComplexProjectIntent(userText: string, locale: Locale) {
+  const t = normalize(userText)
+  if (locale === "en-US") {
+    return hasAny(t, [
+      "most complex project",
+      "hardest project",
+      "most challenging project",
+      "your toughest project",
+      "what was your most complex project",
+    ])
+  }
+  return hasAny(t, [
+    "proyecto mas complejo",
+    "proyecto más complejo",
+    "proyecto mas dificil",
+    "proyecto más difícil",
+    "reto mas complejo",
+    "reto más complejo",
+    "proyecto mas desafiante",
+    "proyecto más desafiante",
+    "mas challenging",
+    "más challenging",
+  ])
+}
+
+/**
+ * (2) “carrera” es ambigua (deporte vs trayectoria).
+ * Aquí la forzamos a intención PROFESIONAL/ACADÉMICA (y cortamos el contexto).
+ */
+function isCareerOrEducationIntent(userText: string, locale: Locale) {
+  const t = normalize(userText)
+
+  if (locale === "en-US") {
+    return hasAny(t, [
+      "your career",
+      "tell me about your career",
+      "your background",
+      "your education",
+      "what did you study",
+      "what have you studied",
+      "academic background",
+      "training",
+    ])
+  }
+
+  return hasAny(t, [
+    "cual es tu carrera",
+    "cuál es tu carrera",
+    "carrera profesional",
+    "trayectoria",
+    "cuentame tu carrera",
+    "cuéntame tu carrera",
+    "que has estudiado",
+    "qué has estudiado",
+    "que estudiaste",
+    "qué estudiaste",
+    "formacion",
+    "formación",
+    "estudios",
+    "perfil profesional",
+    "trayectoria profesional",
+  ])
+}
+
+/**
+ * Elige un nodo “ancla” del graph para carrera/educación.
+ * - Primero intenta educación
+ * - Si no existe, intenta resumen/portfolio o perfil profesional
+ *
+ * ⚠️ Ajusta estos IDs a los que realmente tengas en tu graph.
+ */
+function pickCareerAnchorNode(locale: Locale) {
+  const preferredIds = [
+    // educación
+    "education_academic",
+    "education_masters_specializations",
+    "education_continuous_learning",
+
+    // perfil/overview (por si no hay education en el graph)
+    "profile_overview",
+    "hub_resumen_portfolio",
+  ]
+
+  for (const id of preferredIds) {
+    const n = (FAQ_GRAPH as any[]).find(
+      (x) => x.locale === locale && x.id === id
+    )
+    if (n) return n
+  }
+
+  // fallback: cualquier nodo de educación si existe por tema/id pattern
+  const eduLike = (FAQ_GRAPH as any[]).find(
+    (x) =>
+      x.locale === locale &&
+      typeof x.id === "string" &&
+      (x.id.startsWith("education_") || x.id.includes("education"))
+  )
+  if (eduLike) return eduLike
+
+  return null
+}
+
+/* ===============================
    CONTEXT QUERY (Rachel-style)
    =============================== */
 
@@ -223,90 +337,21 @@ function buildContextQuery(messages: ChatBody["messages"], locale: Locale) {
     joined = joined.slice(joined.length - maxTotalChars) // recorta por el final
   }
 
+  // Pequeño hint de idioma (opcional, pero ayuda)
   const langHint = locale === "es-ES" ? "Language: Spanish\n" : "Language: English\n"
   return langHint + joined
 }
 
-/* ===============================
-   TOPIC SHIFT (cambio de tema)
-   =============================== */
-
-// stopwords mínimos para overlap (no hace falta que sea perfecto)
-const STOP_ES = new Set([
-  "que","qué","como","cómo","cuando","cuándo","donde","dónde","por","para","con","sin","de","del","la","el","los","las",
-  "un","una","unos","unas","y","o","u","a","al","en","es","son","fue","era","ser","hacer","hiciste","trabajo","proyecto",
-  "me","mi","tu","tus","su","sus","se","lo","le","les","ya","pero","mas","más","muy","sobre"
-])
-const STOP_EN = new Set([
-  "what","how","when","where","why","the","a","an","and","or","to","of","in","on","for","with","without","is","are","was",
-  "were","be","been","do","did","you","your","me","my","we","our","it","this","that","as","at"
-])
-
-function tokenizeForOverlap(text: string, locale: Locale) {
-  const t = normalize(text)
-  const tokens = t
-    .split(/[^a-z0-9áéíóúñ]+/i)
-    .map((x) => x.trim())
-    .filter(Boolean)
-    .filter((x) => x.length >= 3)
-
-  const stop = locale === "es-ES" ? STOP_ES : STOP_EN
-  return tokens.filter((x) => !stop.has(x))
-}
-
-function jaccard(a: string[], b: string[]) {
-  const A = new Set(a)
-  const B = new Set(b)
-  if (!A.size || !B.size) return 0
-  let inter = 0
-  for (const x of A) if (B.has(x)) inter++
-  const union = A.size + B.size - inter
-  return union ? inter / union : 0
-}
-
 /**
- * Heurística:
- * - compara el último user vs. el último assistant
- * - si overlap bajo -> probable cambio de tema
+ * Query “solo última intención” (para cuando el usuario cambia de tema).
+ * Evita que embeddings “secuestren” por contexto anterior.
  */
-function isTopicShift(messages: ChatBody["messages"], locale: Locale) {
-  const lastUser =
-    [...(messages || [])].reverse().find((m) => m.role === "user")?.content?.trim() ??
-    ""
-  const lastAssistant =
-    [...(messages || [])].reverse().find((m) => m.role === "assistant")?.content?.trim() ??
-    ""
-
-  if (!lastUser) return false
-  if (!lastAssistant) return false
-
-  // si el user es muy corto, nos interesa detectar shift
-  const userShort = lastUser.trim().length <= 80
-
-  const uTok = tokenizeForOverlap(lastUser, locale)
-  const aTok = tokenizeForOverlap(lastAssistant, locale)
-  const overlap = jaccard(uTok, aTok)
-
-  // overlap muy bajo + pregunta corta => shift
-  if (userShort && overlap < 0.06) return true
-
-  return false
-}
-
-/**
- * Si hay cambio de tema, usamos SOLO lastUser para embeddings (evita contaminación).
- */
-function buildEmbeddingQuery(messages: ChatBody["messages"], locale: Locale) {
+function buildLastUserOnlyQuery(messages: ChatBody["messages"], locale: Locale) {
   const lastUser =
     [...(messages || [])].reverse().find((m) => m.role === "user")?.content?.trim() ??
     ""
   const langHint = locale === "es-ES" ? "Language: Spanish\n" : "Language: English\n"
-
-  if (isTopicShift(messages, locale)) {
-    return langHint + `User (current): ${lastUser.slice(0, 800)}`
-  }
-
-  return buildContextQuery(messages, locale)
+  return langHint + `User (current): ${lastUser.slice(0, 1200)}`
 }
 
 /* ===============================
@@ -321,13 +366,13 @@ function dot(a: Vec, b: Vec) {
   return s
 }
 
-function norm(a: Vec) {
+function vecNorm(a: Vec) {
   return Math.sqrt(dot(a, a))
 }
 
 function cosineSim(a: Vec, b: Vec) {
-  const na = norm(a)
-  const nb = norm(b)
+  const na = vecNorm(a)
+  const nb = vecNorm(b)
   if (na === 0 || nb === 0) return 0
   return dot(a, b) / (na * nb)
 }
@@ -420,72 +465,15 @@ async function semanticRetrieveNode(
 }
 
 /* ===============================
-   CASE OVERVIEW ROUTER
-   =============================== */
-
-/**
- * Si el usuario pregunta algo genérico sobre “qué hiciste en X / cuéntame el caso X”,
- * fuerza el nodo *_overview si existe, evitando caer en research/impact/etc.
- */
-function matchCaseOverview(userText: string, locale: Locale): GraphNode | null {
-  const t = normalize(userText)
-
-  // términos típicos de overview
-  const wantsOverview =
-    t.includes("que hiciste") ||
-    t.includes("qué hiciste") ||
-    t.includes("cuentame") ||
-    t.includes("cuéntame") ||
-    t.includes("resumen") ||
-    t.includes("de que fue") ||
-    t.includes("de qué fue") ||
-    t.includes("caso") ||
-    t.includes("proyecto") ||
-    t.includes("experiencia")
-
-  if (!wantsOverview) return null
-
-  // si el user está preguntando algo específico, NO forzar overview
-  const isSpecific =
-    t.includes("investig") ||
-    t.includes("research") ||
-    t.includes("metodolog") ||
-    t.includes("impact") ||
-    t.includes("metric") ||
-    t.includes("rol") ||
-    t.includes("respons") ||
-    t.includes("decisi") ||
-    t.includes("arquitect") ||
-    t.includes("handoff") ||
-    t.includes("stakeholder")
-
-  if (isSpecific) return null
-
-  const overviewNodes = (FAQ_GRAPH as any[])
-    .filter((n) => n.locale === locale && typeof n.id === "string" && n.id.includes("_overview"))
-
-  // intenta detectar por match/searchText/id
-  for (const n of overviewNodes) {
-    const idKey = normalize(String(n.id).replace(/^cs_/, "").replace(/_overview$/, ""))
-    const st = normalize(String(n.searchText ?? ""))
-    const q = normalize(String(n.question ?? ""))
-
-    // señales de compañía: idKey o palabras fuertes en searchText/question
-    const companyHit =
-      (idKey.length >= 3 && t.includes(idKey)) ||
-      (st && t.split(/\s+/).some((w) => w.length >= 4 && st.includes(w) && t.includes(w))) ||
-      (q && t.split(/\s+/).some((w) => w.length >= 4 && q.includes(w) && t.includes(w)))
-
-    if (companyHit) return n as GraphNode
-  }
-
-  return null
-}
-
-/* ===============================
    FOLLOWUPS: SIEMPRE DESDE GRAPH
    =============================== */
 
+/**
+ * Completa hasta 3 followups usando SOLO nodos del graph.
+ * - Prioriza las existingQuestions (si son del graph)
+ * - Rellena con top similares por embeddings usando seedText
+ * - Nunca devuelve texto “libre”
+ */
 async function completeFollowupsFromGraph(opts: {
   locale: Locale
   seedText: string
@@ -497,6 +485,7 @@ async function completeFollowupsFromGraph(opts: {
     .map((s) => (s || "").trim())
     .filter(Boolean)
 
+  // Mantén solo las que existan como question en graph
   const graphQuestions = new Map(
     (FAQ_GRAPH as any[])
       .filter((n) => n.locale === locale)
@@ -529,6 +518,7 @@ async function completeFollowupsFromGraph(opts: {
 
   scored.sort((a, b) => b.score - a.score)
 
+  // Rellena con similares
   for (const s of scored) {
     if (picked.length >= 3) break
     if (exclude.has(s.node.id)) continue
@@ -540,6 +530,7 @@ async function completeFollowupsFromGraph(opts: {
     pickedNorm.add(nq)
   }
 
+  // Si aún faltan (graph muy pequeño), rellena con lo que quede (determinista)
   if (picked.length < 3) {
     for (const n of nodes) {
       if (picked.length >= 3) break
@@ -568,28 +559,94 @@ export async function POST(req: Request) {
 
     const normalizedLastUser = normalize(lastUser)
 
+    // Query contextual (para embeddings cuando NO hay cambio de tema)
+    const contextQuery = buildContextQuery(messages, locale)
+
     /* =====================================================
-       0) CASE OVERVIEW ROUTER (antes de embeddings)
+       0) INTENT OVERRIDES (antes de todo lo demás)
+       - (1) Proyecto más complejo => PRESET
+       - (2) Carrera/educación => ancla educación/perfil y corta contexto
        ===================================================== */
-    const forcedOverview = matchCaseOverview(lastUser, locale)
-    if (forcedOverview) {
-      const fromIds = forcedOverview.followupIds
-        ? mapFollowupIdsToQuestions(forcedOverview.followupIds, locale)
-        : []
 
-      const followups = await completeFollowupsFromGraph({
-        locale,
-        seedText: `${forcedOverview.question}\n${forcedOverview.answer}`.slice(0, 2000),
-        existingQuestions: fromIds,
-        excludeNodeIds: [forcedOverview.id],
-      })
-
-      const res: ChatResponse = { reply: forcedOverview.answer, followups }
-      return Response.json(res)
+    // (1) Asegura preset de “proyecto más complejo”
+    if (isMostComplexProjectIntent(lastUser, locale)) {
+      const preset = matchPreset(lastUser, locale)
+      if (preset) {
+        const resolved = resolveFollowupStringsToKnownQuestions(
+          preset.followups ?? [],
+          locale
+        )
+        const followups = await completeFollowupsFromGraph({
+          locale,
+          seedText: `${lastUser}\n${preset.answer}`.slice(0, 2000),
+          existingQuestions: resolved,
+        })
+        const res: ChatResponse = { reply: preset.answer, followups }
+        return Response.json(res)
+      }
+      // Si por cualquier razón no encontró preset (desync triggers),
+      // seguimos con el flujo normal (no cortamos).
     }
 
-    // ✅ query para embeddings: contextual o solo lastUser si hay cambio de tema
-    const embeddingQuery = buildEmbeddingQuery(messages, locale)
+    // (2) Carrera / educación: fuerza nodo ancla y evita “carrera = deporte”
+    if (isCareerOrEducationIntent(lastUser, locale)) {
+      // intenta primero: si hay preset directo para estudios/carrera
+      const preset = matchPreset(lastUser, locale)
+      if (preset) {
+        const resolved = resolveFollowupStringsToKnownQuestions(
+          preset.followups ?? [],
+          locale
+        )
+        const followups = await completeFollowupsFromGraph({
+          locale,
+          seedText: `${lastUser}\n${preset.answer}`.slice(0, 2000),
+          existingQuestions: resolved,
+        })
+        const res: ChatResponse = { reply: preset.answer, followups }
+        return Response.json(res)
+      }
+
+      // si no hay preset, ancla a educación (graph) y corta contexto
+      const anchor = pickCareerAnchorNode(locale)
+      if (anchor) {
+        const fromIds = anchor.followupIds
+          ? mapFollowupIdsToQuestions(anchor.followupIds, locale)
+          : []
+
+        const followups = await completeFollowupsFromGraph({
+          locale,
+          seedText: `${anchor.question}\n${anchor.answer}`.slice(0, 2000),
+          existingQuestions: fromIds,
+          excludeNodeIds: [anchor.id],
+        })
+
+        const res: ChatResponse = { reply: anchor.answer, followups }
+        return Response.json(res)
+      }
+
+      // si no hay anchor, hacemos retrieval SOLO con lastUser (sin contexto)
+      const retrieved = await semanticRetrieveNode(
+        buildLastUserOnlyQuery(messages, locale),
+        locale,
+        { threshold: 0.34 }
+      )
+      if (retrieved) {
+        const fromIds = retrieved.followupIds
+          ? mapFollowupIdsToQuestions(retrieved.followupIds, locale)
+          : []
+
+        const followups = await completeFollowupsFromGraph({
+          locale,
+          seedText: `${retrieved.question}\n${retrieved.answer}`.slice(0, 2000),
+          existingQuestions: fromIds,
+          excludeNodeIds: [retrieved.id],
+        })
+
+        const res: ChatResponse = { reply: retrieved.answer, followups }
+        return Response.json(res)
+      }
+      // y si no, cae al flujo normal
+    }
 
     /* =====================================================
        1) GRAPH · EXACT MATCH (clicks / followups)
@@ -655,10 +712,9 @@ export async function POST(req: Request) {
     }
 
     /* =====================================================
-       4) EMBEDDINGS RETRIEVAL
-       - Usa contexto o solo lastUser si hay cambio de tema
+       4) EMBEDDINGS RETRIEVAL (contextual textarea)
        ===================================================== */
-    const retrieved = await semanticRetrieveNode(embeddingQuery, locale, {
+    const retrieved = await semanticRetrieveNode(contextQuery, locale, {
       threshold: 0.34,
     })
 
@@ -702,7 +758,7 @@ export async function POST(req: Request) {
 
     const followups = await completeFollowupsFromGraph({
       locale,
-      seedText: embeddingQuery.slice(0, 2000),
+      seedText: contextQuery.slice(0, 2000),
       existingQuestions: resolveFollowupStringsToKnownQuestions(
         parsed.followups ?? [],
         locale
