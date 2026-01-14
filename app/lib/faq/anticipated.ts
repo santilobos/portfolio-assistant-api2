@@ -1,4 +1,4 @@
-// lib/faq/anticipated.ts
+/* lib/faq/anticipated.ts
 import type { FAQAnticipated } from "../constants"
 
 export const FAQ_ANTICIPATED: FAQAnticipated[] = [
@@ -169,3 +169,4 @@ export const FAQ_ANTICIPATED: FAQAnticipated[] = [
     ],
   },
 ]
+*/

@@ -6,6 +6,36 @@ export const FAQ_GRAPH: FAQNode[] = [
    01) PERFIL PERSONAL (v2)
    ========================= */
 
+   {
+  id: "profile_overview_router",
+  locale: "es-ES",
+  question: "¿Puedes resumirme tu perfil profesional?",
+  answer:
+    "Puedo resumirte mi perfil (rol, experiencia, trayectoria e industrias) y, si quieres, profundizamos en proyectos o en mi forma de trabajar.",
+  match: [
+    "perfil",
+    "tu perfil",
+    "quien eres",
+    "quién eres",
+    "sobre ti",
+    "hablame de ti",
+    "háblame de ti",
+    "rol actual",
+    "experiencia",
+    "años de experiencia",
+    "industria",
+    "industrias",
+  ],
+  searchText:
+    "Perfil profesional. Resumen de rol actual, años de experiencia, trayectoria profesional e industrias. Entrada rápida para conocer quién soy profesionalmente y derivar a proyectos o forma de trabajo.",
+  followupIds: [
+    "pr_resumen_rol_actual",
+    "pp_motiv_por_que_producto",
+    "pr_resumen_anos_experiencia",
+  ],
+},
+
+
 {
   id: "pp_bio_origen",
   locale: "es-ES",
@@ -23,6 +53,8 @@ export const FAQ_GRAPH: FAQNode[] = [
     "en qué países has vivido",
     "has vivido en argentina o españa",
     "vives en perú",
+    "por qué viniste a lima",
+    "por qué te mudaste a lima",
   ],
   searchText:
     "Perfil personal. Biografía y origen. Nací en Córdoba (Argentina). Me mudé a Málaga (España) a los 8 años. Viví en Barcelona y Madrid. Actualmente vivo en Lima (Perú). Historia personal y trayectoria vital.",
@@ -32,6 +64,30 @@ export const FAQ_GRAPH: FAQNode[] = [
     "pp_valores_prioridades",
   ],
 },
+
+{
+  id: "profile_lima_move",
+  locale: "es-ES",
+  question: "¿Por qué te mudaste a Lima?",
+  answer:
+    "Respuesta corta: por amor. Decidí acompañar a mi esposa en su emprendimiento de postres saludables aquí en Lima. Ahora busco nuevos retos profesionales donde aportar todo mi conocimiento sobre diseño de producto digital.",
+  match: [
+    "por que te mudaste a lima",
+    "por qué te mudaste a lima",
+    "mudanza a lima",
+    "por que estas en lima",
+    "por qué estás en lima",
+    "por que vives en lima",
+  ],
+  searchText:
+    "Mudanza a Lima. Decisión personal por acompañar a mi esposa en su emprendimiento de postres saludables. Nuevo contexto profesional y búsqueda de retos donde aportar experiencia en diseño de producto digital.",
+  followupIds: [
+    "pr_resumen_tipo_productos",
+    "pr_resumen_rol_actual",
+    "profile_non_negotiables",
+  ],
+},
+
 
 {
   id: "pp_bio_aficiones",
@@ -360,6 +416,31 @@ export const FAQ_GRAPH: FAQNode[] = [
 },
 
 {
+  id: "profile_most_complex_project",
+  locale: "es-ES",
+  question: "¿Cuál fue tu proyecto más complejo?",
+  answer:
+    "Sin duda, el reto más complejo de mi carrera fue el rediseño del Portal Global del Empleado para Repsol, un ecosistema digital con alcance en 15 países. Lo más complejo fue diseñar una experiencia coherente que funcionara para miles de personas (más de 25 mil empleados) con culturas, roles y necesidades técnicas totalmente distintas, todo sin perder la eficiencia operativa de la compañía.",
+  match: [
+    "¿cuál fue tu proyecto más complejo?",
+    "cual fue tu proyecto mas complejo",
+    "tu proyecto mas complejo",
+    "proyecto más complejo",
+    "proyecto mas complejo",
+    "reto mas complejo",
+    "reto más complejo",
+  ],
+  searchText:
+    "Proyecto más complejo. Repsol. Rediseño Portal Global del Empleado. Alcance 15 países. +25.000 empleados. Diseñar experiencia coherente para múltiples culturas, roles y necesidades técnicas sin perder eficiencia operativa.",
+  followupIds: [
+    "cs_repsol_contexto_problema",
+    "cs_repsol_rol_responsabilidades",
+    "cs_repsol_decisiones_diseno",
+  ],
+},
+
+
+{
   id: "cs_repsol_contexto_problema",
   locale: "es-ES",
   question: "¿Qué problema detectaste en Repsol?",
@@ -582,8 +663,8 @@ export const FAQ_GRAPH: FAQNode[] = [
   match: [
     "qué hiciste en la app de socios del fc barcelona",
     "que hiciste en la app de socios del fc barcelona",
-    "qué hiciste para el fc barcelona",
-    "que hiciste para el fc barcelona",
+    "qué hiciste para el fc barcelona?",
+    "que hiciste para el fc barcelona?",
     "cuéntame el proyecto del fc barcelona",
     "cuentame el proyecto del fc barcelona",
     "en qué consistió tu proyecto del fcb",
@@ -2309,30 +2390,34 @@ export const FAQ_GRAPH: FAQNode[] = [
    04) LIDERAZGO Y SOFT SKILLS
 ========================= */
 
+
 {
-  id: "ls_vision_general",
+  id: "leadership_design_overview",
   locale: "es-ES",
-  question: "¿Cómo entiendes el liderazgo en diseño?",
-  answer: "Mi visión del liderazgo parte de entender el diseño como una disciplina al servicio de las personas, del producto y del negocio, no como un fin en sí mismo. Liderar, para mí, no significa imponer decisiones, sino crear el contexto adecuado para que los equipos puedan pensar mejor, tomar decisiones informadas y construir soluciones con impacto real. Creo en un liderazgo cercano, basado en la confianza, la claridad y la responsabilidad compartida. Entiendo al líder como un facilitador: alguien que elimina fricciones, aporta criterio cuando hace falta y ayuda a enfocar los esfuerzos en los problemas correctos. Me siento cómodo liderando desde el ejemplo, combinando visión estratégica con ejecución hands-on, y acompañando a otros diseñadores en su crecimiento profesional sin perder de vista los objetivos del producto y de la organización. No concibo el liderazgo sin escucha activa, feedback honesto y un entorno donde el error se entienda como parte del aprendizaje. A nivel de equipos, priorizo la colaboración real entre diseño, producto y tecnología. Creo firmemente que los mejores resultados aparecen cuando se rompen silos, se comparte contexto y se toman decisiones basadas en datos, research y experiencia, no en jerarquías o egos. En este sentido, el liderazgo también implica saber cuándo dar dirección y cuándo dar espacio, adaptándose a la madurez del equipo y al momento del proyecto. Finalmente, mi forma de liderar está muy ligada a la construcción de estructuras sostenibles: procesos claros, sistemas de diseño sólidos y una cultura de calidad que permita escalar sin perder coherencia. Liderar es construir a largo plazo, dejando equipos más fuertes, productos más claros y organizaciones más preparadas que cuando uno llegó.",
+  question: "¿Cómo enfocas el liderazgo en diseño de producto?",
+  answer:
+    "Entiendo el liderazgo en diseño como la capacidad de crear contexto para que los equipos puedan pensar mejor y tomar decisiones informadas. Para mí, liderar no es imponer soluciones, sino alinear personas, producto y negocio, generar confianza, dar claridad y asumir responsabilidad compartida. Mi foco está en habilitar impacto real, no en protagonismo individual.",
   match: [
-    "liderazgo",
+    "¿cómo enfocas el liderazgo en diseño de producto?",
+    "como enfocas el liderazgo en diseño de producto",
+    "liderazgo en diseño de producto",
+    "cómo lideras",
+    "como lideras",
     "liderazgo en diseño",
+    "liderazgo",
     "cómo lideras",
     "estilo de liderazgo",
     "gestión de equipos",
-    "facilitador",
-    "confianza",
-    "feedback",
-    "escucha activa"
   ],
   searchText:
-    "Liderazgo en diseño. Estilo de liderazgo. Cómo lidero equipos. Facilitación, confianza, claridad, responsabilidad compartida, feedback honesto, escucha activa. Liderazgo estratégico y hands-on.",
+    "Liderazgo en diseño de producto. Liderar creando contexto, alineando personas, producto y negocio. Confianza, claridad, responsabilidad compartida. Decisiones informadas y foco en impacto real.",
   followupIds: [
     "ls_contexto_repsol",
     "ls_contexto_fcb",
-    "ls_contexto_cofares"
+    "ls_contexto_cofares",
   ],
 },
+
 
 {
   id: "ls_contexto_repsol",
@@ -2443,6 +2528,36 @@ export const FAQ_GRAPH: FAQNode[] = [
  /* =========================
    05) METODOLOGÍAS
 ========================= */
+
+{
+  id: "methods_overview",
+  locale: "es-ES",
+  question: "¿Qué metodologías utilizas en tu trabajo?",
+  answer:
+    "Mi metodología de trabajo no es rígida. Adapto las herramientas según el tipo de problema, el contexto del producto y la fase en la que nos encontremos. En mi día a día recurro con frecuencia a Design Thinking, Lean UX y Atomic Design, pero siempre desde una mirada crítica: entendiendo cuándo aportan valor y cuándo no.",
+  match: [
+    "¿qué metodologías utilizas?",
+    "que metodologias utilizas",
+    "metodologías utilizas",
+    "metodologias utilizas",
+    "tu metodología",
+    "tu metodologia",
+    "metodologia de trabajo",
+    "como trabajas metodologicamente",
+  ],
+  searchText:
+    "Metodologías de trabajo en diseño de producto. Uso de Design Thinking, Lean UX y Atomic Design según contexto, tipo de problema y fase del producto. Enfoque flexible, no dogmático, orientado a aportar valor real.",
+  followupIds: [
+   "mt_dt_cuando_usarlo",
+    "mt_lean_cuando_usarlo",
+     "mt_atomic_cuando_lo_uso",
+  ],
+},
+
+
+
+
+
 
 {
   id: "mt_dt_cuando_usarlo",
@@ -2596,6 +2711,72 @@ export const FAQ_GRAPH: FAQNode[] = [
   /* =========================
    06) PROCESO END-TO-END
 ========================= */
+
+{
+  id: "process_design_overview",
+  locale: "es-ES",
+  question: "¿Cómo es tu proceso de diseño?",
+  answer:
+    "Mi proceso de diseño consiste en un enfoque iterativo y end-to-end, orientado a resolver problemas reales de forma viable y con impacto.\n\n" +
+    "• Entendimiento: Profundizo en el espacio del problema investigando a los usuarios, los objetivos de negocio y las limitaciones técnicas.\n" +
+    "• Ideación: Genero soluciones potenciales basadas en los hallazgos e insights obtenidos durante la fase de investigación.\n" +
+    "• Prototipado: Creo prototipos rápidos para visualizar ideas y testearlas de forma temprana con usuarios y stakeholders.\n" +
+    "• Validación: Recopilo feedback de los usuarios para identificar qué funciona, qué no y qué debe ajustarse.\n" +
+    "• Iteración: Refino los diseños basándome en los aprendizajes hasta equilibrar necesidades de usuario, objetivos de negocio y viabilidad técnica.\n\n" +
+    "Mantengo las consideraciones de ingeniería presentes en todo momento para asegurar que todo lo que diseño sea factible de construir y sostenible en producción.",
+  match: [
+    "proceso de diseño",
+    "tu proceso de diseño",
+    "como es tu proceso",
+    "cómo es tu proceso",
+    "end to end",
+    "end-to-end",
+    "como trabajas",
+    "cómo trabajas",
+  ],
+  searchText:
+    "Proceso de diseño end to end. Entendimiento del problema mediante research de usuarios, negocio y tecnología. Ideación basada en insights. Prototipado rápido. Validación con usuarios. Iteración continua. Diseño factible, alineado con ingeniería y preparado para producción.",
+  followupIds: [
+    "methods_research_overview",
+    "pd_definicion_framing",
+    "pd_definicion_solving",
+  ],
+},
+
+
+
+
+{
+  id: "methods_research_overview",
+  locale: "es-ES",
+  question: "¿Cómo llevas a cabo la investigación en un proyecto?",
+  answer:
+    "La investigación es una fase clave en mis proyectos porque define la calidad de las decisiones posteriores. No la concibo como un entregable aislado, sino como una herramienta para reducir incertidumbre y alinear al equipo.\n\n" +
+    "Mi enfoque combina distintas técnicas según el contexto:\n\n" +
+    "• Entendimiento del contexto: Analizo objetivos de negocio, restricciones técnicas, métricas existentes y estado del producto para entender el problema desde todos los ángulos.\n" +
+    "• Research cualitativo: Realizo entrevistas, sesiones de observación o shadowing para comprender comportamientos, motivaciones y fricciones reales de los usuarios.\n" +
+    "• Research cuantitativo: Utilizo datos, analítica y métricas para validar patrones, dimensionar problemas y priorizar oportunidades.\n" +
+    "• Síntesis e insights: Cruzo la información cualitativa y cuantitativa para identificar patrones claros y convertirlos en insights accionables.\n" +
+    "• Alineación con el equipo: Comparto los aprendizajes con diseño, negocio y tecnología para asegurar una comprensión común antes de avanzar.\n\n" +
+    "El objetivo final no es investigar por investigar, sino generar claridad suficiente para definir bien el problema, priorizar correctamente y tomar decisiones de diseño con mayor impacto y menor riesgo.",
+  match: [
+    "como llevas a cabo la investigacion",
+    "cómo llevas a cabo la investigación",
+    "investigacion en un proyecto",
+    "research en un proyecto",
+    "fase de investigacion",
+    "discovery",
+    "research",
+  ],
+  searchText:
+    "Investigación en proyectos de diseño. Enfoque de research para reducir incertidumbre y alinear equipos. Análisis de contexto, research cualitativo y cuantitativo, síntesis de insights accionables y alineación con negocio y tecnología antes de definir el problema y diseñar soluciones.",
+  followupIds: [
+    "pd_discovery_qual",
+    "pd_discovery_quant",
+    "pd_definicion_framing",
+  ],
+},
+
 
 {
   id: "pd_discovery_qual",
@@ -3362,7 +3543,18 @@ export const FAQ_GRAPH: FAQNode[] = [
   question: "¿Cuál es tu formación académica?",
   answer:
     "Cursé el Grado en Comunicación Audiovisual con especialización en Diseño Multimedia en la Universidad de Málaga, donde adquirí una base sólida en diseño, comunicación visual, narrativa digital y pensamiento crítico, fundamentales para mi posterior desarrollo en producto digital.",
-  match: ["Universidad de Málaga", "Comunicación Audiovisual", "Diseño Multimedia", "formación académica"],
+  match: ["Universidad de Málaga",
+    "Comunicación Audiovisual",
+    "Diseño Multimedia",
+    "formación académica",
+    "¿qué has estudidado?",
+    "¿cuál es tu carrera?",
+    "¿qué carrera has estudiado?",
+    "estudios",
+    "estudiado",
+    "carrera",
+    "¿cuáles son tus estudios?",
+],
   searchText:
     "Educación y formación. Formación académica: Grado en Comunicación Audiovisual con especialización en Diseño Multimedia en la Universidad de Málaga. Base en diseño, comunicación visual, narrativa digital y pensamiento crítico.",
   followupIds: ["education_masters_specializations", "education_continuous_learning", "hub_resumen_portfolio"],
@@ -3397,6 +3589,64 @@ export const FAQ_GRAPH: FAQNode[] = [
 ========================= */
 
 {
+  id: "router_greeting",
+  locale: "es-ES",
+  question: "Hola",
+  answer:
+    "¡Hola! ¿Cómo estás?\nHe diseñado este espacio para contarte sobre mi experiencia profesional, mi proceso de trabajo, aprendizajes y reflexiones dentro del mundo del diseño de producto. ¿Qué área te interesa explorar hoy?",
+  match: [
+    "hola",
+    "hey",
+    "buenas",
+    "hello",
+    "hi",
+    "hola que tal",
+    "hola, que tal",
+    "hola como estas",
+    "hola, como estas",
+    "buenos dias",
+    "buenas tardes",
+    "buenas noches",
+  ],
+  searchText:
+    "Saludo e introducción. Presentación del portfolio. Experiencia profesional, proceso de trabajo, aprendizajes, reflexiones. Invita a explorar resumen, por dónde empezar y casos recomendados.",
+  followupIds: [
+    "hub_resumen_portfolio",
+    "hub_por_donde_empezar",
+    "hub_casos_recomendados",
+  ],
+},
+
+{
+  id: "hub_help_how_it_works",
+  locale: "es-ES",
+  question: "¿Qué puedo preguntarte?",
+  answer:
+    "Puedes preguntarme por mis casos de estudio, mi forma de trabajar, metodologías, proceso end to end, liderazgo, design systems, herramientas o impacto en negocio. Mi objetivo es ayudarte a entender cómo pienso y cómo aporto valor como diseñador de producto senior.",
+  match: [
+    "que puedo preguntarte",
+    "qué puedo preguntarte",
+    "ayuda",
+    "help",
+    "como funciona",
+    "cómo funciona",
+    "por donde empiezo",
+    "por dónde empiezo",
+    "qué puedo preguntarte aquí",
+    "qué me puedes contar",
+  ],
+  searchText:
+    "Ayuda y orientación del portfolio. Qué puedo preguntar. Cómo funciona el asistente. Casos de estudio, metodología, proceso end to end, liderazgo, design systems, herramientas e impacto en negocio. Visión general del contenido disponible.",
+  followupIds: [
+    "hub_casos_recomendados",
+    "methods_overview",
+    "pp_motiv_por_que_producto",
+  ],
+},
+
+
+
+{
   id: "hub_resumen_portfolio",
   locale: "es-ES",
   question: "¿Puedes hacerme un resumen de tu portfolio?",
@@ -3417,7 +3667,7 @@ export const FAQ_GRAPH: FAQNode[] = [
   match: ["por dónde empiezo", "primera vez", "recomendación", "casos", "qué ver primero"],
   searchText:
     "Por dónde empezar: si es la primera vez que visitas el portfolio, recomiendo empezar por los casos donde mejor se refleja mi forma de trabajar y mi impacto como diseñador senior: proyectos donde diseño, negocio y tecnología se alinean para resolver problemas reales y generar resultados tangibles.",
-  followupIds: ["hub_casos_recomendados", "cs_fcb_socios_contexto_problema", "cs_cofares_contexto_problema"],
+  followupIds: ["cs_repsol_overview", "cs_fcb_overview", "cs_cofares_overview"],
 },
 
 {
