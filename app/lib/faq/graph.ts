@@ -254,7 +254,7 @@ export const FAQ_GRAPH: FAQNode[] = [
   answer:
     "Cuento con más de ocho años de experiencia en diseño de producto digital, trabajando en contextos complejos y multidisciplinares, y colaborando con organizaciones de primer nivel como FC Barcelona, Repsol, Roche, Cofares, Inditex, BBVA, IBM y Telefónica, asumiendo responsabilidades tanto estratégicas como de ejecución.",
   match: [
-    "cuántos años de experiencia tienes",
+    "cuántos años de experiencia tienes?",
     "cuantos años de experiencia tienes",
     "cuánta experiencia tienes",
     "cuanta experiencia tienes",
@@ -380,6 +380,9 @@ export const FAQ_GRAPH: FAQNode[] = [
     "pr_trayectoria_etapas",
   ],
 },
+
+
+
 
 
   /* =========================
@@ -3178,6 +3181,36 @@ export const FAQ_GRAPH: FAQNode[] = [
    08) HERRAMIENTAS Y STACK
 ========================= */
 
+{
+  id: "tools_overview",
+  locale: "es-ES",
+  question: "¿Qué herramientas manejas?",
+  answer:
+    "Trabajo con un stack orientado a producto y escalabilidad. En diseño y colaboración utilizo Figma y FigJam como núcleo del proceso. Para prototipado avanzado y validación rápida empleo Figma, Framer y Webflow según el contexto. En sistemas de diseño trabajo con Tokens Studio, Storybook y Style Dictionary para conectar diseño y código. Para research y análisis uso Google Analytics, Hotjar y Lookback. En el lado técnico trabajo con GitHub, VS Code y despliegues en Vercel. Para gestión y alineación de equipos utilizo Notion, Jira y Linear. Mi foco no está en la herramienta en sí, sino en elegir la adecuada para cada fase del producto y del equipo.",
+  match: [
+    "herramientas",
+    "stack",
+    "tooling",
+    "qué herramientas usas",
+    "qué herramientas dominas",
+    "qué herramientas utilizas",
+    "qué herramientas conoces",
+    "qué herramientas prefieres",
+    "qué herramientas manejas",
+    "figma",
+    "design tools",
+    "stack de diseño"
+  ],
+  searchText:
+    "Herramientas de diseño y producto. Stack profesional: Figma, FigJam, Framer, Webflow, Tokens Studio, Storybook, Style Dictionary, Google Analytics, Hotjar, Lookback, GitHub, VS Code, Vercel, Notion, Jira y Linear. Herramientas orientadas a producto, design systems, research, prototipado, desarrollo y gestión de equipos.",
+  followupIds: [
+    "tools_figma",
+    "tools_figjam",
+    "tools_prototyping_figma_advanced",
+  ],
+},
+
+
 // Diseño
 {
   id: "tools_figma",
@@ -3694,6 +3727,119 @@ export const FAQ_GRAPH: FAQNode[] = [
   followupIds: ["ls_vision_general", "mt_dt_cuando_usarlo", "pd_discovery_qual"],
 },
 
+/* =========================
+     UI / ENTRYPOINTS (antes presets)
+  ========================= */
 
+
+{
+  id: "ui_help_navigation",
+  locale: "es-ES",
+  question: "¿Cómo funciona este asistente?",
+  answer:
+    "Puedes preguntarme por proyectos, liderazgo, metodología, proceso, design systems o impacto. Si prefieres, puedo guiarte paso a paso.",
+  match: [
+    "que puedo preguntarte",
+    "qué puedo preguntarte",
+    "ayuda",
+    "help",
+    "como funciona",
+    "cómo funciona",
+  ],
+  searchText:
+    "Ayuda y navegación. Cómo funciona el asistente. Qué puedo preguntar. Proyectos, liderazgo, metodología, proceso, design systems, impacto. Guía paso a paso.",
+  followupIds: [
+    "hub_por_donde_empezar",
+    "hub_casos_recomendados",
+    "hub_contenidos_destacados",
+  ],
+},
+
+{
+  id: "ui_portfolio_entrypoint",
+  locale: "es-ES",
+  question: "¿Qué puedo encontrar en tu portfolio?",
+  answer:
+    "Mi portfolio se estructura en casos de estudio y contenidos transversales (proceso, liderazgo, sistemas de diseño e impacto).",
+  match: [
+    "portfolio",
+    "portafolio",
+    "ver portfolio",
+    "ver trabajos",
+    "ver proyectos",
+    "casos",
+    "case studies",
+  ],
+  searchText:
+    "Entrada portfolio. Estructura del portfolio. Casos de estudio y contenidos transversales. Proceso, liderazgo, sistemas de diseño e impacto.",
+  followupIds: [
+    "hub_casos_recomendados",
+    "hub_resumen_portfolio",
+    "hub_contenidos_destacados",
+  ],
+},
+
+{
+  id: "ui_projects_entrypoint",
+  locale: "es-ES",
+  question: "¿En qué proyectos has trabajado?",
+  answer:
+    "A lo largo de mi carrera, he liderado el diseño de proyectos de alta complejidad tanto en entornos B2B como B2C. Esta experiencia me ha permitido entender desde las necesidades operativas y técnicas de una empresa, hasta el comportamiento emocional de los consumidores finales. Si te interesa, podemos profundizar en los retos específicos y las soluciones aplicadas en cada caso.",
+  match: [
+    "proyectos",
+    "casos de estudio",
+    "case studies",
+    "clientes",
+    "trabajos",
+  ],
+  searchText:
+    "Entrada proyectos. Casos de estudio. Clientes. Trabajos. Contextos B2B y B2C. Explorar casos al detalle.",
+  followupIds: [
+    "cs_repsol_overview",
+    "cs_fcb_overview",
+    "cs_cofares_overview",
+  ],
+},
+
+{
+  id: "ui_profile_entrypoint",
+  locale: "es-ES",
+  question: "¿Qué puedes contarme sobre ti?",
+  answer:
+    "¿Qué te gustaría saber? Puedo contarte sobre sobre mi perfil, trayectoria y enfoque profesional.",
+  match: [
+    "perfil",
+    "quien eres",
+    "quién eres",
+    "sobre ti",
+    "háblame de ti",
+    "hablame de ti",
+    "experiencia",
+    "trayectoria",
+  ],
+  searchText:
+    "Entrada perfil. Quién eres. Sobre ti. Experiencia. Trayectoria profesional. Enfoque profesional.",
+  followupIds: [
+    "pr_resumen_rol_actual",
+    "pr_resumen_anos_experiencia",
+    "pr_resumen_tipo_productos",
+  ],
+},
+
+{
+  id: "ui_thanks",
+  locale: "es-ES",
+  question: "Gracias",
+  answer:
+    "¡Gracias a ti! Si quieres seguir explorando, dime qué área te interesa.",
+  match: ["gracias", "muchas gracias", "thank you", "thanks", "thx"],
+  searchText:
+    "Cierre. Agradecimiento. Continuar explorando el portfolio. Elegir área: proyectos, proceso, liderazgo, design systems, impacto.",
+  followupIds: [
+    "hub_casos_recomendados",
+    "hub_por_donde_empezar",
+    "hub_contenidos_destacados",
+  ],
+},
 
 ]

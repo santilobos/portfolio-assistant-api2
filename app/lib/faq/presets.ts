@@ -1,4 +1,4 @@
-// lib/faq/presets.ts
+/* lib/faq/presets.ts
 import type { FAQPreset } from "../constants"
 
 export const FAQ_PRESETS: FAQPreset[] = [
@@ -120,3 +120,4 @@ export const FAQ_PRESETS: FAQPreset[] = [
     ],
   },
 ]
+*/
