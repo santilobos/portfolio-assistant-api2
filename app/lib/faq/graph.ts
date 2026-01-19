@@ -89,6 +89,9 @@ export const FAQ_GRAPH: FAQNode[] = [
 },
 
 
+
+
+
 {
   id: "pp_bio_aficiones",
   locale: "es-ES",
@@ -248,6 +251,85 @@ export const FAQ_GRAPH: FAQNode[] = [
 },
 
 {
+  id: "logistics_availability_modality",
+  locale: "es-ES",
+  question: "¿Cuál es tu disponibilidad y modalidad de trabajo?",
+  answer:
+    "Actualmente estoy abierto a nuevos retos profesionales en Lima con disponibilidad de incorporación inmediata. En cuanto al modelo de trabajo, apuesto por un formato híbrido: valoro la presencialidad como una herramienta para fortalecer la cultura y el trabajo en equipo, mientras que el trabajo remoto me permite alcanzar la máxima eficiencia en tareas que requieren alta concentración.",
+  match: [
+    "disponibilidad",
+    "cuándo puedes empezar",
+    "remoto o presencial",
+    "trabajas desde casa",
+    "buscas trabajo",
+    "estás disponible",
+    "asistir a la oficina",
+    "trabajar en remoto",
+  ],
+  searchText:
+    "Disponibilidad inmediata. Trabajo en remoto. Híbrido en Lima. Incorporación. Búsqueda activa.",
+  followupIds: ["contact_direct_channels",
+    "pp_motiv_por_que_producto",
+    "pp_motiv_tipo_problemas"],
+},
+
+
+{
+  id: "contact_direct_channels",
+  locale: "es-ES",
+  question: "¿Cómo puedo contactar contigo?",
+  answer:
+  "Puedes encontrarme en estos canales:\n\n• LinkedIn: [linkedin.com/in/santi-lobos](https://www.linkedin.com/in/santi-lobos/)\n• Email: [santilobos21@gmail.com](mailto:santilobos21@gmail.com)",
+  match: [
+    "donde puedo contactarte",
+    "donde te puedo contactar",
+    "pasame tu conctacto",
+    "dame tu contacto",
+    "contactar contigo",
+    "podemos contactarte",
+    "cómo te puedo contactar",
+    "cuándo te puedo contactar",
+    "como puedo contactarte?",
+    "contacto",
+    "contactar",
+    "email",
+    "correo",
+    "linkedin",
+    "teléfono",
+    "escribirte",
+    "entrevista",
+  ],
+  searchText:
+    "Canales de contacto. Enlace a LinkedIn. Correo electrónico. Agendar entrevista.",
+  followupIds: [
+    "cs_repsol_overview", 
+    "ls_vision_general", 
+    "utils_download_cv" // El nodo de descarga de CV que sugerí antes
+  ],
+},
+
+
+
+{
+  id: "utils_download_cv",
+  locale: "es-ES",
+  question: "¿Dónde puedo descargar tu CV?",
+  answer:
+  "Puedes [descargar mi currículum en PDF aquí](/CV_Santi_Lobos.pdf). \n\nTambién puedes echar un vistazo a mi trayectoria detallada en mi [perfil de LinkedIn](https://www.linkedin.com/in/santi-lobos/).",
+  match: [
+    "descargar cv",
+    "tienes tu currículum",
+    "pásame tu cv",
+    "download resume",
+    "archivo cv",
+    "ver currículum",
+    "dame tu cv",
+  ],
+  searchText: "Descargar CV. Currículum Vitae PDF. Resume download. Enlace a LinkedIn.",
+  followupIds: ["contact_direct_channels", "hub_resumen_portfolio", "pr_resumen_anos_experiencia"],
+},
+
+{
   id: "pr_resumen_anos_experiencia",
   locale: "es-ES",
   question: "¿Cuántos años de experiencia tienes?",
@@ -320,11 +402,101 @@ export const FAQ_GRAPH: FAQNode[] = [
   searchText:
     "Perfil profesional. Trayectoria y etapas. Junior Product Designer en VTC Projects (Barcelona, producto físico). Consultoría IT en Madrid: garaje de ideas (4,5 años). Evolución de middle a Senior Product Designer. Team owner y gestión: equipo ~15 diseñadores junior. General Software (Senior Product Designer, consultoría IT). Elastic Heads (liderazgo de producto + construcción de estructura, procesos y cultura de diseño).",
   followupIds: [
-    "pr_trayectoria_evolucion",
-    "pr_resumen_rol_actual",
-    "pr_industrias",
+    "pr_exp_garaje",          
+    "pr_exp_general_software", 
+    "pr_exp_elastic_heads",    
   ],
 },
+
+
+{
+  id: "pr_exp_garaje",
+  locale: "es-ES",
+  question: "¿Cómo fue tu experiencia en Garaje de Ideas?",
+  answer:
+    "Mi etapa en Garaje de Ideas fue fundamental en mi carrera; la considero mi gran escuela estratégica. Allí evolucioné hasta convertirme en un diseñador capaz de gestionar productos para clientes de primer nivel como FC Barcelona, Repsol, Inditex y BBVA. Más allá del diseño visual, me profesionalicé en la intersección entre negocio, tecnología y usuario, aprendiendo a escalar soluciones en entornos de alta complejidad.",
+  match: [
+    // frases “tipo usuario”
+    "como fue tu experiencia en garaje de ideas",
+    "como fue tu experiencia trabajando en garaje de ideas",
+    "como fue tu experiencia trabajando con garaje de ideas",
+    "como fue trabajar en garaje de ideas",
+    "que tal fue trabajar en garaje de ideas",
+    "como fue tu paso por garaje de ideas",
+    "tu etapa en garaje de ideas",
+    "experiencia en garaje de ideas",
+    "experiencia trabajando en garaje de ideas",
+    // keywords seguras (no ambiguas)
+    "garaje de ideas"
+  ],
+  searchText:
+    "Garaje de Ideas. Experiencia / etapa / paso profesional. Consultoría IT. Escuela estratégica. Cómo fue trabajar allí: entorno exigente, aprendizaje, intersección negocio-tecnología-usuario. Evolución profesional. Gestión de productos y stakeholders. Clientes: FC Barcelona, Repsol, Inditex, BBVA. Team owner. Mentoring.",
+  followupIds: [
+    "cs_repsol_overview",
+    "cs_fcb_socios_overview",
+    "cs_bbva_overview",
+  ],
+},
+
+
+
+{
+  id: "pr_exp_general_software",
+  locale: "es-ES",
+  question: "¿Cómo fue tu experiencia en General Software?",
+  answer:
+    "En General Software asumí un desafío de alto impacto: liderar desde cero la creación de un Design System agnóstico. Esta experiencia fue clave para consolidar mi perfil técnico y mi visión estratégica. Trabajé directamente con los C-levels de la compañía líder en logística farmacéutica, traduciendo necesidades de negocio de gran escala en una arquitectura de diseño escalable y eficiente.",
+  match: [
+    // frases tipo usuario
+    "como fue tu experiencia en general software",
+    "como fue tu experiencia trabajando en general software",
+    "como fue trabajar en general software",
+    "que tal fue trabajar en general software",
+    "experiencia trabajando en general software",
+    "tu experiencia en general software",
+    "tu paso por general software",
+    // keyword segura
+    "general software"
+    // OJO: NO pongas "gs" (demasiado corto y ambiguo)
+  ],
+  searchText:
+    "General Software. Experiencia / etapa / paso profesional. Cómo fue trabajar allí. Liderar desde cero un Design System agnóstico. Perfil técnico + visión estratégica. Trabajo con C-levels. Logística farmacéutica. Arquitectura escalable. Eficiencia y alineación entre negocio, diseño y tecnología.",
+  followupIds: [
+    "cs_cofares_overview",
+    "cs_cofares_contexto_problema",
+    "cs_cofares_rol_responsabilidades",
+  ],
+},
+
+
+{
+  id: "pr_exp_elastic_heads",
+  locale: "es-ES",
+  question: "¿Cómo fue tu experiencia en Elastic Heads?",
+  answer:
+    "Mi paso por Elastic Heads fue una experiencia de liderazgo integral. Me incorporé con el objetivo de dirigir proyectos estratégicos y, sobre todo, para construir los pilares de la cultura de diseño de la empresa. Me enfoqué en fortalecer los procesos de trabajo en equipo y en potenciar el crecimiento de perfiles junior, ejerciendo un rol de mentor para guiarlos en sus desafíos técnicos y profesionales.",
+  match: [
+    // frases tipo usuario
+    "como fue tu experiencia en elastic heads",
+    "como fue tu experiencia trabajando en elastic heads",
+    "como fue trabajar en elastic heads",
+    "que tal fue trabajar en elastic heads",
+    "experiencia trabajando en elastic heads",
+    "tu experiencia en elastic heads",
+    "tu paso por elastic heads",
+    // keyword segura
+    "elastic heads"
+    // OJO: NO pongas "elastic" (demasiado ambiguo)
+  ],
+  searchText:
+    "Elastic Heads. Experiencia / etapa / paso profesional. Cómo fue trabajar allí. Liderazgo integral. Construcción de cultura de diseño. Procesos internos. Estructura de equipo. Mentoring y crecimiento de perfiles junior. Dirección de proyectos estratégicos.",
+  followupIds: [
+    "cs_overon_overview",
+    "cs_overon_contexto_problema",
+    "cs_overon_rol_responsabilidades",
+  ],
+},
+
 
 {
   id: "pr_trayectoria_evolucion",
@@ -2395,7 +2567,7 @@ export const FAQ_GRAPH: FAQNode[] = [
 
 
 {
-  id: "leadership_design_overview",
+  id: "ls_vision_general",
   locale: "es-ES",
   question: "¿Cómo enfocas el liderazgo en diseño de producto?",
   answer:

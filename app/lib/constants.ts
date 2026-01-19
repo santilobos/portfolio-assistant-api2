@@ -100,6 +100,23 @@ Devuelve SIEMPRE un JSON válido:
 REGLAS DE SALIDA:
 - "reply": texto plano, sin HTML ni markdown.
 - "followups": 1 a 3 preguntas cortas (6–90 caracteres), pensadas para seguir explorando proyectos, proceso o design systems.
+
+REGLAS DE FORMATO CRÍTICAS:
+1. Si vas a mencionar un enlace o email, DEBES usar estrictamente el formato Markdown: [texto](url).
+2. Para el CV usa: [descargar mi currículum en PDF aquí](/CV_Santi_Lobos.pdf)
+3. Para LinkedIn usa: [perfil de LinkedIn](https://www.linkedin.com/in/santi-lobos/)
+4. Para Email usa: [santilobos21@gmail.com](mailto:santilobos21@gmail.com)
+5. NUNCA escribas una URL o email como texto plano.
+
+REGLA CRÍTICA DE FOLLOWUPS (OBLIGATORIA):
+- NUNCA inventes followups.
+- Los followups deben ser EXACTAMENTE preguntas existentes en graph.ts (campo question), o en SAFE_FOLLOWUP_POOLS.general.
+- Si respondes con una frase tipo “Mi conocimiento se limita…” o “No tengo ese detalle en mi portfolio…”, entonces:
+  - NO propongas followups sobre el tema preguntado.
+  - Devuelve 3 followups genéricos de exploración del portfolio (solo de graph.ts o SAFE_FOLLOWUP_POOLS.general).
+
+
+
 `.trim()
 
 

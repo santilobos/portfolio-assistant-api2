@@ -67,7 +67,6 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
       boxSizing: "border-box",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, position: "relative" }}>
-        {/* Mantenemos fontWeight 400 pero aseguramos color negro puro y nitidez */}
         <div style={{ 
           fontSize: "0.9rem", 
           fontWeight: 400, 
@@ -138,64 +137,56 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
   )
 }
 
-// --- 3. COMPONENTE PRINCIPAL ---
+// --- 3. LOGICA Y RENDERIZADO ---
 
 type Msg = { role: "user" | "assistant"; content: string }
 
-const OUT_OF_SCOPE_FOLLOWUPS = [
-  "¿Quieres que te cuente un proyecto con métricas?" ,
-  "¿Te interesa más mis conocimientos en Design System?",
-  "¿Prefieres que te hable de mi proceso de diseño?",
-] as const;
-
-function isCompensationQuestion(q: string) {
-  const t = q.toLowerCase();
-  return (
-    t.includes("salario") ||
-    t.includes("sueldo") ||
-    t.includes("cuanto cobras") ||
-    t.includes("cuánto cobras") ||
-    t.includes("expectativa salarial") ||
-    t.includes("compensación") ||
-    t.includes("remuneración") ||
-    t.includes("rate") ||
-    t.includes("day rate") ||
-    t.includes("hourly") ||
-    t.includes("salary")
-  );
-}
-
 function sanitizeAssistantText(text: string) {
   return (text ?? "")
-    // 1. Elimina etiquetas HTML por seguridad
     .replace(/<\/?[^>]+>/g, "")
-
-    // 2. Mantenemos las negritas (**) pero eliminamos otros símbolos de Markdown 
-    // que podrían ensuciar la UI (como bloques de código o guiones bajos)
-    .replace(/`/g, "")
-    .replace(/_/g, "")
-
-    // 3. Limpiamos encabezados de Markdown (ej: ### Titulo) al inicio de línea
+    .replace(/`/g, "") 
     .replace(/^\s*#{1,6}\s+/gm, "")
-
-    // 4. Normalizamos los bullets: convierte guiones sueltos en puntos limpios
     .replace(/^\s*-\s+/gm, "• ")
-
-    // 5. Limpiamos saltos de línea excesivos (máximo 2 seguidos)
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
 
-
 function RenderAssistantText({ text }: { text: string }) {
-  if (!text) return null
+  if (!text) return null;
 
-  // Función para convertir **texto** en <strong>texto</strong>
   const renderLineWithBold = (line: string) => {
-    const parts = line.split(/(\*\*.*?\*\*)/g);
+    const parts = line.split(/(\*\*.*?\*\*|\[.*?\]\(.*?\))/g);
+
     return parts.map((part, i) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i} style={{ fontWeight: 700, color: '#000' }}>{part.slice(2, -2)}</strong>;
+        return (
+          <strong key={i} style={{ fontWeight: 700, color: '#000' }}>
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+
+      if (part.startsWith('[') && part.includes('](')) {
+        const match = part.match(/\[(.*?)\]\((.*?)\)/);
+        if (match) {
+          const [_, label, url] = match;
+          return (
+            <a
+              key={i}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: 'rgb(255, 92, 0)',
+                textDecoration: 'underline',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              {label}
+            </a>
+          );
+        }
       }
       return part;
     });
@@ -210,11 +201,12 @@ function RenderAssistantText({ text }: { text: string }) {
         const isBullet = line.startsWith("• ") || /^\d+\.\s+/.test(line);
 
         return isBullet ? (
-          <div key={idx} className={styles.bulletLine}>
-            {renderLineWithBold(line.replace(/^•\s*/, ""))}
+          <div key={idx} className={styles.bulletLine} style={{ marginBottom: '8px', display: 'flex', gap: '8px' }}>
+            <span>•</span>
+            <div>{renderLineWithBold(line.replace(/^•\s*/, ""))}</div>
           </div>
         ) : (
-          <p key={idx} className={styles.paragraphLine}>
+          <p key={idx} className={styles.paragraphLine} style={{ marginBottom: '12px' }}>
             {renderLineWithBold(line)}
           </p>
         );
@@ -223,7 +215,21 @@ function RenderAssistantText({ text }: { text: string }) {
   );
 }
 
+// --- 4. COMPONENTE PRINCIPAL WIDGET ---
 
+const OUT_OF_SCOPE_FOLLOWUPS = [
+  "¿Quieres que te cuente un proyecto con métricas?" ,
+  "¿Te interesa más mis conocimientos en Design System?",
+  "¿Prefieres que te hable de mi proceso de diseño?",
+] as const;
+
+function isCompensationQuestion(q: string) {
+  const t = q.toLowerCase();
+  return (
+    t.includes("salario") || t.includes("sueldo") || t.includes("cuanto cobras") ||
+    t.includes("expectativa salarial") || t.includes("salary")
+  );
+}
 
 export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([]);
@@ -231,47 +237,32 @@ export default function Widget() {
   const [loading, setLoading] = React.useState(false);
   const [introKey, setIntroKey] = React.useState(0);
   const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([]);
-  const [askedQuestions, setAskedQuestions] = React.useState<string[]>([]); // MEMORIA DE PREGUNTAS
+  const [askedQuestions, setAskedQuestions] = React.useState<string[]>([]);
   const hasText = input.trim().length > 0;
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Preguntas sugeridas iniciales
   const quick = [
     "¿Cuál fue tu proyecto más complejo?", 
     "¿Qué metodologías utilizas?", 
     "¿Cómo enfocas el liderazgo en diseño de producto?"
   ];
 
-  // Auto-scroll al final
   React.useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
   }, [messages, loading, dynamicFollowUps]);
 
-  // Enviar posición del mouse a Framer
   React.useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      window.parent.postMessage({
-        type: "widget-mouse-move",
-        x: e.clientX,
-        y: e.clientY
-      }, "*");
+      window.parent.postMessage({ type: "widget-mouse-move", x: e.clientX, y: e.clientY }, "*");
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    e.stopPropagation();
-    const target = e.target;
-    setTimeout(() => {
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 100);
-  };
-
- const typeText = (fullText: string, suggestions?: string[]) => {
+  const typeText = (fullText: string, suggestions?: string[]) => {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     let i = 0;
     typingIntervalRef.current = setInterval(() => {
@@ -289,31 +280,16 @@ export default function Widget() {
         setLoading(false);
 
         if (suggestions && suggestions.length > 0) {
-          // 1. Filtrar preguntas que el usuario YA ha hecho (Memoria)
-          const notAskedYet = suggestions.filter(
-            s => !askedQuestions.includes(s.toLowerCase().trim())
-          );
-
-          // 2. Identificar cuáles son "saltos" a otros proyectos
-          const PROJECT_KEYWORDS = [
-            "repsol", "fc barcelona", "fcb", "cofares", "mediapro", "depasify", "bbva", "inditex", "roche", "mysugr",
-            "portal del empleado", "design system", "plataforma broadcast", "app de socios", "gestion de partidos", "checkout", "ecommerce", "fintech"
-          ];
+          const notAskedYet = suggestions.filter(s => !askedQuestions.includes(s.toLowerCase().trim()));
+          const PROJECT_KEYWORDS = ["repsol", "fc barcelona", "fcb", "cofares", "mediapro", "depasify", "bbva", "inditex"];
           
-          // 3. Lógica de Ordenación (No exclusión):
-          // En lugar de elegir un grupo u otro, los combinamos todos.
-          // Ponemos las "internas" primero y los "saltos" después.
           const sortedSuggestions = [...notAskedYet].sort((a, b) => {
             const aIsJump = PROJECT_KEYWORDS.some(key => a.toLowerCase().includes(key));
             const bIsJump = PROJECT_KEYWORDS.some(key => b.toLowerCase().includes(key));
-            
-            // Si A es salto y B es interna, B va primero (-1)
             if (aIsJump && !bIsJump) return 1;
             if (!aIsJump && bIsJump) return -1;
             return 0;
           });
-
-          // Mostramos las 3 mejores sugerencias resultantes de la mezcla
           setDynamicFollowUps(sortedSuggestions.slice(0, 3));
         }
       }
@@ -326,7 +302,7 @@ export default function Widget() {
     setInput("");
     setLoading(false);
     setDynamicFollowUps([]);
-    setAskedQuestions([]); // LIMPIAMOS LA MEMORIA AL RESETEAR
+    setAskedQuestions([]);
     setIntroKey(prev => prev + 1);
   };
 
@@ -334,9 +310,7 @@ export default function Widget() {
     const q = (text ?? input).trim();
     if (!q || loading) return;
     
-    // GUARDAMOS LA PREGUNTA EN EL HISTORIAL
     setAskedQuestions(prev => [...prev, q.toLowerCase().trim()]);
-    
     setInput("");
     setLoading(true);
     setDynamicFollowUps([]); 
@@ -351,25 +325,16 @@ export default function Widget() {
         body: JSON.stringify({ messages: newMessages }), 
       });
       const data = await res.json();
-
       const mainContent = sanitizeAssistantText(data?.reply ?? "");
       const apiFollowups = Array.isArray(data?.followups) ? data.followups : [];
-
-      const finalSuggestions =
-        apiFollowups.length > 0
-          ? apiFollowups
-          : isCompensationQuestion(q)
-            ? [...OUT_OF_SCOPE_FOLLOWUPS]
-            : [];
-
+      const finalSuggestions = apiFollowups.length > 0 ? apiFollowups : isCompensationQuestion(q) ? [...OUT_OF_SCOPE_FOLLOWUPS] : [];
       typeText(mainContent, finalSuggestions);
-
     } catch (e) {
       setLoading(false);
       setMessages(prev => {
         const next = [...prev];
         const last = next[next.length - 1];
-        if (last) last.content = "Mmm parece que no me han programado para responder a esta pregunta.";
+        if (last) last.content = "Mmm parece que algo ha fallado en la conexión.";
         return next;
       });
     }
@@ -385,71 +350,40 @@ export default function Widget() {
       <div ref={listRef} className={styles.messages}>
         <AnimatePresence mode="popLayout">
           {messages.length === 0 ? (
-            <motion.div
-              key={`intro-${introKey}`}
-              className={styles.intro}
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <motion.div variants={itemVariants} className={styles.chatTitle}>
-                Pregúntame sobre mi trabajo
-              </motion.div>
-
+            <motion.div key={`intro-${introKey}`} className={styles.intro} variants={containerVariants} initial="hidden" animate="visible">
+              <motion.div variants={itemVariants} className={styles.chatTitle}>Pregúntame sobre mi trabajo</motion.div>
               <motion.div variants={containerVariants} className={styles.quickGrid}>
-                {quick
-                  .filter(q => !askedQuestions.includes(q.toLowerCase().trim())) // FILTRO EN LA HOME
-                  .map((q) => (
-                    <motion.button
-                      key={q}
-                      variants={itemVariants}
-                      onClick={() => send(q)}
-                      className={styles.quickBtn}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {q}
-                    </motion.button>
-                  ))}
+                {quick.filter(q => !askedQuestions.includes(q.toLowerCase().trim())).map((q) => (
+                  <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.quickBtn} whileTap={{ scale: 0.98 }}>
+                    {q}
+                  </motion.button>
+                ))}
               </motion.div>
             </motion.div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               {messages.map((m, i) => {
                 const isLastAssistant = m.role === "assistant" && i === messages.length - 1;
-                
                 if (m.role === "user") return (
                   <div key={i} className={styles.userRow}>
                     <div className={styles.userBubble}>{m.content}</div>
                   </div>
                 );
-
                 return (
                   <div key={i} className={styles.assistantRow}>
                     {m.content === "" && loading && isLastAssistant ? (
                       <div className={styles.thinking}>Pensando</div>
                     ) : (
-                      <motion.div
-                        key={`a-${i}-${m.content.length > 0 ? "done" : "typing"}`}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                      >
+                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
                         <RenderAssistantText text={m.content} />
                       </motion.div>
                     )}
-                    
                     {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 5 }} 
-                        animate={{ opacity: 1, y: 0 }} 
-                        className={styles.followUpsContainer}
-                      >
+                      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className={styles.followUpsContainer}>
                         <div className={styles.divider} />
                         <div className={styles.followUps}>
                           {dynamicFollowUps.map(q => (
-                            <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>
-                               {q}
-                            </button>
+                            <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>{q}</button>
                           ))}
                         </div>
                       </motion.div>
@@ -471,25 +405,13 @@ export default function Widget() {
               e.target.style.height = 'auto';
               e.target.style.height = `${e.target.scrollHeight}px`;
             }} 
-            onKeyDown={e => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
-            }} 
-            onFocus={handleFocus}
+            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }} 
             className={styles.textArea}
             placeholder="Escribe aquí..." 
             rows={1}
           />
-          <button 
-            onClick={() => send()} 
-            disabled={loading || !hasText} 
-            className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
-          >
-            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor">
-              <path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/>
-            </svg>
+          <button onClick={() => send()} disabled={loading || !hasText} className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}>
+            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor"><path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/></svg>
           </button>
         </div>
       </div>

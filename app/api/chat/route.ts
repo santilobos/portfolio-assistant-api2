@@ -1,5 +1,9 @@
 import OpenAI from "openai"
-import { BASE_SYSTEM_PROMPT, FAQ_GRAPH, SAFE_FOLLOWUP_POOLS } from "../../lib/constants"
+import {
+  BASE_SYSTEM_PROMPT,
+  FAQ_GRAPH,
+  SAFE_FOLLOWUP_POOLS,
+} from "../../lib/constants"
 
 type Locale = "es-ES" | "en-US"
 
@@ -33,9 +37,32 @@ function normalizeQuestion(s: string) {
     .trim()
 }
 
+function filterFollowupsToGraph(
+  followups: string[],
+  locale: Locale
+): string[] {
+  const allowed = new Set(
+    FAQ_GRAPH
+      .filter((n) => n.locale === locale)
+      .map((n) => normalizeQuestion(n.question))
+      .concat(
+        SAFE_FOLLOWUP_POOLS.general.map((q) => normalizeQuestion(q))
+      )
+  )
+
+  return (followups || []).filter((q) =>
+    allowed.has(normalizeQuestion(q))
+  )
+}
+
+
 /* =========================
    ANSWERED-QUESTIONS DETECTOR
+   (marca como “ya preguntado” si el user incluyó una
+    pregunta del graph (question o match) dentro del texto)
    ========================= */
+
+type GraphNode = (typeof FAQ_GRAPH)[number]
 
 const answeredKeyCache: Record<Locale, string[] | undefined> = {
   "es-ES": undefined,
@@ -46,7 +73,6 @@ function getAnswerKeysForLocale(locale: Locale) {
   if (answeredKeyCache[locale]) return answeredKeyCache[locale]!
 
   const keys: string[] = []
-
   for (const n of FAQ_GRAPH) {
     if (n.locale !== locale) continue
 
@@ -61,6 +87,7 @@ function getAnswerKeysForLocale(locale: Locale) {
     }
   }
 
+  // unique
   answeredKeyCache[locale] = Array.from(new Set(keys))
   return answeredKeyCache[locale]!
 }
@@ -68,7 +95,7 @@ function getAnswerKeysForLocale(locale: Locale) {
 function extractAnsweredQuestions(
   messages: Array<{ role: "user" | "assistant" | "system"; content: string }>,
   locale: Locale
-): string[] {
+): Set<string> {
   const keys = getAnswerKeysForLocale(locale)
   const answered = new Set<string>()
 
@@ -78,20 +105,18 @@ function extractAnsweredQuestions(
     if (!t) continue
 
     for (const k of keys) {
-      // evita micro-matches
-      if (k.length < 10) continue
+      // evita micro-matches tipo “rol”
+      if (k.length < 8) continue
       if (t.includes(k)) answered.add(k)
     }
   }
 
-  return Array.from(answered)
+  return answered
 }
 
 /* =========================
    GRAPH INDEX (cache)
    ========================= */
-
-type GraphNode = (typeof FAQ_GRAPH)[number]
 
 const graphIndexCache: Record<Locale, Record<string, GraphNode> | undefined> = {
   "es-ES": undefined,
@@ -152,7 +177,10 @@ function mapFollowupIdsToQuestions(ids: string[], locale: Locale) {
   return out
 }
 
-function ensureThreeFollowups(followups: string[], fallbackPool: readonly string[]) {
+function ensureThreeFollowups(
+  followups: string[],
+  fallbackPool: readonly string[]
+) {
   const cleaned = (followups || [])
     .map((s) => (s || "").trim())
     .filter(Boolean)
@@ -198,7 +226,10 @@ function cosineSim(a: Vec, b: Vec) {
   return dot(a, b) / (na * nb)
 }
 
-const embeddingCache: Record<Locale, { vectors: Vec[]; nodes: GraphNode[] } | undefined> = {
+const embeddingCache: Record<
+  Locale,
+  { vectors: Vec[]; nodes: GraphNode[] } | undefined
+> = {
   "es-ES": undefined,
   "en-US": undefined,
 }
@@ -230,32 +261,7 @@ async function ensureGraphEmbeddings(locale: Locale) {
 
   const vectors = res.data.map((d) => d.embedding as Vec)
   embeddingCache[locale] = { vectors, nodes }
-
   return embeddingCache[locale]!
-}
-
-async function semanticRetrieveNodeWithScore(
-  userText: string,
-  locale: Locale,
-  opts?: { threshold?: number }
-) {
-  const threshold = opts?.threshold ?? 0.3
-  const query = userText.trim()
-  if (!query) return null
-
-  const { vectors, nodes } = await ensureGraphEmbeddings(locale)
-  const qVec = await embedText(query)
-
-  const scored = nodes.map((n, i) => ({
-    node: n,
-    score: cosineSim(qVec, vectors[i]),
-  }))
-
-  scored.sort((a, b) => b.score - a.score)
-  const best = scored[0]
-  if (!best || best.score < threshold) return null
-
-  return best // { node, score }
 }
 
 async function semanticRetrieveTopKWithScore(
@@ -278,20 +284,16 @@ async function semanticRetrieveTopKWithScore(
   }))
 
   scored.sort((a, b) => b.score - a.score)
-
-  // nos quedamos solo con los que pasan el threshold y cortamos en topK
   return scored.filter((x) => x.score >= threshold).slice(0, topK)
 }
 
-
-/** ✅ TopK para anclar el LLM a Graph */
-async function semanticRetrieveTopK(
+async function semanticRetrieveTopKNodes(
   userText: string,
   locale: Locale,
-  opts?: { topK?: number; threshold?: number }
+  opts?: { threshold?: number; topK?: number }
 ) {
-  const topK = opts?.topK ?? 6
   const threshold = opts?.threshold ?? 0.28
+  const topK = opts?.topK ?? 6
   const query = userText.trim()
   if (!query) return []
 
@@ -302,10 +304,7 @@ async function semanticRetrieveTopK(
     .map((n, i) => ({ node: n, score: cosineSim(qVec, vectors[i]) }))
     .sort((a, b) => b.score - a.score)
 
-  return scored
-    .filter((x) => x.score >= threshold)
-    .slice(0, topK)
-    .map((x) => x.node)
+  return scored.filter((x) => x.score >= threshold).slice(0, topK).map((x) => x.node)
 }
 
 function buildLLMContextFromNodes(nodes: GraphNode[]) {
@@ -320,6 +319,36 @@ function buildLLMContextFromNodes(nodes: GraphNode[]) {
 }
 
 /* =========================
+   INTENT HINTS (muy simple)
+   ========================= */
+
+function inferIntentHint(userText: string) {
+  const t = normalizeQuestion(userText)
+
+  // intención “opinión/experiencia”
+  const isExperience =
+    t.includes("experiencia") ||
+    t.includes("que tal") ||
+    t.includes("como fue") ||
+    t.includes("fue buena") ||
+    t.includes("fue mala") ||
+    t.includes("te gusto") ||
+    t.includes("te gustó")
+
+  if (isExperience) {
+    return (
+      "Si el usuario pregunta por experiencia (qué tal / cómo fue trabajar), " +
+      "responde con una valoración breve (positiva/retadora) y luego sustenta con hechos del contexto."
+    )
+  }
+
+  return (
+    "Ajusta la respuesta a la intención real de la pregunta. " +
+    "Si el usuario pide un resumen, resume. Si pide detalles, entra al detalle."
+  )
+}
+
+/* =========================
    ROUTE
    ========================= */
 
@@ -329,25 +358,30 @@ export async function POST(req: Request) {
     const locale: Locale = body.locale ?? "es-ES"
     const messages = body.messages ?? []
 
-    const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? ""
+    const lastUser =
+      [...messages].reverse().find((m) => m.role === "user")?.content ?? ""
 
     // Guard: input vacío
     if (!lastUser.trim()) {
       return Response.json({
-        reply: "¿Qué te gustaría explorar del portfolio: proyectos, proceso, design systems o impacto?",
+        reply:
+          "¿Qué te gustaría explorar del portfolio: proyectos, proceso, design systems o impacto?",
         followups: ensureThreeFollowups([], SAFE_FOLLOWUP_POOLS.general),
       })
     }
 
-    // 🔥 answered se calcula con claves del graph (question + match)
+    // ✅ Importante: aquí asumo que extractAnsweredQuestions devuelve Set<string>
     const answered = extractAnsweredQuestions(messages, locale)
-    const filterAlreadyAnswered = (qs: string[]) =>
-      (qs || []).filter((q) => !answered.includes(normalizeQuestion(q)))
 
-    // 1) GRAPH (verdad / determinista)
+    const filterAlreadyAnswered = (qs: string[]) =>
+      (qs || []).filter((q) => !answered.has(normalizeQuestion(q)))
+
+    // 1) GRAPH (determinista)
     const node = matchGraph(lastUser, locale)
     if (node) {
-      const fromIds = node.followupIds ? mapFollowupIdsToQuestions(node.followupIds, locale) : []
+      const fromIds = node.followupIds
+        ? mapFollowupIdsToQuestions(node.followupIds, locale)
+        : []
 
       const followups = ensureThreeFollowups(
         filterAlreadyAnswered(fromIds),
@@ -357,91 +391,104 @@ export async function POST(req: Request) {
       return Response.json({ reply: node.answer, followups })
     }
 
- // 2) EMBEDDINGS → RAG-lite con LLM (ajuste de intención)
-const retrievedList = await semanticRetrieveTopKWithScore(lastUser, locale, {
-  threshold: 0.3,
-  topK: 3,
-})
+    // 2) EMBEDDINGS → RAG-lite con LLM (ajuste de intención)
+    const retrievedList = await semanticRetrieveTopKWithScore(lastUser, locale, {
+      threshold: 0.3,
+      topK: 3,
+    })
 
-if (retrievedList.length) {
-  const top = retrievedList[0].node
+    if (retrievedList.length) {
+      const top = retrievedList[0].node
 
-  const fromIds = top.followupIds
-    ? mapFollowupIdsToQuestions(top.followupIds, locale)
-    : []
+      // followups "guiados" del nodo top (siempre preferibles)
+      const fromIds = top.followupIds
+        ? mapFollowupIdsToQuestions(top.followupIds, locale)
+        : []
 
-  const followups = ensureThreeFollowups(
-    filterAlreadyAnswered(fromIds),
-    SAFE_FOLLOWUP_POOLS.general
-  )
+      // ✅ followups deterministas del nodo, filtrados por "ya preguntado"
+      const followups = ensureThreeFollowups(
+        filterAlreadyAnswered(fromIds),
+        SAFE_FOLLOWUP_POOLS.general
+      )
 
-  // 🔒 Contexto anclado al graph
-  const context = retrievedList
-    .map(
-      (r, i) =>
-        `# Nodo ${i + 1} (score ${r.score.toFixed(3)})\n` +
-        `Q: ${r.node.question}\n` +
-        `A: ${r.node.answer}\n` +
-        `Search: ${r.node.searchText}\n`
-    )
-    .join("\n")
+      const context = retrievedList
+        .map(
+          (r, i) =>
+            `# Nodo ${i + 1} (score ${r.score.toFixed(3)})\n` +
+            `Q: ${r.node.question}\n` +
+            `A: ${r.node.answer}\n` +
+            `Search: ${r.node.searchText}\n`
+        )
+        .join("\n")
 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    temperature: 0.3,
-    messages: [
-      { role: "system", content: BASE_SYSTEM_PROMPT },
-      {
-        role: "system",
-        content:
-          "CONTEXTO (fuente de verdad). Usa SOLO esta información. " +
-          "No inventes datos fuera de este contexto.\n\n" +
-          context,
-      },
-      {
-        role: "user",
-        content:
-          `Pregunta del usuario: ${lastUser}\n\n` +
-          `Instrucción:\n` +
-          `- Ajusta la respuesta a la intención real de la pregunta.\n` +
-          `- Si pregunta por experiencia (“qué tal”, “cómo fue trabajar”), empieza con una valoración breve y luego sustenta con hechos del contexto.\n` +
-          `- Habla siempre en primera persona.\n` +
-          `- Devuelve JSON válido con { "reply": "...", "followups": [] }.`,
-      },
-    ],
-    response_format: { type: "json_object" },
-  })
+      const completion = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        temperature: 0.25,
+        messages: [
+          { role: "system", content: BASE_SYSTEM_PROMPT },
+          {
+            role: "system",
+            content:
+              "CONTEXTO (fuente de verdad). Usa SOLO esta información. " +
+              "No inventes datos fuera de este contexto.\n\n" +
+              context,
+          },
+          {
+            role: "system",
+            content: "REGLA DE INTENCIÓN: " + inferIntentHint(lastUser),
+          },
+          {
+            role: "user",
+            content:
+              `Pregunta del usuario: ${lastUser}\n\n` +
+              `Devuelve JSON válido con:\n` +
+              `{ "reply": "...", "followups": [] }`,
+          },
+        ],
+        response_format: { type: "json_object" },
+      })
 
-  const raw = completion.choices[0]?.message?.content || "{}"
-  let parsed: ChatResponse = { reply: "", followups: [] }
+      const raw = completion.choices[0]?.message?.content || "{}"
+      let parsed: ChatResponse = { reply: "", followups: [] }
 
-  try {
-    parsed = JSON.parse(raw) as ChatResponse
-  } catch {
-    parsed = { reply: raw, followups: [] }
-  }
+      try {
+        parsed = JSON.parse(raw) as ChatResponse
+      } catch {
+        parsed = { reply: raw, followups: [] }
+      }
 
-  return Response.json({
-    reply: parsed.reply ?? "",
-    followups,
-  })
-}
+      // ✅ Blindaje: solo followups que existan en graph o safe pools
+      const safeFollowups = filterFollowupsToGraph(parsed.followups ?? [], locale)
+      const filteredSafe = filterAlreadyAnswered(safeFollowups)
 
+      // ⚠️ En RAG-lite, mantenemos followups deterministas del nodo (los de arriba).
+      // Si quieres que el LLM pueda proponer followups (pero filtrados), usa:
+      // const followups = ensureThreeFollowups(filteredSafe, SAFE_FOLLOWUP_POOLS.general)
 
-    // 3) LLM (último fallback) ✅ ANCLADO A GRAPH
-    const ctxNodes = await semanticRetrieveTopK(lastUser, locale, { topK: 6, threshold: 0.28 })
+      return Response.json({
+        reply: (parsed.reply ?? "").toString(),
+        followups,
+      })
+    }
+
+    // 3) LLM fallback ANCLADO A GRAPH
+    const ctxNodes = await semanticRetrieveTopKNodes(lastUser, locale, {
+      topK: 6,
+      threshold: 0.28,
+    })
+
     const CONTEXTO =
       ctxNodes.length > 0
         ? `CONTEXTO (extraído de mi portfolio):\n${buildLLMContextFromNodes(ctxNodes)}`
         : `CONTEXTO (extraído de mi portfolio):\n- No se ha encontrado un nodo suficientemente relevante.`
 
-        
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.2,
       messages: [
         { role: "system", content: BASE_SYSTEM_PROMPT },
         { role: "system", content: CONTEXTO },
+        { role: "system", content: "REGLA DE INTENCIÓN: " + inferIntentHint(lastUser) },
         ...messages.map((m) => ({
           role: m.role as "user" | "assistant" | "system",
           content: m.content,
@@ -459,10 +506,11 @@ if (retrievedList.length) {
       parsed = { reply: raw, followups: [] }
     }
 
-    const followups = ensureThreeFollowups(
-      filterAlreadyAnswered(parsed.followups ?? []),
-      SAFE_FOLLOWUP_POOLS.general
-    )
+    // ✅ Blindaje + no repetir ya respondidas
+    const safeFollowups = filterFollowupsToGraph(parsed.followups ?? [], locale)
+    const filteredSafe = filterAlreadyAnswered(safeFollowups)
+
+    const followups = ensureThreeFollowups(filteredSafe, SAFE_FOLLOWUP_POOLS.general)
 
     return Response.json({
       reply: (parsed.reply ?? "").toString(),
@@ -471,7 +519,8 @@ if (retrievedList.length) {
   } catch (err: any) {
     return Response.json(
       {
-        reply: "He tenido un problema técnico procesando tu mensaje. ¿Puedes repetirlo de otra forma?",
+        reply:
+          "He tenido un problema técnico procesando tu mensaje. ¿Puedes repetirlo de otra forma?",
         followups: ensureThreeFollowups([], SAFE_FOLLOWUP_POOLS.general),
       },
       { status: 500 }
