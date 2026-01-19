@@ -34,6 +34,8 @@
   overscroll-behavior: contain;
 }
 
+
+
 /* --- Filas y Burbujas --- */
 .assistantRow {
   display: flex;
@@ -388,3 +390,5 @@
 .assistantText a:hover {
   opacity: 0.8; /* Efecto visual al pasar el ratón */
 }
+
+
