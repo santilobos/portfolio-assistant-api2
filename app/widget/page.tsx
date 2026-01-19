@@ -54,21 +54,18 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
   
   return (
     <div style={{
-  height: 56, 
-  position: "absolute", // Usamos absolute con respecto a .app que es relative
-  top: 0, 
-  left: 0,
-  right: 0,
-  width: "100%",
-  zIndex: 1000, // Un nivel muy alto
-  background: "#f5f5f5",
-  borderBottom: "1px solid rgba(198, 209, 221, 1)", 
-  padding: "0 16px",
-  display: "flex", 
-  alignItems: "center", 
-  justifyContent: "space-between", 
-  boxSizing: "border-box",
-}}>
+      height: 56, 
+      position: "sticky", 
+      top: 0, 
+      zIndex: 50, 
+      background: "#f5f5f5",
+      borderBottom: "1px solid rgba(198, 209, 221, 1)", 
+      padding: "0 16px",
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "space-between", 
+      boxSizing: "border-box",
+    }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, position: "relative" }}>
         <div style={{ 
           fontSize: "0.9rem", 
