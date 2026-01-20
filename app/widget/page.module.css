@@ -1,6 +1,11 @@
 /* --- Estructura Base --- */
 
-:global(html, body) {
+:global(html) {
+  height: 100%;
+  overflow: hidden;
+}
+
+:global(body) {
   height: 100%;
   overflow: hidden;
 }
