@@ -19,6 +19,8 @@ const aeonik = localFont({
   variable: "--font-aeonik"
 })
 
+
+
 // --- 1. VARIANTES DE ANIMACIÓN ---
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -121,15 +123,19 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
         <button onClick={onReset} className={styles.iconBtn}>
           <Icon src="/icons/reset.svg" alt="Reset" />
         </button>
-        <button 
-          onClick={() => {
-            if (typeof window !== "undefined") {
-              window.parent.postMessage("close-widget", "*");
-            }
-            onClose();
-          }} 
-          className={styles.iconBtn}
-        >
+        <button
+  onClick={() => {
+    // ✅ reset del teclado virtual
+    document.documentElement.style.setProperty("--kbd", "0px")
+
+    if (typeof window !== "undefined") {
+      window.parent.postMessage("close-widget", "*")
+    }
+    onClose()
+  }}
+  className={styles.iconBtn}
+>
+
           <Icon src="/icons/close.svg" alt="Close" />
         </button>
       </div>
@@ -242,43 +248,45 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // ✅ NEW: ref para poder resetear altura del textarea
+  const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
+
   const quick = [
-    "¿Cuál fue tu proyecto más complejo?", 
-    "¿Qué metodologías utilizas?", 
-    "¿Cómo enfocas el liderazgo en diseño de producto?"
+    "¿Cuál fue tu proyecto más complejo?",
+    "¿Qué metodologías utilizas?",
+    "¿Cómo enfocas el liderazgo en diseño de producto?",
   ];
 
   React.useEffect(() => {
-  const vv = window.visualViewport
-  if (!vv) return
+    const vv = window.visualViewport;
+    if (!vv) return;
 
-  const setVars = () => {
-    // keyboard height aproximada (Android Chrome)
-    const kbd = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
-    document.documentElement.style.setProperty("--kbd", `${kbd}px`)
-  }
+    const setVars = () => {
+      // keyboard height aproximada (Android Chrome)
+      const kbd = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty("--kbd", `${kbd}px`);
+    };
 
-  // 1) inicial
-  setVars()
+    // 1) inicial
+    setVars();
 
-  // 2) cambios reales del visual viewport
-  vv.addEventListener("resize", setVars)
-  vv.addEventListener("scroll", setVars)
+    // 2) cambios reales del visual viewport
+    vv.addEventListener("resize", setVars);
+    vv.addEventListener("scroll", setVars);
 
-  // 3) IMPORTANTÍSIMO: cuando haces focus, a veces NO hay resize hasta que tecleas
-  const onFocusIn = () => requestAnimationFrame(setVars)
-  const onFocusOut = () => requestAnimationFrame(setVars)
-  window.addEventListener("focusin", onFocusIn)
-  window.addEventListener("focusout", onFocusOut)
+    // 3) IMPORTANTÍSIMO: cuando haces focus, a veces NO hay resize hasta que tecleas
+    const onFocusIn = () => requestAnimationFrame(setVars);
+    const onFocusOut = () => requestAnimationFrame(setVars);
+    window.addEventListener("focusin", onFocusIn);
+    window.addEventListener("focusout", onFocusOut);
 
-  return () => {
-    vv.removeEventListener("resize", setVars)
-    vv.removeEventListener("scroll", setVars)
-    window.removeEventListener("focusin", onFocusIn)
-    window.removeEventListener("focusout", onFocusOut)
-  }
-}, [])
-
+    return () => {
+      vv.removeEventListener("resize", setVars);
+      vv.removeEventListener("scroll", setVars);
+      window.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("focusout", onFocusOut);
+    };
+  }, []);
 
   React.useEffect(() => {
     if (listRef.current) {
@@ -312,12 +320,12 @@ export default function Widget() {
         setLoading(false);
 
         if (suggestions && suggestions.length > 0) {
-          const notAskedYet = suggestions.filter(s => !askedQuestions.includes(s.toLowerCase().trim()));
+          const notAskedYet = suggestions.filter((s) => !askedQuestions.includes(s.toLowerCase().trim()));
           const PROJECT_KEYWORDS = ["repsol", "fc barcelona", "fcb", "cofares", "mediapro", "depasify", "bbva", "inditex"];
-          
+
           const sortedSuggestions = [...notAskedYet].sort((a, b) => {
-            const aIsJump = PROJECT_KEYWORDS.some(key => a.toLowerCase().includes(key));
-            const bIsJump = PROJECT_KEYWORDS.some(key => b.toLowerCase().includes(key));
+            const aIsJump = PROJECT_KEYWORDS.some((key) => a.toLowerCase().includes(key));
+            const bIsJump = PROJECT_KEYWORDS.some((key) => b.toLowerCase().includes(key));
             if (aIsJump && !bIsJump) return 1;
             if (!aIsJump && bIsJump) return -1;
             return 0;
@@ -332,38 +340,51 @@ export default function Widget() {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     setMessages([]);
     setInput("");
+
+    // ✅ NEW: reset de altura al hacer reset
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+    }
+
     setLoading(false);
     setDynamicFollowUps([]);
     setAskedQuestions([]);
-    setIntroKey(prev => prev + 1);
+    setIntroKey((prev) => prev + 1);
   };
 
   async function send(text?: string) {
     const q = (text ?? input).trim();
     if (!q || loading) return;
-    
-    setAskedQuestions(prev => [...prev, q.toLowerCase().trim()]);
+
+    setAskedQuestions((prev) => [...prev, q.toLowerCase().trim()]);
     setInput("");
+
+    // ✅ NEW: reset de altura al enviar (evita que quede alto cuando se vacía)
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+    }
+
     setLoading(true);
-    setDynamicFollowUps([]); 
+    setDynamicFollowUps([]);
 
     const newMessages: Msg[] = [...messages, { role: "user", content: q }];
     setMessages([...newMessages, { role: "assistant", content: "" }]);
-    
+
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }), 
+        body: JSON.stringify({ messages: newMessages }),
       });
       const data = await res.json();
       const mainContent = sanitizeAssistantText(data?.reply ?? "");
       const apiFollowups = Array.isArray(data?.followups) ? data.followups : [];
-      const finalSuggestions = apiFollowups.length > 0 ? apiFollowups : isCompensationQuestion(q) ? [...OUT_OF_SCOPE_FOLLOWUPS] : [];
+      const finalSuggestions =
+        apiFollowups.length > 0 ? apiFollowups : isCompensationQuestion(q) ? [...OUT_OF_SCOPE_FOLLOWUPS] : [];
       typeText(mainContent, finalSuggestions);
     } catch (e) {
       setLoading(false);
-      setMessages(prev => {
+      setMessages((prev) => {
         const next = [...prev];
         const last = next[next.length - 1];
         if (last) last.content = "Mmm parece que algo ha fallado en la conexión.";
@@ -374,33 +395,47 @@ export default function Widget() {
 
   return (
     <div className={`${styles.app} ${azeret.variable}`}>
-      <ChatHeader 
-        onReset={handleReset} 
-        onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} 
-      />
+      <ChatHeader onReset={handleReset} onClose={() => window.parent?.postMessage({ type: "CHAT_REQUEST_CLOSE" }, "*")} />
 
       <div ref={listRef} className={styles.messages}>
         <AnimatePresence mode="popLayout">
           {messages.length === 0 ? (
-            <motion.div key={`intro-${introKey}`} className={styles.intro} variants={containerVariants} initial="hidden" animate="visible">
-              <motion.div variants={itemVariants} className={styles.chatTitle}>Pregúntame sobre mi trabajo</motion.div>
+            <motion.div
+              key={`intro-${introKey}`}
+              className={styles.intro}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div variants={itemVariants} className={styles.chatTitle}>
+                Pregúntame sobre mi trabajo
+              </motion.div>
               <motion.div variants={containerVariants} className={styles.quickGrid}>
-                {quick.filter(q => !askedQuestions.includes(q.toLowerCase().trim())).map((q) => (
-                  <motion.button key={q} variants={itemVariants} onClick={() => send(q)} className={styles.quickBtn} whileTap={{ scale: 0.98 }}>
-                    {q}
-                  </motion.button>
-                ))}
+                {quick
+                  .filter((q) => !askedQuestions.includes(q.toLowerCase().trim()))
+                  .map((q) => (
+                    <motion.button
+                      key={q}
+                      variants={itemVariants}
+                      onClick={() => send(q)}
+                      className={styles.quickBtn}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {q}
+                    </motion.button>
+                  ))}
               </motion.div>
             </motion.div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               {messages.map((m, i) => {
                 const isLastAssistant = m.role === "assistant" && i === messages.length - 1;
-                if (m.role === "user") return (
-                  <div key={i} className={styles.userRow}>
-                    <div className={styles.userBubble}>{m.content}</div>
-                  </div>
-                );
+                if (m.role === "user")
+                  return (
+                    <div key={i} className={styles.userRow}>
+                      <div className={styles.userBubble}>{m.content}</div>
+                    </div>
+                  );
                 return (
                   <div key={i} className={styles.assistantRow}>
                     {m.content === "" && loading && isLastAssistant ? (
@@ -411,11 +446,17 @@ export default function Widget() {
                       </motion.div>
                     )}
                     {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (
-                      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className={styles.followUpsContainer}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={styles.followUpsContainer}
+                      >
                         <div className={styles.divider} />
                         <div className={styles.followUps}>
-                          {dynamicFollowUps.map(q => (
-                            <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>{q}</button>
+                          {dynamicFollowUps.map((q) => (
+                            <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>
+                              {q}
+                            </button>
                           ))}
                         </div>
                       </motion.div>
@@ -430,20 +471,32 @@ export default function Widget() {
 
       <div className={styles.inputContainer}>
         <div className={styles.composer}>
-          <textarea 
-            value={input} 
-            onChange={e => {
+          <textarea
+            ref={textAreaRef}  // ✅ NEW
+            value={input}
+            onChange={(e) => {
               setInput(e.target.value);
-              e.target.style.height = 'auto';
+              e.target.style.height = "auto";
               e.target.style.height = `${e.target.scrollHeight}px`;
-            }} 
-            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }} 
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }}
             className={styles.textArea}
-            placeholder="Escribe aquí..." 
+            placeholder="Escribe aquí..."
             rows={1}
           />
-          <button onClick={() => send()} disabled={loading || !hasText} className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}>
-            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor"><path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z"/></svg>
+          <button
+            onClick={() => send()}
+            disabled={loading || !hasText}
+            className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}
+          >
+            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor">
+              <path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z" />
+            </svg>
           </button>
         </div>
       </div>

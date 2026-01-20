@@ -19,12 +19,13 @@
   flex: 1;
   overflow-y: auto;
   padding: 20px 14px 0; /* top right/left bottom */
-  padding-bottom: calc(20px + var(--kbd, 0px));
+  padding-bottom: calc(20px + 84px + var(--kbd, 0px));
   display: flex;
   flex-direction: column;
   gap: 24px;
   overscroll-behavior: contain;
   min-height: 0; /* recomendado en flex layouts */
+  
 }
 
 
@@ -209,6 +210,7 @@
   bottom: 0;
   transform: translateY(calc(-1 * var(--kbd, 0px)));
   will-change: transform;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .composer {
@@ -235,13 +237,23 @@
   max-height: 150px;
   font-family: inherit;
   line-height: 1.4;
-  overflow-y: auto;
+
+  overflow-y: hidden;        /* ✅ antes: auto */
+  scrollbar-width: none;     /* ✅ Firefox */
+  -ms-overflow-style: none;  /* ✅ Edge antiguo */
+
   color: #7b7b7b;
   display: block;
   font-family: var(--font-aeonik);
-  /* FIX: scroll-margin evita que el navegador desplace el iframe al hacer focus */
   scroll-margin-top: 100vh;
 }
+
+/* ✅ Oculta scrollbar en WebKit (Chrome/Safari) */
+.textArea::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 
 .sendBtn {
   margin-bottom: 4px;
@@ -271,10 +283,7 @@
     overflow-anchor: none;
   }
 
-  .textArea:focus {
-    /* Clava el textarea en su sitio sin mover el frame superior */
-    scroll-margin: 0;
-  }
+ 
 }
 
 /* --- Mobile Fixes --- */
@@ -286,10 +295,6 @@
     contain: none;
   }
 
-  /* ✅ CLAVE: evita saltos y reposicionamientos raros al hacer focus */
-  .textArea {
-    scroll-margin-top: 0;
-  }
 
   .inputContainer {
     /* ✅ Mantiene safe-area + padding fijo (mejor que max()) */
@@ -327,13 +332,15 @@
 }
 
 .thinking {
-  font-family: var(--font-azeret), monospace; /* Para que use tu fuente de código */
+  font-family: var(--font-azeret), monospace;
   font-size: 0.85rem;
-  color: rgb(255, 92, 0); /* Cambia aquí el color al naranja de tu portfolio */
+  color: rgb(255, 92, 0);
   padding: 8px 0;
   display: flex;
   align-items: center;
   gap: 8px;
+
+  margin-bottom: 16px; /* ✅ nuevo: separa del composer */
 }
 
 /* Si tienes una animación de puntos o un pequeño círculo */
