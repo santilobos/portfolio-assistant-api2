@@ -1,4 +1,10 @@
 /* --- Estructura Base --- */
+
+:global(html, body) {
+  height: 100%;
+  overflow: hidden;
+}
+
 .app {
   display: flex;
   flex-direction: column;
