@@ -19,6 +19,8 @@ const aeonik = localFont({
   variable: "--font-aeonik"
 })
 
+// --- Esta línea es solo para el git push ---
+
 // --- 1. VARIANTES DE ANIMACIÓN ---
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
