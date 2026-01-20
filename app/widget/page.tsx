@@ -244,6 +244,22 @@ export default function Widget() {
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const autosizeTextArea = React.useCallback(() => {
+  const el = textAreaRef.current
+  if (!el) return
+
+  el.style.height = "auto"
+
+  const maxHeight = 150 // mismo valor que en CSS
+  const nextHeight = Math.min(el.scrollHeight, maxHeight)
+
+  el.style.height = `${nextHeight}px`
+
+  // Evita la franja gris del scrollbar
+  el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden"
+}, [])
+
+
   // ✅ NEW: ref + focus sin scroll para evitar que el header “salte” en el primer focus en mobile
   const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const focusWithoutScroll = React.useCallback(() => {
@@ -292,6 +308,49 @@ export default function Widget() {
       window.removeEventListener("focusout", onFocusOut);
     };
   }, []);
+
+  React.useEffect(() => {
+  const vv = window.visualViewport
+  if (!vv) return
+
+  let locked = false
+
+  const lock = () => {
+    if (locked) return
+    locked = true
+    document.documentElement.style.overflow = "hidden"
+    document.body.style.overflow = "hidden"
+  }
+
+  const unlock = () => {
+    if (!locked) return
+    locked = false
+    document.documentElement.style.overflow = ""
+    document.body.style.overflow = ""
+  }
+
+  const sync = () => {
+    const kbd = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+    if (kbd > 0) lock()
+    else unlock()
+  }
+
+  // inicial + listeners
+  sync()
+  vv.addEventListener("resize", sync)
+  vv.addEventListener("scroll", sync)
+  window.addEventListener("focusin", sync)
+  window.addEventListener("focusout", sync)
+
+  return () => {
+    vv.removeEventListener("resize", sync)
+    vv.removeEventListener("scroll", sync)
+    window.removeEventListener("focusin", sync)
+    window.removeEventListener("focusout", sync)
+    unlock()
+  }
+}, [])
+
 
   React.useEffect(() => {
     if (listRef.current) {
@@ -477,28 +536,24 @@ export default function Widget() {
       <div className={styles.inputContainer}>
         <div className={styles.composer}>
           <textarea
-            ref={textAreaRef} // ✅ NEW
-            value={input}
-            onTouchStart={(e) => {
-              // ✅ NEW: evita el scroll automático del navegador en el primer foco (header desaparecía)
-              e.preventDefault();
-              focusWithoutScroll();
-            }}
-            onChange={(e) => {
-              setInput(e.target.value);
-              e.target.style.height = "auto";
-              e.target.style.height = `${e.target.scrollHeight}px`;
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
-            }}
-            className={styles.textArea}
-            placeholder="Escribe aquí..."
-            rows={1}
-          />
+  ref={textAreaRef}
+  value={input}
+  onFocus={() => {
+    // opcional: re-asegura scroll abajo
+    requestAnimationFrame(() => {
+      if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
+    })
+  }}
+  onChange={(e) => {
+    setInput(e.target.value)
+    autosizeTextArea()
+  }}
+  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+  className={styles.textArea}
+  placeholder="Escribe aquí..."
+  rows={1}
+/>
+
           <button
             onClick={() => send()}
             disabled={loading || !hasText}
