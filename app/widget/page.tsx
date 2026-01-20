@@ -249,6 +249,38 @@ export default function Widget() {
   ];
 
   React.useEffect(() => {
+  const vv = window.visualViewport
+  if (!vv) return
+
+  const setVars = () => {
+    // keyboard height aproximada (Android Chrome)
+    const kbd = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+    document.documentElement.style.setProperty("--kbd", `${kbd}px`)
+  }
+
+  // 1) inicial
+  setVars()
+
+  // 2) cambios reales del visual viewport
+  vv.addEventListener("resize", setVars)
+  vv.addEventListener("scroll", setVars)
+
+  // 3) IMPORTANTÍSIMO: cuando haces focus, a veces NO hay resize hasta que tecleas
+  const onFocusIn = () => requestAnimationFrame(setVars)
+  const onFocusOut = () => requestAnimationFrame(setVars)
+  window.addEventListener("focusin", onFocusIn)
+  window.addEventListener("focusout", onFocusOut)
+
+  return () => {
+    vv.removeEventListener("resize", setVars)
+    vv.removeEventListener("scroll", setVars)
+    window.removeEventListener("focusin", onFocusIn)
+    window.removeEventListener("focusout", onFocusOut)
+  }
+}, [])
+
+
+  React.useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
