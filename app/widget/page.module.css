@@ -25,7 +25,12 @@
   gap: 24px;
   overscroll-behavior: contain;
   min-height: 0; /* recomendado en flex layouts */
-  
+}
+
+@supports selector(.messages:has(.intro)) {
+  .messages:has(.intro) {
+    justify-content: flex-end;
+  }
 }
 
 
