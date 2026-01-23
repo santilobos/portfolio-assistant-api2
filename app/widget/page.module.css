@@ -16,7 +16,7 @@
   height: 100dvh; /* estable */
   width: 100%;
   position: relative;
-  background: #f5f5f5;
+  background: #F6F5F3;
   /* IMPORTANTE: overflowAnchor bloquea el salto de 1px al hacer focus */
   overflow-anchor: none;
   overflow: hidden;
@@ -61,7 +61,7 @@
   font-size: 0.9rem;
   line-height: 1.2rem;
   font-weight: 500;
-  color: #4d4d4d;
+  color:#706A5C;
   max-width: 100%;
   white-space: pre-wrap;
   padding: 8px;
@@ -85,9 +85,9 @@
   padding: 16px;
   border-radius: 4px;
   /* CAMBIO: Añadimos 'solid' y el color gris que prefieras */
-  border: 1px solid rgba(198, 209, 221, 1);
+  border: 1px solid #D1CEC7;
   max-width: 85%;
-  color: #000000;
+  color: #706A5C;
   font-size: 0.9rem;
 }
 
@@ -130,7 +130,7 @@
   font-weight: 500;
   line-height: 1.3;
   margin-bottom: 8px;
-  color: #111;
+  color: #706A5C;
   letter-spacing: -0.02em;
 }
 
@@ -144,11 +144,11 @@
 .quickBtn {
   font-family: var(--font-aeonik);
   text-align: left;
-  padding: 8px;
+  padding: 0 4 4 0px;
   border-radius: 4px;
   border: none;
-  background: #f5f5f5;
-  color: #4b5563;
+  background: #F6F5F3;
+  color: #706A5C;
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -171,7 +171,7 @@
 
 .divider {
   height: 1px;
-  background-color: #f1f1f1;
+  background-color: #D1CEC7;
   margin: 20px 0 12px;
   width: 100%;
 }
@@ -190,7 +190,7 @@
   padding: 4px 16px;
   text-align: left;
   font-size: 0.95rem;
-  color: #999999;
+  color: #8C8573;
   cursor: pointer;
   border-radius: 8px;
   transition: all 0.2s ease;
@@ -212,7 +212,7 @@
 
 .followUpBtn::before {
   content: "↳";
-  color: #999999;
+  color: #8C8573;
   font-weight: 200;
 }
 
@@ -221,8 +221,8 @@
   width: 100%;
   padding: 14px;
   padding-bottom: calc(env(safe-area-inset-bottom) + 14px);
-  border-top: 1px solid rgba(0,0,0,0.12);
-  background: #f5f5f5;
+  border-top: 1px solid #D1CEC7;
+  background: #f6f4f3;
   box-sizing: border-box;
   position: sticky;
   bottom: 0;
@@ -236,7 +236,7 @@
   gap: 10px;
   align-items: flex-end;
   background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.15);
+  border: 1px solid  #D1CEC7;
   border-radius: 4px;
   padding: 10px 12px;
   width: 100%;
@@ -260,10 +260,14 @@
   scrollbar-width: none;     /* ✅ Firefox */
   -ms-overflow-style: none;  /* ✅ Edge antiguo */
 
-  color: #7b7b7b;
+  color: #706A5C;
   display: block;
   font-family: var(--font-aeonik);
   scroll-margin-top: 100vh;
+}
+
+textarea::placeholder {
+  color: #8C8573;
 }
 
 /* ✅ Oculta scrollbar en WebKit (Chrome/Safari) */
@@ -281,7 +285,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(0, 0, 0, 0.2);
+  color: #8c857391;
   transition: all 0.2s ease;
 }
 
@@ -317,7 +321,7 @@
   .inputContainer {
     /* ✅ Mantiene safe-area + padding fijo (mejor que max()) */
     padding-bottom: calc(env(safe-area-inset-bottom) + 14px);
-    background: #f5f5f5;
+    background: #F6F5F3;
   }
 }
 
@@ -337,7 +341,7 @@
   padding: 8px;
   cursor: pointer;
   border-radius: 4px;
-  color: #666666;
+  color: #706A5C;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -382,7 +386,7 @@
 .divider {
   width: 100%;
   height: 1px;
-  background-color: #e2e8f0; /* Un gris muy suave */
+  background-color: #8c857359; /* Un gris muy suave */
   margin: 16px 0; /* Espacio arriba y abajo de la línea */
 }
 

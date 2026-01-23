@@ -60,8 +60,8 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
       position: "sticky", 
       top: 0, 
       zIndex: 50, 
-      background: "#f5f5f5",
-      borderBottom: "1px solid rgba(198, 209, 221, 1)", 
+      background: "#F6F5F3",
+      borderBottom: "1px solid #D1CEC7", 
       padding: "0 16px",
       display: "flex", 
       alignItems: "center", 
@@ -72,7 +72,7 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
         <div style={{ 
           fontSize: "0.9rem", 
           fontWeight: 400, 
-          color: "#000000", 
+          color: "#706A5C", 
           letterSpacing: 0.5, 
           fontFamily: azeret.style.fontFamily,
           WebkitFontSmoothing: "antialiased",
@@ -103,15 +103,15 @@ function ChatHeader({ onReset, onClose }: { onReset: () => void; onClose: () => 
               width: "240px",
               padding: "12px",
               backgroundColor: "#ffffff",
-              border: "1px solid rgba(198, 209, 221, 1)", 
+              border: "1px solid rgba(209, 206, 199, 1)", 
               borderRadius: "4px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              boxShadow: "0 4px 12px rgba(209,206,199,0.4)",
               zIndex: 70,
               fontSize: "0.75rem",
               fontFamily: azeret.style.fontFamily,
               fontWeight: 400, 
               lineHeight: "1.4",
-              color: "#656565ff", 
+              color: "#706A5C", 
             }}>
                He programado este asistente para ayudarte a conocer mi trabajo, metodologías y experiencia de manera rápida y sencilla.
             </div>

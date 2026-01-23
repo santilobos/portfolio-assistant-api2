@@ -76,6 +76,7 @@ export const FAQ_GRAPH: FAQNode[] = [
     "por qué te mudaste a lima",
     "mudanza a lima",
     "por que estas en lima",
+    "por que te viniste a lima",
     "por qué estás en lima",
     "por que vives en lima",
   ],
@@ -224,6 +225,39 @@ export const FAQ_GRAPH: FAQNode[] = [
    ========================= */
 
 {
+  id: "pr_sueldo",
+  locale: "es-ES",
+  question: "¿Cuál es tu expectativa salarial?",
+  answer:
+    "Prefiero tratar el tema de la expectativa salarial directamente en una entrevista. Así puedo entender mejor el contexto del rol, el alcance de responsabilidades y el tipo de impacto esperado, y alinearlo de forma justa y transparente con la propuesta.",
+  match: [
+    "Cuál es tu expectativa salarial",
+    "¿Cuál es tu expectativa salarial?",
+    "expectativa salarial",
+    "banda salarial",
+    "rango salarial",
+    "pretensión salarial",
+    "aspiración salarial",
+    "cuánto quieres cobrar",
+    "cuánto esperas cobrar",
+    "cuánto es tu sueldo",
+    "por cuánto dinero quieres entrar",
+    "cuál es tu sueldo",
+    "salario esperado",
+    "salary expectations",
+    "expected salary",
+    "cuanto cobras",
+  ],
+  searchText:
+    "Expectativa salarial. Pretensión salarial. Banda salarial. Tema a tratar en entrevista. Conversación directa y transparente según rol, responsabilidades e impacto.",
+  followupIds: [
+    "contact_direct_channels",
+    "utils_download_cv",
+  ],
+},
+
+
+{
   id: "pr_resumen_rol_actual",
   locale: "es-ES",
   question: "¿Cuál es tu rol actual?",
@@ -279,7 +313,7 @@ export const FAQ_GRAPH: FAQNode[] = [
   locale: "es-ES",
   question: "¿Cómo puedo contactar contigo?",
   answer:
-  "Puedes encontrarme en estos canales:\n\n• LinkedIn: [linkedin.com/in/santi-lobos](https://www.linkedin.com/in/santi-lobos/)\n• Email: [santilobos21@gmail.com](mailto:santilobos21@gmail.com)",
+  "Puedes encontrarme en estos canales:\n\nLinkedIn: [linkedin.com/in/santi-lobos](https://www.linkedin.com/in/santi-lobos/)\nEmail: [santilobos21@gmail.com](mailto:santilobos21@gmail.com)",
   match: [
     "donde puedo contactarte",
     "donde te puedo contactar",
