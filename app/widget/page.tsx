@@ -472,7 +472,7 @@ export default function Widget() {
               animate="visible"
             >
               <motion.div variants={itemVariants} className={styles.chatTitle}>
-                Pregúntame sobre mi trabajo
+                Qué quieres saber?
               </motion.div>
               <motion.div variants={containerVariants} className={styles.quickGrid}>
                 {quick
