@@ -225,6 +225,104 @@ export const FAQ_GRAPH: FAQNode[] = [
    ========================= */
 
 {
+  id: "pr_clientes_grandes",
+  locale: "es-ES",
+  question: "¿Cómo has llegado a trabajar con clientes tan grandes?",
+  answer:
+  "Mi trayectoria con grandes cuentas es el resultado de combinar rigor técnico con visión estratégica, pero también de años de formación constante, práctica y dedicación intensa.\n\n" +
+  "Trabajar en consultoría, con clientes de múltiples industrias, me permitió desarrollar una fuerte capacidad para resolver problemas complejos a través del diseño estratégico y el pensamiento crítico.\n\n" +
+  "He perfeccionado metodologías de workshops estratégicos que ayudan a los stakeholders a ordenar ideas, alinear expectativas y detectar necesidades reales. Este enfoque, sumado al trabajo profundo detrás de cada proyecto, a mi capacidad para diseñar interfaces cuidadas y a una forma de trabajo altamente colaborativa, me permite asegurar que cada solución no solo sea sólida a nivel visual, sino que responda de forma clara a los objetivos de negocio.",
+
+  match: [
+    "clientes grandes",
+    "grandes cuentas",
+    "por qué tú",
+    "metodología",
+    "workshops",
+    "pensamiento crítico",
+    "diseño estratégico",
+    "solución de problemas",
+    "grandes empresas",
+    "experiencia corporativa",
+    "cómo trabajas",
+    "habilidades",
+    "talento",
+    "lógica",
+    "estética",
+  ],
+  searchText:
+   "clientes grandes. cuentas. metodología. workshops. pensamiento crítico. diseño estratégico. solución problemas. lógica. interfaces. estética. equipo.",
+  followupIds: [
+    "cs_repsol_overview",
+    "cs_fcb_ecom_overview",
+    "cs_cofares_overview",
+  ],
+},
+
+
+{
+  id: "pr_tiempos_proyecto",
+  locale: "es-ES",
+  question: "¿Cuánto demoras en hacer un proyecto?",
+  answer:
+    "El tiempo depende bastante de la complejidad real del problema y del estado del producto. Mi foco no está en cumplir plazos arbitrarios, sino en definir el proceso mínimo necesario para tomar buenas decisiones y entregar valor de forma progresiva.",
+  match: [
+     // Pregunta directa (ES)
+  "¿cuánto demoras en un proyecto?",
+  "cuánto demoras",
+  "cuánto tardas",
+  "cuánto te toma",
+  "cuánto dura un proyecto",
+  "cuánto tiempo toma",
+  "en cuánto tiempo",
+  "para cuándo estaría",
+  "cuándo lo entregas",
+  "cuándo estaría listo",
+
+  // Plazos / estimación (ES)
+  "tiempos de entrega",
+  "plazo de entrega",
+  "plazos",
+  "deadline",
+  "deadlines",
+  "cronograma",
+  "timeline",
+  "estimación",
+  "estimación de tiempos",
+  "time estimate",
+  "duración",
+
+  // Fases del proceso (ES)
+  "fases del proyecto",
+  "fases de diseño",
+  "discovery",
+  "descubrimiento",
+  "investigación",
+  "validación",
+  "prototipo",
+  "prototipado",
+  "iteración",
+  "iterar",
+  "medición",
+  "medir resultados",
+
+  // Lenguaje de negocio / entrega (EN frecuente)
+  "delivery time",
+  "turnaround",
+  "timeframe",
+  "project timeline",
+  ],
+  searchText:
+    "duración proyecto tiempos de entrega plazo deadline cronograma timeline timeframe turnaround estimación de tiempos cuánto tarda cuánto demoras discovery descubrimiento investigación validación prototipo prototipado medir medición iterar iteración calidad datos diseño estratégico agilidad negocio escalado",
+  followupIds: [
+    "impact_hard_decisions",
+    "methods_overview",
+    "impact_overview",
+  ],
+},
+
+
+{
   id: "pr_sueldo",
   locale: "es-ES",
   question: "¿Cuál es tu expectativa salarial?",
@@ -255,6 +353,39 @@ export const FAQ_GRAPH: FAQNode[] = [
     "utils_download_cv",
   ],
 },
+
+
+{
+  id: "pr_mayores_obstaculos",
+  locale: "es-ES",
+  question: "¿Cuál fue el proyecto que más obstáculos te presentó y cómo lo resolviste?",
+  answer:
+    "Depende del tipo de obstáculo.\n\n" +
+"En Overon, el problema era diseñar una única plataforma de control de señal que sirviera a varias empresas con modelos de negocio distintos. Lo resolví con una fase de investigación profunda que demostró que, aunque los negocios diferían, el comportamiento de los usuarios era muy similar. A partir de ahí, diseñé patrones de componentes con slots, permitiendo personalización por equipo sin romper una base común compartida.\n\n" +
+"En Repsol, el principal reto fue la escala: una plataforma interna para 15 países, cada uno con culturas, procesos y objetivos diferentes. La investigación reveló que las necesidades críticas eran transversales: productividad y acceso rápido a la información. Lo resolví priorizando estas funciones en la arquitectura, segmentando el contenido mediante etiquetas por país, sede y rol, y potenciando el buscador para facilitar la localización de documentos.\n\n" +
+"En el FC Barcelona, el problema era reducir el abandono en el checkout sin poder modificar el número de pasos por restricciones internas. La solución fue optimizar la UI y la percepción de confianza en cada paso, reduciendo fricción y mejorando la conversión sin alterar el flujo existente.",
+
+  match: [
+     "mayores obstáculos",
+    "proyecto más difícil",
+    "reto más grande",
+    "mayor desafío",
+    "problemas en proyectos",
+    "cómo lo resolviste",
+    "cómo lo solucionaste",
+    "cómo afrontaste el problema",
+    "toma de decisiones difíciles",
+    "resolución de problemas",
+  ],
+  searchText:
+    "obstáculos en proyectos resolución problemas decisiones de diseño investigación estratégica patrones de diseño componentes modulares arquitectura información escalabilidad checkout conversión reducción abandono ui confianza impacto negocio",
+  followupIds: [
+    "impact_hard_decisions",
+    "methods_overview",
+    "impact_overview",
+  ],
+},
+
 
 
 {
@@ -633,11 +764,13 @@ export const FAQ_GRAPH: FAQNode[] = [
   match: [
     "¿cuál fue tu proyecto más complejo?",
     "cual fue tu proyecto mas complejo",
-    "tu proyecto mas complejo",
     "proyecto más complejo",
     "proyecto mas complejo",
-    "reto mas complejo",
     "reto más complejo",
+    "reto mas complejo",
+    "proyecto de mayor escala",
+    "proyecto más grande",
+    "mayor alcance",
   ],
   searchText:
     "Proyecto más complejo. Repsol. Rediseño Portal Global del Empleado. Alcance 15 países. +25.000 empleados. Diseñar experiencia coherente para múltiples culturas, roles y necesidades técnicas sin perder eficiencia operativa.",
