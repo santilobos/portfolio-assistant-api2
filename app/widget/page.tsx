@@ -267,6 +267,23 @@ export default function Widget() {
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Intentamos detectar la URL. 
+      // Si el widget está en un subdominio, buscamos "/repsol" en la ruta
+      const path = window.location.pathname.toLowerCase();
+      const search = window.location.search.toLowerCase();
+      
+      if (path.includes("repsol") || search.includes("repsol")) {
+        setConfig(CONFIG_PROYECTOS.repsol);
+      } else {
+        setConfig(CONFIG_PROYECTOS.default);
+      }
+    }
+  }, [introKey]);
+
+  
+
   // ✅ NUEVO: Detección de URL para cambiar Título y Botones
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
