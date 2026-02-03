@@ -20,10 +20,10 @@ const aeonik = localFont({
 })
 
 // --- CONFIGURACIÓN DINÁMICA ---
-const CONFIG_PROYECTOS: Record<string, { titulo: string; followUps: { label: string; id: string }[] }> = {
+const CONFIG_PROYECTOS: Record<string, { titulo: string; questions: { label: string; id: string }[] }> = {
   repsol: {
     titulo: "Pregunta sobre el case de Repsol...",
-    followUps: [
+    questions: [
       { label: "¿Qué metodología empleaste?", id: "cs_repsol_metodologia" },
       { label: "¿Cuál era el problema inicial?", id: "cs_repsol_contexto_problema" },
       { label: "¿Cuál fue tu rol en el proyecto?", id: "cs_repsol_rol_responsabilidades" }
@@ -31,7 +31,7 @@ const CONFIG_PROYECTOS: Record<string, { titulo: string; followUps: { label: str
   },
   default: {
     titulo: "¿Qué quieres saber?",
-    followUps: [
+    questions: [
       { label: "¿Cuál fue tu proyecto más complejo?", id: "profile_most_complex_project" },
       { label: "¿Qué metodologías utilizas?", id: "methods_overview" },
       { label: "¿Cómo enfocas el liderazgo?", id: "ls_vision_general" }
@@ -142,7 +142,7 @@ function RenderAssistantText({ text }: { text: string }) {
   );
 }
 
-// --- COMPONENTE PRINCIPAL WIDGET ---
+// --- CONSTANTES ---
 const OUT_OF_SCOPE_FOLLOWUPS = ["¿Quieres que te cuente un proyecto con métricas?", "¿Te interesa más mis conocimientos en Design System?", "¿Prefieres que te hable de mi proceso de diseño?"];
 
 function isCompensationQuestion(q: string) {
@@ -150,6 +150,7 @@ function isCompensationQuestion(q: string) {
   return t.includes("salario") || t.includes("sueldo") || t.includes("cuanto cobras") || t.includes("expectativa salarial") || t.includes("salary");
 }
 
+// --- COMPONENTE PRINCIPAL ---
 export default function Widget() {
   const [messages, setMessages] = React.useState<Msg[]>([]);
   const [input, setInput] = React.useState("");
@@ -157,34 +158,51 @@ export default function Widget() {
   const [introKey, setIntroKey] = React.useState(0);
   const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([]);
   const [askedQuestions, setAskedQuestions] = React.useState<string[]>([]);
-  
-  // MEJORA: config inicializado en null para forzar detección de URL
   const [config, setConfig] = React.useState<any>(null);
 
+  const hasText = input.trim().length > 0;
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
-  // EFECTO CRÍTICO: Detección de URL
+  const REPSOL_MAP: Record<string, string> = {
+    "¿qué hiciste para repsol?": "cs_repsol_overview",
+    "¿qué problema detectaste en repsol?": "cs_repsol_contexto_problema",
+    "¿cual fue tu rol y responsabilidad en repsol?": "cs_repsol_rol_responsabilidades",
+    "¿qué metodología empleaste en repsol?": "cs_repsol_metodologia",
+    "¿cómo llevaste a cabo la fase de investigación en repsol?": "cs_repsol_research_discovery",
+    "¿qué decisiones de diseño tomaste en repsol?": "cs_repsol_decisiones_diseno",
+    "¿cómo fue la relación con negocio y desarrollo en repsol?": "cs_repsol_colaboracion",
+    "¿cuál fue el impacto de tu trabajo en repsol?": "cs_repsol_metricas_impacto",
+    "¿qué aprendiste en el proyecto de repsol?": "cs_repsol_aprendizajes"
+  };
+
   React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const caseSlug = params.get("case");
-    if (caseSlug && CONFIG_PROYECTOS[caseSlug]) {
-      setConfig(CONFIG_PROYECTOS[caseSlug]);
-    } else {
-      setConfig(CONFIG_PROYECTOS.default);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const caseSlug = params.get("case")?.toLowerCase();
+      
+      if (caseSlug && CONFIG_PROYECTOS[caseSlug]) {
+        setConfig(CONFIG_PROYECTOS[caseSlug]);
+      } else {
+        setConfig(CONFIG_PROYECTOS.default);
+      }
     }
-  }, []);
+  }, [introKey]);
 
   const autosizeTextArea = React.useCallback(() => {
-    const el = textAreaRef.current; if (!el) return;
+    const el = textAreaRef.current;
+    if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight, 150)}px`;
+    const nextHeight = Math.min(el.scrollHeight, 150);
+    el.style.height = `${nextHeight}px`;
     el.style.overflowY = el.scrollHeight > 150 ? "auto" : "hidden";
   }, []);
 
   React.useEffect(() => {
-    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
   }, [messages, loading, dynamicFollowUps]);
 
   const typeText = (fullText: string, suggestions?: string[]) => {
@@ -199,125 +217,141 @@ export default function Widget() {
         if (last && last.role === "assistant") last.content = chunk;
         return next;
       });
+
       if (i >= fullText.length) {
-        clearInterval(typingIntervalRef.current!);
+        if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
         setLoading(false);
-        if (suggestions) {
-            setDynamicFollowUps(suggestions.filter(s => !askedQuestions.includes(s.toLowerCase().trim())).slice(0, 3));
+        if (suggestions && suggestions.length > 0) {
+          // Filtrar por preguntas ya hechas antes de mostrar
+          const filtered = suggestions.filter(s => !askedQuestions.includes(s.toLowerCase().trim()));
+          setDynamicFollowUps(filtered.slice(0, 3));
         }
       }
     }, 15);
   };
 
   async function send(text?: string, nodeId?: string) {
-    const rawInput = (text || input).trim();
-    if (!rawInput || loading) return;
+    const q = (text ?? input).trim();
+    if (!q || loading) return;
 
-    setAskedQuestions((prev) => [...prev, rawInput.toLowerCase().trim()]);
+    // Registrar la pregunta actual en el historial
+    setAskedQuestions((prev) => [...prev, q.toLowerCase().trim()]);
     setInput("");
     if (textAreaRef.current) textAreaRef.current.style.height = "auto";
 
     setLoading(true);
     setDynamicFollowUps([]);
 
-    const newMessages: Msg[] = [...messages, { role: "user", content: rawInput }];
+    const newMessages: Msg[] = [...messages, { role: "user", content: q }];
     setMessages([...newMessages, { role: "assistant", content: "" }]);
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-            messages: newMessages,
-            nodeId: nodeId || null // MEJORA: Enviamos ID técnico si existe
-        }),
+        body: JSON.stringify({ messages: newMessages, nodeId: nodeId || null }),
       });
-      
-      if (!res.ok) throw new Error();
+
       const data = await res.json();
-      
       const mainContent = sanitizeAssistantText(data?.reply ?? "");
-      const apiFollowups = Array.isArray(data?.followups) ? data.followups : [];
-      
-      const finalSuggestions = apiFollowups.length > 0 
-        ? apiFollowups 
-        : isCompensationQuestion(rawInput) 
-          ? [...OUT_OF_SCOPE_FOLLOWUPS] 
-          : [];
+      let apiFollowups: string[] = Array.isArray(data?.followups) ? data.followups : [];
 
-      typeText(mainContent, finalSuggestions);
+      const params = new URLSearchParams(window.location.search);
+      const isRepsol = params.get("case") === "repsol";
 
+      if (isRepsol) {
+        apiFollowups = apiFollowups.filter((f: string) => {
+          if (!f) return false;
+          const key = f.toLowerCase().trim();
+          // Solo permitir si está en el mapa Y no ha sido preguntada aún
+          return Object.prototype.hasOwnProperty.call(REPSOL_MAP, key) && !askedQuestions.includes(key);
+        });
+
+        if (apiFollowups.length === 0) {
+          // Fallback con preguntas que rotan si la IA se queda sin ideas
+          const allRepsolQuestions = Object.keys(REPSOL_MAP);
+          apiFollowups = allRepsolQuestions
+            .filter(q => !askedQuestions.includes(q.toLowerCase()))
+            .slice(0, 3);
+        }
+      } else {
+        // En caso default también filtramos por historial
+        apiFollowups = apiFollowups.filter(f => !askedQuestions.includes(f.toLowerCase().trim()));
+      }
+
+      typeText(mainContent, apiFollowups);
     } catch (e) {
       setLoading(false);
       setMessages((prev) => {
         const next = [...prev];
         const last = next[next.length - 1];
-        if (last) last.content = "Mmm parece que algo ha fallado. ¿Podrías intentarlo de nuevo?";
+        if (last) last.content = "Lo siento, ha habido un error en la conexión.";
         return next;
       });
     }
   }
 
-  // Prevenir renderizado hasta que config esté cargado
+  const handleReset = () => {
+    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+    setMessages([]);
+    setInput("");
+    setLoading(false);
+    setDynamicFollowUps([]);
+    setAskedQuestions([]);
+    setIntroKey(prev => prev + 1);
+  };
+
   if (!config) return null;
 
   return (
-    <div className={`${styles.app} ${azeret.variable} ${aeonik.variable}`}>
-      <ChatHeader 
-        onReset={() => { 
-            setMessages([]); 
-            setAskedQuestions([]); 
-            setIntroKey(k => k+1); 
-            setDynamicFollowUps([]);
-        }} 
-        onClose={() => {}} 
-      />
-      
+    <div className={`${styles.app} ${azeret.variable}`}>
+      <ChatHeader onReset={handleReset} onClose={() => {}} />
+
       <div ref={listRef} className={styles.messages}>
         <AnimatePresence mode="popLayout">
           {messages.length === 0 ? (
             <motion.div key={`intro-${introKey}`} className={styles.intro} variants={containerVariants} initial="hidden" animate="visible">
               <motion.div variants={itemVariants} className={styles.chatTitle}>{config.titulo}</motion.div>
               <motion.div variants={containerVariants} className={styles.quickGrid}>
-                {config.followUps.map((item: any) => (
-                  <motion.button 
-                    key={item.id} 
-                    variants={itemVariants} 
-                    onClick={() => send(item.label, item.id)} 
-                    className={styles.quickBtn}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {item.label}
+                {config.questions?.map((q: any) => (
+                  <motion.button key={q.id} variants={itemVariants} onClick={() => send(q.label, q.id)} className={styles.quickBtn} whileTap={{ scale: 0.98 }}>
+                    {q.label}
                   </motion.button>
                 ))}
               </motion.div>
             </motion.div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              {messages.map((m, i) => (
-                <div key={i} className={m.role === "user" ? styles.userRow : styles.assistantRow}>
-                  {m.role === "user" ? <div className={styles.userBubble}>{m.content}</div> : (
-                    <>
-                      {m.content === "" && loading ? (
-                        <div className={styles.thinking}>
-                          <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5 }}>Pensando</motion.span>
+              {messages.map((m, i) => {
+                const isLastAssistant = m.role === "assistant" && i === messages.length - 1;
+                if (m.role === "user") return (
+                  <div key={i} className={styles.userRow}><div className={styles.userBubble}>{m.content}</div></div>
+                );
+                return (
+                  <div key={i} className={styles.assistantRow}>
+                    {m.content === "" && loading && isLastAssistant ? (
+                      <div className={styles.thinking}>Pensando</div>
+                    ) : (
+                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+                        <RenderAssistantText text={m.content} />
+                      </motion.div>
+                    )}
+                    {isLastAssistant && !loading && dynamicFollowUps.length > 0 && (
+                      <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className={styles.followUpsContainer}>
+                        <div className={styles.divider} />
+                        <div className={styles.followUps}>
+                          {dynamicFollowUps.map((q) => {
+                            const id = REPSOL_MAP[q.toLowerCase().trim()];
+                            return (
+                              <button key={q} onClick={() => send(q, id)} className={styles.followUpBtn}>{q}</button>
+                            );
+                          })}
                         </div>
-                      ) : <RenderAssistantText text={m.content} />}
-                      
-                      {i === messages.length - 1 && !loading && dynamicFollowUps.length > 0 && (
-                        <div className={styles.followUpsContainer}>
-                          <div className={styles.divider} />
-                          <div className={styles.followUps}>
-                            {dynamicFollowUps.map(q => (
-                              <button key={q} onClick={() => send(q)} className={styles.followUpBtn}>{q}</button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              ))}
+                      </motion.div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </AnimatePresence>
@@ -325,17 +359,19 @@ export default function Widget() {
 
       <div className={styles.inputContainer}>
         <div className={styles.composer}>
-          <textarea 
-            ref={textAreaRef} 
-            value={input} 
-            onChange={e => { setInput(e.target.value); autosizeTextArea(); }} 
-            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }} 
-            className={styles.textArea} 
-            placeholder="Escribe aquí..." 
-            rows={1} 
+          <textarea
+            ref={textAreaRef}
+            value={input}
+            onChange={(e) => { setInput(e.target.value); autosizeTextArea(); }}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+            className={styles.textArea}
+            placeholder="Escribe aquí..."
+            rows={1}
           />
-          <button onClick={() => send()} disabled={loading || !input.trim()} className={`${styles.sendBtn} ${input.trim() ? styles.sendBtnActive : ""}`}>
-            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor"><path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z" /></svg>
+          <button onClick={() => send()} disabled={loading || !hasText} className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ""}`}>
+            <svg width="24" height="24" viewBox="0 0 960 960" fill="currentColor">
+              <path d="M120 760v-240l320-80-320-80V120l760 320-760 320Z" />
+            </svg>
           </button>
         </div>
       </div>
