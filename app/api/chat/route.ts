@@ -10,6 +10,7 @@ type Locale = "es-ES" | "en-US"
 type ChatBody = {
   messages: Array<{ role: "user" | "assistant" | "system"; content: string }>
   locale?: Locale
+  nodeId?: string // <--- Añade esto
 }
 
 type ChatResponse = {
@@ -357,11 +358,29 @@ export async function POST(req: Request) {
     const body = (await req.json()) as ChatBody
     const locale: Locale = body.locale ?? "es-ES"
     const messages = body.messages ?? []
+    const nodeId = body.nodeId // <--- Capturamos el ID enviado desde el front
 
     const lastUser =
       [...messages].reverse().find((m) => m.role === "user")?.content ?? ""
 
-    // Guard: input vacío
+    // 1. PRIORIDAD ABSOLUTA: Si existe nodeId, respondemos directamente del Graph
+    if (nodeId) {
+      const directNode = FAQ_GRAPH.find((n) => n.id === nodeId && n.locale === locale)
+      
+      if (directNode) {
+        const fromIds = directNode.followupIds
+          ? mapFollowupIdsToQuestions(directNode.followupIds, locale)
+          : []
+
+        // Devolvemos la respuesta del nodo sin pasar por el LLM
+        return Response.json({ 
+          reply: directNode.answer, 
+          followups: ensureThreeFollowups(fromIds, SAFE_FOLLOWUP_POOLS.general) 
+        })
+      }
+    }
+
+    // Guard: input vacío (solo si no hay nodeId)
     if (!lastUser.trim()) {
       return Response.json({
         reply:
@@ -370,13 +389,12 @@ export async function POST(req: Request) {
       })
     }
 
-    // ✅ Importante: aquí asumo que extractAnsweredQuestions devuelve Set<string>
     const answered = extractAnsweredQuestions(messages, locale)
 
     const filterAlreadyAnswered = (qs: string[]) =>
       (qs || []).filter((q) => !answered.has(normalizeQuestion(q)))
 
-    // 1) GRAPH (determinista)
+    // 2) GRAPH (determinista por texto)
     const node = matchGraph(lastUser, locale)
     if (node) {
       const fromIds = node.followupIds
@@ -391,7 +409,7 @@ export async function POST(req: Request) {
       return Response.json({ reply: node.answer, followups })
     }
 
-    // 2) EMBEDDINGS → RAG-lite con LLM (ajuste de intención)
+    // 3) EMBEDDINGS → RAG-lite con LLM
     const retrievedList = await semanticRetrieveTopKWithScore(lastUser, locale, {
       threshold: 0.3,
       topK: 3,
@@ -399,13 +417,10 @@ export async function POST(req: Request) {
 
     if (retrievedList.length) {
       const top = retrievedList[0].node
-
-      // followups "guiados" del nodo top (siempre preferibles)
       const fromIds = top.followupIds
         ? mapFollowupIdsToQuestions(top.followupIds, locale)
         : []
 
-      // ✅ followups deterministas del nodo, filtrados por "ya preguntado"
       const followups = ensureThreeFollowups(
         filterAlreadyAnswered(fromIds),
         SAFE_FOLLOWUP_POOLS.general
@@ -450,20 +465,11 @@ export async function POST(req: Request) {
 
       const raw = completion.choices[0]?.message?.content || "{}"
       let parsed: ChatResponse = { reply: "", followups: [] }
-
       try {
         parsed = JSON.parse(raw) as ChatResponse
       } catch {
         parsed = { reply: raw, followups: [] }
       }
-
-      // ✅ Blindaje: solo followups que existan en graph o safe pools
-      const safeFollowups = filterFollowupsToGraph(parsed.followups ?? [], locale)
-      const filteredSafe = filterAlreadyAnswered(safeFollowups)
-
-      // ⚠️ En RAG-lite, mantenemos followups deterministas del nodo (los de arriba).
-      // Si quieres que el LLM pueda proponer followups (pero filtrados), usa:
-      // const followups = ensureThreeFollowups(filteredSafe, SAFE_FOLLOWUP_POOLS.general)
 
       return Response.json({
         reply: (parsed.reply ?? "").toString(),
@@ -471,7 +477,7 @@ export async function POST(req: Request) {
       })
     }
 
-    // 3) LLM fallback ANCLADO A GRAPH
+    // 4) LLM fallback ANCLADO A GRAPH
     const ctxNodes = await semanticRetrieveTopKNodes(lastUser, locale, {
       topK: 6,
       threshold: 0.28,
@@ -499,17 +505,14 @@ export async function POST(req: Request) {
 
     const raw = completion.choices[0]?.message?.content || "{}"
     let parsed: ChatResponse = { reply: "", followups: [] }
-
     try {
       parsed = JSON.parse(raw) as ChatResponse
     } catch {
       parsed = { reply: raw, followups: [] }
     }
 
-    // ✅ Blindaje + no repetir ya respondidas
     const safeFollowups = filterFollowupsToGraph(parsed.followups ?? [], locale)
     const filteredSafe = filterAlreadyAnswered(safeFollowups)
-
     const followups = ensureThreeFollowups(filteredSafe, SAFE_FOLLOWUP_POOLS.general)
 
     return Response.json({

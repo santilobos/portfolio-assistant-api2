@@ -415,3 +415,184 @@ textarea::placeholder {
 .assistantText a:hover {
   opacity: 0.8; /* Efecto visual al pasar el ratón */
 }
+
+
+
+
+/*
+
+import * as React from "react"
+import { createStore } from "https://framer.com/m/framer/store.js@^1.0.0"
+
+// Estado global para controlar la apertura del chat
+const useStore = createStore({
+    isChatOpen: false,
+})
+
+// 1. BOTÓN TRIGGER (CHATLLM)
+export function ChatButtonTrigger(Component): React.ComponentType {
+    return (props) => {
+        const [store, setStore] = useStore()
+        return (
+            <Component
+                {...props}
+                style={{
+                    ...props.style,
+                    cursor: "pointer",
+                    display: store.isChatOpen ? "none" : "flex",
+                }}
+                onClick={() => setStore({ isChatOpen: true })}
+            />
+        )
+    }
+}
+
+// 2. VERSIÓN ESTABLE: SIDE PANEL DESKTOP
+export function SidePanelDesktop(Component): React.ComponentType {
+    return (props) => {
+        const [store, setStore] = useStore()
+        const [isClient, setIsClient] = React.useState(false)
+
+        React.useEffect(() => {
+            // Solo activamos el renderizado en el cliente para evitar errores de servidor
+            setIsClient(true)
+
+            const handleMessage = (e) => {
+                if (e.data === "close-widget") setStore({ isChatOpen: false })
+            }
+            window.addEventListener("message", handleMessage)
+            return () => window.removeEventListener("message", handleMessage)
+        }, [setStore])
+
+        // Si el servidor de Framer intenta renderizar, devolvemos un placeholder invisible
+        if (!isClient) return <div style={{ width: 0 }} />
+
+        return (
+            <Component
+                {...props}
+                animate={{
+                    // Animación de ancho estándar que empuja el contenido
+                    width: store.isChatOpen ? 400 : 0,
+                    opacity: store.isChatOpen ? 1 : 0,
+                }}
+                initial={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                style={{
+                    ...props.style,
+                    position: "relative",
+                    display: "flex",
+                    overflow: "hidden",
+                    // Mantenemos el iframe cargado para que sea visible al abrir
+                    visibility: store.isChatOpen ? "visible" : "hidden",
+                    pointerEvents: store.isChatOpen ? "all" : "none",
+                    // Fix de color de fondo para evitar parpadeos de carga [cite: 2025-12-24]
+                    backgroundColor: "#ffffff",
+                }}
+            />
+        )
+    }
+}
+
+// 3. SIDE PANEL MOBILE (Fixed / Overlay) — ajusta altura con visualViewport (evita que el teclado tape el textarea)
+export function SidePanelMobile(Component): React.ComponentType {
+    return (props) => {
+        const [store, setStore] = useStore()
+        const [isClient, setIsClient] = React.useState(false)
+
+        // Altura/top dinámicos según visualViewport (teclado)
+        const [vv, setVv] = React.useState<{ top: number; height: number }>({
+            top: 0,
+            height: 0,
+        })
+
+        React.useEffect(() => {
+            setIsClient(true)
+
+            const handleMessage = (e) => {
+                if (e.data === "close-widget") setStore({ isChatOpen: false })
+            }
+            window.addEventListener("message", handleMessage)
+
+            return () => window.removeEventListener("message", handleMessage)
+        }, [setStore])
+
+        React.useEffect(() => {
+            if (!isClient) return
+
+            const updateFromViewport = () => {
+                const vvp = window.visualViewport
+
+                // Fallback si no existe visualViewport
+                if (!vvp) {
+                    setVv({ top: 0, height: window.innerHeight })
+                    return
+                }
+
+                // En iOS: offsetTop puede cambiar con el teclado / barras
+                setVv({
+                    top: Math.round(vvp.offsetTop || 0),
+                    height: Math.round(vvp.height || window.innerHeight),
+                })
+            }
+
+            updateFromViewport()
+
+            const vvp = window.visualViewport
+            if (vvp) {
+                vvp.addEventListener("resize", updateFromViewport)
+                vvp.addEventListener("scroll", updateFromViewport)
+            }
+            window.addEventListener("resize", updateFromViewport)
+
+            return () => {
+                if (vvp) {
+                    vvp.removeEventListener("resize", updateFromViewport)
+                    vvp.removeEventListener("scroll", updateFromViewport)
+                }
+                window.removeEventListener("resize", updateFromViewport)
+            }
+        }, [isClient])
+
+        if (!isClient) return <div style={{ display: "none" }} />
+
+        const panelTop = vv.height ? vv.top : 0
+        const panelHeight = vv.height ? vv.height : undefined // si no hay vv, no forzamos
+
+        return (
+            <Component
+                {...props}
+                // Slide sin transform
+                initial={{ left: "100%", opacity: 0 }}
+                animate={{
+                    left: store.isChatOpen ? "0%" : "100%",
+                    opacity: store.isChatOpen ? 1 : 0,
+                }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                style={{
+                    ...props.style,
+
+                    position: "fixed",
+                    left: undefined, // lo controla framer por animate
+                    right: 0,
+                    width: "100vw",
+
+                    // ✅ clave: el panel se ajusta al área visible (sin teclado)
+                    top: panelTop,
+                    height: panelHeight,
+
+                    // ✅ no uses bottom cuando controlas height, evita conflictos
+                    bottom: "auto",
+
+                    zIndex: 99999,
+                    backgroundColor: "#ffffff",
+
+                    pointerEvents: store.isChatOpen ? "auto" : "none",
+                    visibility: store.isChatOpen ? "visible" : "hidden",
+
+                    // Importante: no bloquees el comportamiento interno del iframe
+                    overflow: "hidden",
+                }}
+            />
+        )
+    }
+}

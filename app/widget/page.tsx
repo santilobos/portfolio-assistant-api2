@@ -19,7 +19,25 @@ const aeonik = localFont({
   variable: "--font-aeonik"
 })
 
-// --- Esta línea es solo para el git ---
+// --- CONFIGURACIÓN DE CASOS ---
+const CONFIG_PROYECTOS: Record<string, { titulo: string; questions: { label: string; id: string }[] }> = {
+  repsol: {
+    titulo: "Te resumo el case de Repsol...",
+    questions: [
+      { label: "Cuál era el problema inicial?", id: "cs_repsol_contexto_problema" },
+      { label: "Qué metodología empleaste?", id: "cs_repsol_metodologia" },
+      { label: "Cuál fue tu rol en el proyecto?", id: "cs_repsol_rol_responsabilidades" }
+    ]
+  },
+  default: {
+    titulo: "¿Qué quieres saber?",
+    questions: [
+      { label: "¿Cuál fue tu proyecto más complejo?", id: "profile_most_complex_project" },
+      { label: "¿Qué metodologías utilizas?", id: "methods_overview" },
+      { label: "¿Como enfocas el liderazgo en diseño de producto?", id: "ls_vision_general" }
+    ]
+  }
+}
 
 // --- 1. VARIANTES DE ANIMACIÓN ---
 const containerVariants: Variants = {
@@ -240,67 +258,51 @@ export default function Widget() {
   const [introKey, setIntroKey] = React.useState(0);
   const [dynamicFollowUps, setDynamicFollowUps] = React.useState<string[]>([]);
   const [askedQuestions, setAskedQuestions] = React.useState<string[]>([]);
+  
+  // ✅ NUEVO: Estado para configuración de URL
+  const [config, setConfig] = React.useState<any>(null);
+
   const hasText = input.trim().length > 0;
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const typingIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
+
+  // ✅ NUEVO: Detección de URL para cambiar Título y Botones
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const caseSlug = params.get("case");
+    if (caseSlug && CONFIG_PROYECTOS[caseSlug]) {
+      setConfig(CONFIG_PROYECTOS[caseSlug]);
+    } else {
+      setConfig(CONFIG_PROYECTOS.default);
+    }
+  }, [introKey]); // Se refresca si reiniciamos el chat
 
   const autosizeTextArea = React.useCallback(() => {
-  const el = textAreaRef.current
-  if (!el) return
+    const el = textAreaRef.current
+    if (!el) return
+    el.style.height = "auto"
+    const maxHeight = 150 
+    const nextHeight = Math.min(el.scrollHeight, maxHeight)
+    el.style.height = `${nextHeight}px`
+    el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden"
+  }, [])
 
-  el.style.height = "auto"
-
-  const maxHeight = 150 // mismo valor que en CSS
-  const nextHeight = Math.min(el.scrollHeight, maxHeight)
-
-  el.style.height = `${nextHeight}px`
-
-  // Evita la franja gris del scrollbar
-  el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden"
-}, [])
-
-
-  // ✅ NEW: ref + focus sin scroll para evitar que el header “salte” en el primer focus en mobile
-  const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
-  const focusWithoutScroll = React.useCallback(() => {
-    const el = textAreaRef.current;
-    if (!el) return;
-    try {
-      (el as any).focus({ preventScroll: true });
-    } catch {
-      el.focus();
-    }
-  }, []);
-
-  const quick = [
-    "¿Cuál fue tu proyecto más complejo?",
-    "¿Qué metodologías utilizas?",
-    "¿Cómo enfocas el liderazgo en diseño de producto?",
-  ];
-
+  // Viewport & Keyboard Logic (Original)
   React.useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-
     const setVars = () => {
-      // keyboard height aproximada (Android Chrome)
       const kbd = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
       document.documentElement.style.setProperty("--kbd", `${kbd}px`);
     };
-
-    // 1) inicial
     setVars();
-
-    // 2) cambios reales del visual viewport
     vv.addEventListener("resize", setVars);
     vv.addEventListener("scroll", setVars);
-
-    // 3) IMPORTANTÍSIMO: cuando haces focus, a veces NO hay resize hasta que tecleas
     const onFocusIn = () => requestAnimationFrame(setVars);
     const onFocusOut = () => requestAnimationFrame(setVars);
     window.addEventListener("focusin", onFocusIn);
     window.addEventListener("focusout", onFocusOut);
-
     return () => {
       vv.removeEventListener("resize", setVars);
       vv.removeEventListener("scroll", setVars);
@@ -310,61 +312,31 @@ export default function Widget() {
   }, []);
 
   React.useEffect(() => {
-  const vv = window.visualViewport
-  if (!vv) return
-
-  let locked = false
-
-  const lock = () => {
-    if (locked) return
-    locked = true
-    document.documentElement.style.overflow = "hidden"
-    document.body.style.overflow = "hidden"
-  }
-
-  const unlock = () => {
-    if (!locked) return
-    locked = false
-    document.documentElement.style.overflow = ""
-    document.body.style.overflow = ""
-  }
-
-  const sync = () => {
-    const kbd = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
-    if (kbd > 0) lock()
-    else unlock()
-  }
-
-  // inicial + listeners
-  sync()
-  vv.addEventListener("resize", sync)
-  vv.addEventListener("scroll", sync)
-  window.addEventListener("focusin", sync)
-  window.addEventListener("focusout", sync)
-
-  return () => {
-    vv.removeEventListener("resize", sync)
-    vv.removeEventListener("scroll", sync)
-    window.removeEventListener("focusin", sync)
-    window.removeEventListener("focusout", sync)
-    unlock()
-  }
-}, [])
-
+    const vv = window.visualViewport
+    if (!vv) return
+    let locked = false
+    const lock = () => { if (locked) return; locked = true; document.documentElement.style.overflow = "hidden"; document.body.style.overflow = "hidden"; }
+    const unlock = () => { if (!locked) return; locked = false; document.documentElement.style.overflow = ""; document.body.style.overflow = ""; }
+    const sync = () => {
+      const kbd = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      if (kbd > 0) lock()
+      else unlock()
+    }
+    sync()
+    vv.addEventListener("resize", sync); vv.addEventListener("scroll", sync);
+    window.addEventListener("focusin", sync); window.addEventListener("focusout", sync);
+    return () => {
+      vv.removeEventListener("resize", sync); vv.removeEventListener("scroll", sync);
+      window.removeEventListener("focusin", sync); window.removeEventListener("focusout", sync);
+      unlock()
+    }
+  }, [])
 
   React.useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
   }, [messages, loading, dynamicFollowUps]);
-
-  React.useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      window.parent.postMessage({ type: "widget-mouse-move", x: e.clientX, y: e.clientY }, "*");
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
 
   const typeText = (fullText: string, suggestions?: string[]) => {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
@@ -404,33 +376,25 @@ export default function Widget() {
     if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     setMessages([]);
     setInput("");
-
-    // ✅ NEW: resetea altura del textarea si venía “alto”
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
-    }
-
+    if (textAreaRef.current) textAreaRef.current.style.height = "auto";
     setLoading(false);
     setDynamicFollowUps([]);
     setAskedQuestions([]);
     setIntroKey((prev) => prev + 1);
   };
 
-  async function send(text?: string) {
+ async function send(text?: string, nodeId?: string) {
     const q = (text ?? input).trim();
     if (!q || loading) return;
 
     setAskedQuestions((prev) => [...prev, q.toLowerCase().trim()]);
     setInput("");
-
-    // ✅ NEW: resetea altura del textarea tras enviar
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
-    }
+    if (textAreaRef.current) textAreaRef.current.style.height = "auto";
 
     setLoading(true);
     setDynamicFollowUps([]);
 
+    // Mantenemos el historial para la UI, pero...
     const newMessages: Msg[] = [...messages, { role: "user", content: q }];
     setMessages([...newMessages, { role: "assistant", content: "" }]);
 
@@ -438,13 +402,32 @@ export default function Widget() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ 
+          // 1. Enviamos el historial
+          messages: newMessages,
+          // 2. Enviamos el ID técnico. 
+          // IMPORTANTE: Tu API debe estar programada para que si 'nodeId' existe, 
+          // ignore el motor de búsqueda semántica y devuelva ese nodo exacto.
+          nodeId: nodeId || null,
+          // 3. Opcional: enviamos el caso actual como contexto extra
+          currentCase: new URLSearchParams(window.location.search).get("case") 
+        }),
       });
+
+      if (!res.ok) throw new Error("API Error");
+
       const data = await res.json();
       const mainContent = sanitizeAssistantText(data?.reply ?? "");
+      
+      // Si la API devuelve followups específicos del nodo de Repsol, los usamos
       const apiFollowups = Array.isArray(data?.followups) ? data.followups : [];
-      const finalSuggestions =
-        apiFollowups.length > 0 ? apiFollowups : isCompensationQuestion(q) ? [...OUT_OF_SCOPE_FOLLOWUPS] : [];
+      
+      const finalSuggestions = apiFollowups.length > 0 
+        ? apiFollowups 
+        : isCompensationQuestion(q) 
+          ? [...OUT_OF_SCOPE_FOLLOWUPS] 
+          : [];
+
       typeText(mainContent, finalSuggestions);
     } catch (e) {
       setLoading(false);
@@ -456,6 +439,9 @@ export default function Widget() {
       });
     }
   }
+
+  // Si aún no hemos detectado la URL, no pintamos nada para evitar el flash de "default"
+  if (!config) return null;
 
   return (
     <div className={`${styles.app} ${azeret.variable}`}>
@@ -472,22 +458,22 @@ export default function Widget() {
               animate="visible"
             >
               <motion.div variants={itemVariants} className={styles.chatTitle}>
-                Qué quieres saber?
+                {config.titulo}
               </motion.div>
               <motion.div variants={containerVariants} className={styles.quickGrid}>
-                {quick
-                  .filter((q) => !askedQuestions.includes(q.toLowerCase().trim()))
-                  .map((q) => (
-                    <motion.button
-                      key={q}
-                      variants={itemVariants}
-                      onClick={() => send(q)}
-                      className={styles.quickBtn}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {q}
-                    </motion.button>
-                  ))}
+                {/* ✅ DINÁMICO: Preguntas basadas en la URL del Case Study */}
+                {config.questions.map((q: any) => (
+  <motion.button
+    key={q.id}
+    variants={itemVariants}
+    // PASO IMPORTANTE: Aquí enviamos el ID técnico
+    onClick={() => send(q.label, q.id)} 
+    className={styles.quickBtn}
+    whileTap={{ scale: 0.98 }}
+  >
+    {q.label}
+  </motion.button>
+))}
               </motion.div>
             </motion.div>
           ) : (
@@ -536,24 +522,22 @@ export default function Widget() {
       <div className={styles.inputContainer}>
         <div className={styles.composer}>
           <textarea
-  ref={textAreaRef}
-  value={input}
-  onFocus={() => {
-    // opcional: re-asegura scroll abajo
-    requestAnimationFrame(() => {
-      if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
-    })
-  }}
-  onChange={(e) => {
-    setInput(e.target.value)
-    autosizeTextArea()
-  }}
-  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-  className={styles.textArea}
-  placeholder="Escribe aquí..."
-  rows={1}
-/>
-
+            ref={textAreaRef}
+            value={input}
+            onFocus={() => {
+              requestAnimationFrame(() => {
+                if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
+              })
+            }}
+            onChange={(e) => {
+              setInput(e.target.value)
+              autosizeTextArea()
+            }}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+            className={styles.textArea}
+            placeholder="Escribe aquí..."
+            rows={1}
+          />
           <button
             onClick={() => send()}
             disabled={loading || !hasText}
